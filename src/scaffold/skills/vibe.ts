@@ -11,7 +11,7 @@ description: Start or continue working on an idea. Usage: /vibe [idea descriptio
 
 ## Step 1: Orient
 
-Read \`CLAUDE.md\` and \`vibestate.md\`. Run \`git branch\` and \`git status\`. Do not narrate this.
+Read \`CLAUDE.md\` and \`vibestate.md\`. Run \`git branch\` and \`git status\`. Do not narrate this. State the current mode (simple or detailed) in one word: "Mode: <mode>".
 
 ## Step 2: Branch routing
 
@@ -63,7 +63,7 @@ Read these files to understand current state:
 - \`vibestate.md\` — active feature, done log, notes
 - Run \`git branch\` and \`git status\`
 
-Summarize the current state in 2-3 sentences.
+State the current mode from CLAUDE.md: "Mode: <mode>". Summarize the current state in 2-3 sentences.
 
 ## Step 2: Branch routing
 
