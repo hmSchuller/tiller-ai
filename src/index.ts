@@ -1,8 +1,7 @@
 import { Command } from 'commander';
 import { initCommand } from './commands/init.js';
 import { upgradeCommand } from './commands/upgrade.js';
-import { modeCommand } from './commands/mode.js';
-import { workflowCommand } from './commands/workflow.js';
+import { configCommand } from './commands/config.js';
 
 const program = new Command();
 
@@ -22,17 +21,8 @@ program
   .action(upgradeCommand);
 
 program
-  .command('mode')
-  .description('Switch between simple and detailed mode')
-  .argument('<mode>', 'Mode: simple or detailed')
-  .option('--project', 'Set the shared project default instead of your personal override')
-  .action(modeCommand);
-
-program
-  .command('workflow')
-  .description('Switch between solo and team workflow')
-  .argument('<workflow>', 'Workflow: solo or team')
-  .option('--project', 'Set the shared project default instead of your personal override')
-  .action(workflowCommand);
+  .command('config')
+  .description('Interactively update mode and workflow settings')
+  .action(configCommand);
 
 program.parse();

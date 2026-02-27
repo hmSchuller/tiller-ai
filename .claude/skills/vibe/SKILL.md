@@ -51,7 +51,7 @@ Before planning, check if a tech debt cleanup is due:
 - 2–5 numbered milestones, each with: what gets built + what gets tested
 - Files to create or modify
 - Any trade-offs worth noting
-- **Execution rules** (embed verbatim): After plan approval, read `vibestate.md` to find the milestone checklist, then execute the milestone loop: for each remaining milestone, announce "Milestone X/N: <description>", build functionality, add or update tests, run `` and fix failures, run `git add -A && git commit -m "<milestone>"`, update `vibestate.md` checkboxes and `changelog.md` Done section then amend commit, report "Saved: <description> (X/N)". When all milestones are done, summarize what was built and suggest `/land`.
+- **Execution rules** (embed verbatim): After plan approval, read `vibestate.md` to find the milestone checklist, then execute the milestone loop: for each remaining milestone, announce "Milestone X/N: <description>", build functionality, add or update tests, run `npm test` and fix failures, run `git add -A && git commit -m "<milestone>"`, update `vibestate.md` checkboxes and `changelog.md` Done section then amend commit, report "Saved: <description> (X/N)". When all milestones are done, summarize what was built and suggest `/land`.
 
   Before exiting plan mode, write the milestone checklist to the `Active feature` section of `vibestate.md` with `Status: executing` and the plan file path.
 
@@ -61,7 +61,7 @@ For each milestone:
 1. **detailed only:** Announce: "Milestone X/N: <description>"
 2. Build the functionality
 3. Add or update tests for what was built
-4. Run `` — **simple:** fix failures silently. **detailed:** fix before continuing.
+4. Run `npm test` — **simple:** fix failures silently. **detailed:** fix before continuing.
 5. `git add -A && git commit -m "<milestone description>"`
 6. Update `vibestate.md` milestone checkboxes (detailed) and add entry to `changelog.md` Done section. Amend: `git commit --amend --no-edit`
 7. **simple:** Say: "Saved: <what changed>". **detailed:** Report: "Saved: <description> (X/N)"

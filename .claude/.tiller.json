@@ -1,8 +1,8 @@
 {
   "version": "0.1.0",
-  "mode": "detailed",
-  "workflow": "solo",
-  "runCommand": "",
+  "mode": "simple",
+  "workflow": "team",
+  "runCommand": "npm test",
   "managedFiles": [
     ".claude/CLAUDE.md",
     ".claude/settings.json",

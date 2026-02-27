@@ -1,4 +1,4 @@
-import { intro, outro, spinner } from '@clack/prompts';
+import { intro, outro, spinner, select, isCancel } from '@clack/prompts';
 import { resolve, basename } from 'node:path';
 import { scaffold } from '../scaffold/index.js';
 import type { ProjectConfig } from '../scaffold/types.js';
@@ -9,12 +9,36 @@ export async function initCommand(): Promise<void> {
 
   intro('tiller-ai init');
 
+  const modeAnswer = await select({
+    message: 'Mode',
+    options: [
+      { value: 'simple', label: 'simple', hint: 'You describe what you want. Claude builds it. Minimal narration.' },
+      { value: 'detailed', label: 'detailed', hint: 'Claude explains its approach, shows trade-offs, and waits for approval.' },
+    ],
+  });
+
+  if (isCancel(modeAnswer)) {
+    process.exit(0);
+  }
+
+  const workflowAnswer = await select({
+    message: 'Workflow',
+    options: [
+      { value: 'solo', label: 'solo', hint: 'Merges directly to main. For single developers or local-only work.' },
+      { value: 'team', label: 'team', hint: 'Pushes branch and opens a PR. For teams with code review.' },
+    ],
+  });
+
+  if (isCancel(workflowAnswer)) {
+    process.exit(0);
+  }
+
   const config: ProjectConfig = {
     projectName,
     description: '',
     runCommand: '',
-    mode: 'simple',
-    workflow: 'solo',
+    mode: modeAnswer as 'simple' | 'detailed',
+    workflow: workflowAnswer as 'solo' | 'team',
   };
 
   const s = spinner();

@@ -7,7 +7,10 @@ npx tiller-ai init
 # Answer a few questions:
 #   Project name?  my-app
 #   Run command?   npm test
-#   Mode?          detailed`;
+#   Mode?          detailed
+
+# Change settings any time:
+npx tiller-ai config`;
 
 const setupCode = `# Inside Claude Code, run:
 /setup
@@ -53,6 +56,8 @@ const vibeCode = `# Start a feature with a plain-English description:
             Run <code>npx tiller-ai init</code> in your project root.
             Tiller scaffolds all the config files, slash commands, and
             git hooks you need — committed straight to your repo.
+            Run <code>npx tiller-ai config</code> any time to switch
+            mode or workflow.
           </p>
         </div>
         <div class="step-code">

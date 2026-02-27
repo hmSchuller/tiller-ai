@@ -17,7 +17,7 @@ Save the current branch name as `<feature-branch>`.
 
 ## Step 2: Run verify
 
-Run ``
+Run `npm test`
 
 If it fails:
 - **simple:** Say: "Something's not working, let me sort it out." Fix it first.
