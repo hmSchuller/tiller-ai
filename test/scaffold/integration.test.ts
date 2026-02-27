@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { mkdtemp, rm, readFile, access } from 'node:fs/promises';
+import { mkdtemp, rm, readFile, access, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { scaffold } from '../../src/scaffold/index.js';
@@ -117,5 +117,41 @@ describe('scaffold integration', () => {
 
   it('initializes a git repo with initial commit', async () => {
     expect(await exists('.git')).toBe(true);
+  });
+});
+
+describe('scaffold integration — existing .gitignore', () => {
+  let dir: string;
+
+  beforeAll(async () => {
+    dir = await mkdtemp(join(tmpdir(), 'tiller-existing-gitignore-'));
+    // Write a pre-existing .gitignore with project-specific content
+    await writeFile(join(dir, '.gitignore'), '# My project\nsecrets.txt\nbuild/\n', 'utf-8');
+    await scaffold(config, dir);
+  });
+
+  afterAll(async () => {
+    await rm(dir, { recursive: true, force: true });
+  });
+
+  it('preserves original .gitignore content', async () => {
+    const content = await readFile(join(dir, '.gitignore'), 'utf-8');
+    expect(content).toContain('# My project');
+    expect(content).toContain('secrets.txt');
+    expect(content).toContain('build/');
+  });
+
+  it('appends missing tiller entries under a # Tiller comment', async () => {
+    const content = await readFile(join(dir, '.gitignore'), 'utf-8');
+    expect(content).toContain('vibestate.md');
+    expect(content).toContain('.tiller.local.json');
+    expect(content).toContain('# Tiller');
+  });
+
+  it('does not duplicate tiller entries when already present', async () => {
+    const content = await readFile(join(dir, '.gitignore'), 'utf-8');
+    const count = (str: string, sub: string) => str.split(sub).length - 1;
+    expect(count(content, 'vibestate.md')).toBe(1);
+    expect(count(content, '.tiller.local.json')).toBe(1);
   });
 });
