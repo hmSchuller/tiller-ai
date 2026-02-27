@@ -15,7 +15,7 @@ If on `main`:
 
 ## Step 2: Run verify
 
-Run ``
+Run `npm test`
 
 If it fails:
 - **simple:** Say: "Something's broken, let me fix it first." Fix it, then continue.

@@ -4,6 +4,7 @@
 
 ## Done
 
+- [2026-02-27] chore: fill in verify command in skill files — npm test
 - [2026-02-27] docs: mention tiller config on website — code block and step description
 - [2026-02-27] feat: replace mode/workflow commands with unified tiller config — interactive select UI for mode, workflow, and scope
 - [2026-02-27] landed feature/fix-nodejs-version-requirement
