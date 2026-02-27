@@ -4,6 +4,7 @@
 
 ## Done
 
+- [2026-02-27] bump version to 0.1.2 — package.json, index.ts, tiller-manifest.ts, config.test.ts
 - [2026-02-27] landed feature/bump-version-to-0-1-1
 - [2026-02-27] bump version to 0.1.1 — import TILLER_VERSION from single source, update package.json, index.ts, and tests
 - [2026-02-27] landed feature/command-config-interactive-select
