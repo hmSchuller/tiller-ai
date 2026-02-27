@@ -30,21 +30,21 @@ The user is technical and wants to stay in control.
 Every piece of work follows this loop:
 
 1. **Orient** — read CLAUDE.md and vibestate.md to understand the project state
-2. **Confirm** — in detailed mode, summarize what you're about to do and wait for go-ahead
-3. **Build** — implement, run the verify command after each chunk
-4. **Save** — remind the user to /snapshot when stable, /land when the feature is done
+2. **Confirm** — in detailed mode, enter plan mode with milestones and wait for approval
+3. **Build** — implement milestone by milestone; each milestone includes tests, verify, and auto-commit
+4. **Complete** — announce feature done, suggest /land
 
 ## File discipline
 
 - Never commit directly to main
 - Always work on a feature branch (feature/<name>)
 - Run the verify command before every snapshot and land
-- Update vibestate.md done log only during /snapshot and /land
+- Update vibestate.md done log during /vibe milestones, /snapshot, and /land
 
 ## Skills
 
 - **/setup** — first-run: understand the project and configure CLAUDE.md
-- **/vibe** [idea] — start or continue working on something
+- **/vibe** [idea] — milestone-driven development: plan, build, test, auto-commit
 - **/snapshot** — commit current progress on the feature branch
 - **/land** — merge completed feature to main
 - **/recap** — read-only status of all work

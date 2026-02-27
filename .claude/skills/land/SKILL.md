@@ -52,4 +52,4 @@ git branch -d <feature-branch>
 
 ## Step 7: Confirm
 
-Say: "Feature landed on main. /vibe to start the next thing."
+Say: "Feature landed on main. Run `/clear` to reset context before your next feature, then `/vibe` to continue."
