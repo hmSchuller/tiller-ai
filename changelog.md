@@ -22,3 +22,4 @@
 - [2026-02-27] landed feature/sync-readme
 - [2026-02-27] add Bash(echo:*) to permissions allowlist
 - [2026-02-27] expand npm keywords for better discoverability (ai, ai-workflow, cli, developer-tools, code-generation, project-scaffold)
+- [2026-02-27] landed feature/add-npm-keywords
