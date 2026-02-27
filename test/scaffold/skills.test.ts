@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { generateVibeSkill } from '../../src/scaffold/skills/vibe.js';
-import { generateSnapshotSkill } from '../../src/scaffold/skills/snapshot.js';
+import { generateSaveSkill } from '../../src/scaffold/skills/save.js';
 import { generateRecapSkill } from '../../src/scaffold/skills/recap.js';
 import { generateLandSkill } from '../../src/scaffold/skills/land.js';
 import { generateTechDebtSkill } from '../../src/scaffold/skills/tech-debt.js';
@@ -74,14 +74,14 @@ describe('generateVibeSkill', () => {
   });
 });
 
-describe('generateSnapshotSkill', () => {
+describe('generateSaveSkill', () => {
   it('has correct frontmatter name', () => {
-    expect(generateSnapshotSkill(simpleConfig)).toContain('name: snapshot');
+    expect(generateSaveSkill(simpleConfig)).toContain('name: save');
   });
 
   it('produces the same template structure regardless of mode', () => {
-    const simple = generateSnapshotSkill(simpleConfig);
-    const detailed = generateSnapshotSkill(detailedConfig);
+    const simple = generateSaveSkill(simpleConfig);
+    const detailed = generateSaveSkill(detailedConfig);
     expect(simple).toContain('simple');
     expect(simple).toContain('detailed');
     expect(detailed).toContain('simple');
@@ -89,23 +89,23 @@ describe('generateSnapshotSkill', () => {
   });
 
   it('checks for feature branch', () => {
-    expect(generateSnapshotSkill(simpleConfig)).toContain('main');
+    expect(generateSaveSkill(simpleConfig)).toContain('main');
   });
 
   it('runs verify command', () => {
-    expect(generateSnapshotSkill(simpleConfig)).toContain('npm test');
+    expect(generateSaveSkill(simpleConfig)).toContain('npm test');
   });
 
   it('commits with git add -A', () => {
-    expect(generateSnapshotSkill(simpleConfig)).toContain('git add -A');
+    expect(generateSaveSkill(simpleConfig)).toContain('git add -A');
   });
 
   it('writes Done entry to changelog.md', () => {
-    expect(generateSnapshotSkill(simpleConfig)).toContain('changelog.md');
+    expect(generateSaveSkill(simpleConfig)).toContain('changelog.md');
   });
 
   it('handles both simple and detailed mode at runtime', () => {
-    const result = generateSnapshotSkill(simpleConfig);
+    const result = generateSaveSkill(simpleConfig);
     expect(result).toContain('simple');
     expect(result).toContain('detailed');
   });

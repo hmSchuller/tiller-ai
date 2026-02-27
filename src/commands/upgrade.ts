@@ -7,7 +7,7 @@ import { generatePostWriteHook } from '../scaffold/hooks/post-write.js';
 import { generateSecretScanHook } from '../scaffold/hooks/secret-scan.js';
 import { generateSetupSkill } from '../scaffold/skills/setup.js';
 import { generateVibeSkill } from '../scaffold/skills/vibe.js';
-import { generateSnapshotSkill } from '../scaffold/skills/snapshot.js';
+import { generateSaveSkill } from '../scaffold/skills/save.js';
 import { generateRecapSkill } from '../scaffold/skills/recap.js';
 import { generateLandSkill } from '../scaffold/skills/land.js';
 import { generateTechDebtSkill } from '../scaffold/skills/tech-debt.js';
@@ -62,7 +62,7 @@ export async function upgradeCommand(): Promise<void> {
     await writeFile('.claude/hooks/secret-scan.sh', generateSecretScanHook(config));
     await writeFile('.claude/skills/setup/SKILL.md', generateSetupSkill(config));
     await writeFile('.claude/skills/vibe/SKILL.md', generateVibeSkill(config));
-    await writeFile('.claude/skills/snapshot/SKILL.md', generateSnapshotSkill(config));
+    await writeFile('.claude/skills/save/SKILL.md', generateSaveSkill(config));
     await writeFile('.claude/skills/recap/SKILL.md', generateRecapSkill(config));
     await writeFile('.claude/skills/land/SKILL.md', generateLandSkill(config));
     await writeFile('.claude/skills/tech-debt/SKILL.md', generateTechDebtSkill(config));

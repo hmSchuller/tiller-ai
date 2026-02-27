@@ -1,9 +1,9 @@
 ---
-name: snapshot
+name: save
 description: Save current progress with a commit on the feature branch
 ---
 
-# /snapshot — Save progress
+# /save — Save progress
 
 ## Step 1: Check branch
 
@@ -11,7 +11,7 @@ Run `git branch --show-current`.
 
 If on `main`:
 - **simple:** Say: "You're on main — use /vibe to start a feature first." Stop.
-- **detailed:** Warn: "You're on main. Snapshot is for feature branches. Use /vibe to start a feature branch first." Stop.
+- **detailed:** Warn: "You're on main. Save is for feature branches. Use /vibe to start a feature branch first." Stop.
 
 ## Step 2: Run verify
 
@@ -19,7 +19,7 @@ Run ``
 
 If it fails:
 - **simple:** Say: "Something's broken, let me fix it first." Fix it, then continue.
-- **detailed:** Show the error output. Do NOT commit. Say: "Verify failed. Fix the errors and try /snapshot again." Stop.
+- **detailed:** Show the error output. Do NOT commit. Say: "Verify failed. Fix the errors and try /save again." Stop.
 
 ## Step 3: Describe changes
 
@@ -48,4 +48,4 @@ Run `git add changelog.md && git commit --amend --no-edit`.
 ## Step 6: Confirm
 
 - **simple:** Say: "Saved. Keep going or type /land when you're done."
-- **detailed:** Say: "Snapshot saved: <message>. Use /land when this feature is ready to merge."
+- **detailed:** Say: "Saved: <message>. Use /land when this feature is ready to merge."

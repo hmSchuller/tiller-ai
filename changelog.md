@@ -1,8 +1,10 @@
 # changelog.md — tiller-ai
 
-> Shared project history. Updated by /vibe, /snapshot, and /land. Committed and shared.
+> Shared project history. Updated by /vibe, /save, and /land. Committed and shared.
 
 ## Done
+
+- [2026-02-27] rename /snapshot to /save — shorter, more intuitive, matches skill output
 
 - [2026-02-27] renamed CLI intro strings from `tiller` to `tiller-ai` to match bin name
 - [2026-02-27] landed feature/create-static-promotional-website-for-github-pages
