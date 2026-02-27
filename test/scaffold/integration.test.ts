@@ -99,6 +99,13 @@ describe('scaffold integration', () => {
     expect(await exists('.claude/hooks/session-resume.sh')).toBe(true);
   });
 
+  it('creates .claude/.tiller-tech-debt.json with correct defaults', async () => {
+    expect(await exists('.claude/.tiller-tech-debt.json')).toBe(true);
+    const content = JSON.parse(await read('.claude/.tiller-tech-debt.json'));
+    expect(content.lastTechDebtAtFeature).toBe(0);
+    expect(content.threshold).toBe(3);
+  });
+
   it('creates all skills including tech-debt', async () => {
     expect(await exists('.claude/skills/setup/SKILL.md')).toBe(true);
     expect(await exists('.claude/skills/vibe/SKILL.md')).toBe(true);

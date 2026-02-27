@@ -17,6 +17,7 @@ import { generateRecapSkill } from './skills/recap.js';
 import { generateLandSkill } from './skills/land.js';
 import { generateSetupSkill } from './skills/setup.js';
 import { generateTechDebtSkill } from './skills/tech-debt.js';
+import { generateTechDebtState } from './tech-debt-state.js';
 
 const TILLER_VERSION = '0.1.0';
 
@@ -33,6 +34,7 @@ export async function scaffold(config: ProjectConfig, targetDir: string): Promis
   await writeFile(p('.claude/CLAUDE.md'), generateDotClaudeMd(config));
   await writeFile(p('.claude/settings.json'), generateSettingsJson(config));
   await writeFile(p('.claude/.tiller.json'), generateTillerManifest(config, TILLER_VERSION));
+  await writeFile(p('.claude/.tiller-tech-debt.json'), generateTechDebtState());
 
   // Hooks
   await writeFile(p('.claude/hooks/post-write.sh'), generatePostWriteHook(config));
