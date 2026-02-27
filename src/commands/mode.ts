@@ -4,10 +4,8 @@ import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { writeFile } from '../utils/fs.js';
 import { generateRootClaudeMd } from '../scaffold/claude-md.js';
-import { generateTillerManifest } from '../scaffold/tiller-manifest.js';
+import { generateTillerManifest, TILLER_VERSION } from '../scaffold/tiller-manifest.js';
 import type { ProjectConfig } from '../scaffold/types.js';
-
-const TILLER_VERSION = '0.1.0';
 
 export async function modeCommand(newMode: string, options: { project?: boolean }): Promise<void> {
   intro('tiller-ai mode — switch between simple and detailed');

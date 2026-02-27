@@ -12,10 +12,8 @@ import { generateRecapSkill } from '../scaffold/skills/recap.js';
 import { generateLandSkill } from '../scaffold/skills/land.js';
 import { generateTechDebtSkill } from '../scaffold/skills/tech-debt.js';
 import { generateDotClaudeMd } from '../scaffold/claude-md.js';
-import { generateTillerManifest, MANAGED_FILES } from '../scaffold/tiller-manifest.js';
+import { generateTillerManifest, MANAGED_FILES, TILLER_VERSION } from '../scaffold/tiller-manifest.js';
 import type { ProjectConfig } from '../scaffold/types.js';
-
-const TILLER_VERSION = '0.1.0';
 
 export async function upgradeCommand(): Promise<void> {
   intro('tiller-ai upgrade — update hooks and skills');
