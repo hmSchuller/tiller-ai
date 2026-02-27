@@ -5,6 +5,7 @@
 ## Done
 
 - [2026-02-27] renamed package from tiller-code to tiller-ai
+- [2026-02-27] landed feature/rename-package-to-tiller-ai
 
 - [2026-02-27] v0 — initial scaffold
 - [2026-02-27] vibe skill resumes existing feature branches instead of recreating them
