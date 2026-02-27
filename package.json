@@ -1,0 +1,39 @@
+{
+  "name": "tiller-code",
+  "version": "0.1.0",
+  "description": "Scaffold Claude Code projects with a structured vibe loop",
+  "type": "module",
+  "bin": {
+    "tiller": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.9.1",
+    "commander": "^12.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "claude",
+    "claude-code",
+    "scaffold",
+    "vibe-coding"
+  ],
+  "license": "MIT"
+}

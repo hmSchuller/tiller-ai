@@ -1,0 +1,22 @@
+---
+name: snapshot
+description: Save current progress with a commit on the feature branch
+---
+
+# /snapshot — Save progress
+
+1. Check branch — if on `main`, say: "You're on main — use /vibe to start a feature first." Stop.
+
+2. Run `` — if it fails, say: "Something's broken, let me fix it first." Fix it, then try again.
+
+3. Infer a commit message from `git diff --stat HEAD`. Keep it short and plain.
+
+4. Commit:
+```
+git add -A
+git commit -m "<message>"
+```
+
+5. Update vibestate.md Done section with today's date and the message. Amend the commit to include it.
+
+6. Say: "Saved. Keep going or type /land when you're done."

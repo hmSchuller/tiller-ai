@@ -1,0 +1,16 @@
+{
+  "version": "0.1.0",
+  "mode": "simple",
+  "runCommand": "",
+  "managedFiles": [
+    ".claude/CLAUDE.md",
+    ".claude/settings.json",
+    ".claude/hooks/post-write.sh",
+    ".claude/hooks/secret-scan.sh",
+    ".claude/skills/setup/SKILL.md",
+    ".claude/skills/vibe/SKILL.md",
+    ".claude/skills/snapshot/SKILL.md",
+    ".claude/skills/recap/SKILL.md",
+    ".claude/skills/land/SKILL.md"
+  ]
+}
