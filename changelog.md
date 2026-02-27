@@ -4,6 +4,7 @@
 
 ## Done
 
+- [2026-02-27] landed feature/fix-gitignore-preservation
 - [2026-02-27] fix: preserve existing .gitignore on init — append tiller entries only if missing
 - [2026-02-27] landed feature/bump-version-to-0-1-2
 - [2026-02-27] bump version to 0.1.2 — package.json, index.ts, tiller-manifest.ts, config.test.ts
