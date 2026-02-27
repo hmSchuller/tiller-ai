@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { generateRootClaudeMd, generateDotClaudeMd } from '../../src/scaffold/claude-md.js';
-import { simpleConfig, detailedConfig } from '../helpers/fixtures.js';
+import { simpleConfig, detailedConfig, teamSimpleConfig } from '../helpers/fixtures.js';
 
 describe('generateRootClaudeMd', () => {
   it('includes project name as h1', () => {
@@ -51,5 +51,36 @@ describe('generateDotClaudeMd', () => {
   it('mentions feature branches', () => {
     const result = generateDotClaudeMd(simpleConfig);
     expect(result).toContain('feature branch');
+  });
+
+  it('describes both workflow modes', () => {
+    const result = generateDotClaudeMd(simpleConfig);
+    expect(result).toContain('### solo');
+    expect(result).toContain('### team');
+  });
+
+  it('explains vibestate.md vs changelog.md split', () => {
+    const result = generateDotClaudeMd(simpleConfig);
+    expect(result).toContain('vibestate.md');
+    expect(result).toContain('changelog.md');
+  });
+
+  it('documents per-dev override via .tiller.local.json', () => {
+    const result = generateDotClaudeMd(simpleConfig);
+    expect(result).toContain('.tiller.local.json');
+  });
+});
+
+describe('generateRootClaudeMd — workflow section', () => {
+  it('includes workflow section for solo', () => {
+    const result = generateRootClaudeMd(simpleConfig);
+    expect(result).toContain('## Workflow');
+    expect(result).toContain('solo');
+  });
+
+  it('includes workflow section for team', () => {
+    const result = generateRootClaudeMd(teamSimpleConfig);
+    expect(result).toContain('## Workflow');
+    expect(result).toContain('team');
   });
 });
