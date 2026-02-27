@@ -56,6 +56,18 @@ describe('generateVibeSkill', () => {
     expect(generateVibeSkill(simpleConfig)).toContain('Mode: <mode>');
   });
 
+  it('includes tech debt check step between branch routing and planning', () => {
+    const result = generateVibeSkill(simpleConfig);
+    expect(result).toContain('Step 2.5');
+    expect(result).toContain('tech debt');
+    expect(result).toContain('.tiller-tech-debt.json');
+    expect(result).toContain('landedCount');
+  });
+
+  it('instructs vibe to use Task tool for tech debt agent', () => {
+    expect(generateVibeSkill(simpleConfig)).toContain('Task tool');
+  });
+
   it('writes Done entries to changelog.md, not vibestate.md', () => {
     const result = generateVibeSkill(simpleConfig);
     expect(result).toContain('changelog.md');
