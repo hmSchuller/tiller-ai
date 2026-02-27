@@ -14,3 +14,4 @@
 - [2026-02-27] multi-dev support: workflow config, vibestate/changelog split, unified skills, team PR flow, per-dev mode
 - [2026-02-27] landed feature/multi-dev-support
 - [2026-02-27] rewrote README to reflect actual feature set (file tree, workflows, CLI, skills)
+- [2026-02-27] snapshot: feature/sync-readme in progress

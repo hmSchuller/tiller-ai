@@ -1,7 +1,6 @@
 {
   "version": "0.1.0",
   "mode": "detailed",
-  "workflow": "solo",
   "runCommand": "",
   "managedFiles": [
     ".claude/CLAUDE.md",
@@ -12,6 +11,7 @@
     ".claude/skills/vibe/SKILL.md",
     ".claude/skills/snapshot/SKILL.md",
     ".claude/skills/recap/SKILL.md",
-    ".claude/skills/land/SKILL.md"
+    ".claude/skills/land/SKILL.md",
+    ".claude/skills/tech-debt/SKILL.md"
   ]
 }

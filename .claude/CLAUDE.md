@@ -4,7 +4,7 @@
 
 ## Modes
 
-The mode is set in CLAUDE.md. Read it at the start of every session.
+The mode is set in CLAUDE.md (or overridden locally in `.tiller.local.json`). Read it at the start of every session.
 
 ### simple
 
@@ -25,11 +25,23 @@ The user is technical and wants to stay in control.
 - Surface decisions and trade-offs before making them
 - When something goes wrong, explain what happened and what you plan to do
 
+## Workflows
+
+The workflow is set in CLAUDE.md (or overridden locally in `.tiller.local.json`).
+
+### solo
+
+Single developer or local-only flow. /land merges directly to main.
+
+### team
+
+Multiple developers. /land pushes the feature branch and opens a PR. Merging happens on GitHub/GitLab after review and CI.
+
 ## Vibe loop
 
 Every piece of work follows this loop:
 
-1. **Orient** — read CLAUDE.md and vibestate.md to understand the project state
+1. **Orient** — read CLAUDE.md, vibestate.md (local), and changelog.md (shared)
 2. **Confirm** — in detailed mode, enter plan mode with milestones and wait for approval
 3. **Build** — implement milestone by milestone; each milestone includes tests, verify, and auto-commit
 4. **Complete** — announce feature done, suggest /land
@@ -39,14 +51,23 @@ Every piece of work follows this loop:
 - Never commit directly to main
 - Always work on a feature branch (feature/<name>)
 - Run the verify command before every snapshot and land
-- Update vibestate.md done log during /vibe milestones, /snapshot, and /land
+- `vibestate.md` is gitignored — it tracks your local active feature state
+- `changelog.md` is committed and shared — it tracks the project's done log
+
+## Per-dev overrides
+
+Create `.tiller.local.json` (gitignored) to override mode or workflow personally:
+```json
+{ "mode": "simple", "workflow": "solo" }
+```
+Skills read `.tiller.local.json` first, then fall back to CLAUDE.md.
 
 ## Skills
 
 - **/setup** — first-run: understand the project and configure CLAUDE.md
-- **/vibe** [idea] — milestone-driven development: plan, build, test, auto-commit
+- **/vibe** [idea] — milestone-driven development: plan, build, test, auto-commit. Every 3 landed features, automatically runs a background tech debt cleanup before planning.
 - **/snapshot** — commit current progress on the feature branch
-- **/land** — merge completed feature to main
+- **/land** — merge or PR depending on workflow
 - **/recap** — read-only status of all work
 
 ## Rules
