@@ -3,107 +3,108 @@ import { generateVibeSkill } from '../../src/scaffold/skills/vibe.js';
 import { generateSnapshotSkill } from '../../src/scaffold/skills/snapshot.js';
 import { generateRecapSkill } from '../../src/scaffold/skills/recap.js';
 import { generateLandSkill } from '../../src/scaffold/skills/land.js';
-import { simpleConfig, detailedConfig } from '../helpers/fixtures.js';
+import { simpleConfig, detailedConfig, teamSimpleConfig } from '../helpers/fixtures.js';
 
 describe('generateVibeSkill', () => {
   it('has correct frontmatter name', () => {
-    const result = generateVibeSkill(simpleConfig);
-    expect(result).toContain('name: vibe');
+    expect(generateVibeSkill(simpleConfig)).toContain('name: vibe');
+  });
+
+  it('produces the same template structure regardless of mode', () => {
+    // Both configs have same mode-agnostic structure; only runCommand differs
+    const simple = generateVibeSkill(simpleConfig);
+    const detailed = generateVibeSkill(detailedConfig);
+    expect(simple).toContain('If mode is simple');
+    expect(simple).toContain('If mode is detailed');
+    expect(detailed).toContain('If mode is simple');
+    expect(detailed).toContain('If mode is detailed');
   });
 
   it('includes $ARGUMENTS usage', () => {
+    expect(generateVibeSkill(simpleConfig)).toContain('$ARGUMENTS');
+  });
+
+  it('handles both simple and detailed mode at runtime', () => {
     const result = generateVibeSkill(simpleConfig);
-    expect(result).toContain('$ARGUMENTS');
+    expect(result).toContain('simple');
+    expect(result).toContain('detailed');
   });
 
-  it('simple mode plans milestones internally', () => {
-    const result = generateVibeSkill(simpleConfig);
-    expect(result).toContain('Plan milestones (internal)');
-    expect(result).not.toContain('Wait for explicit confirmation');
+  it('instructs detailed mode to enter plan mode', () => {
+    expect(generateVibeSkill(simpleConfig)).toContain('EnterPlanMode');
   });
 
-  it('detailed mode enters plan mode', () => {
-    const result = generateVibeSkill(detailedConfig);
-    expect(result).toContain('EnterPlanMode');
+  it('instructs simple mode to plan internally', () => {
+    expect(generateVibeSkill(simpleConfig)).toContain('internally');
   });
 
-  it('both modes build milestone by milestone', () => {
-    expect(generateVibeSkill(simpleConfig)).toContain('Build milestone by milestone');
-    expect(generateVibeSkill(detailedConfig)).toContain('Build milestone by milestone');
+  it('includes verify command', () => {
+    expect(generateVibeSkill(simpleConfig)).toContain('npm test');
   });
 
-  it('both modes require adding or updating tests', () => {
+  it('includes milestone build loop', () => {
     expect(generateVibeSkill(simpleConfig)).toContain('Add or update tests');
-    expect(generateVibeSkill(detailedConfig)).toContain('Add or update tests');
-  });
-
-  it('both modes auto-commit after each milestone', () => {
     expect(generateVibeSkill(simpleConfig)).toContain('git add -A && git commit');
-    expect(generateVibeSkill(detailedConfig)).toContain('git add -A && git commit');
-  });
-
-  it('both modes announce feature complete', () => {
-    expect(generateVibeSkill(simpleConfig)).toContain('Feature complete');
-    expect(generateVibeSkill(detailedConfig)).toContain('/land');
-  });
-
-  it('simple mode hides milestones from user', () => {
-    const result = generateVibeSkill(simpleConfig);
-    expect(result).toContain('Do not show this plan to the user');
-  });
-
-  it('detailed mode embeds execution rules in plan', () => {
-    const result = generateVibeSkill(detailedConfig);
-    expect(result).toContain('Execution rules');
-  });
-
-  it('includes the verify command', () => {
-    const result = generateVibeSkill(simpleConfig);
-    expect(result).toContain('npm test');
   });
 
   it('mentions feature branch creation', () => {
-    const result = generateVibeSkill(simpleConfig);
-    expect(result).toContain('feature/');
+    expect(generateVibeSkill(simpleConfig)).toContain('feature/');
   });
 
-  it('both modes announce the current mode', () => {
+  it('announces the current mode', () => {
     expect(generateVibeSkill(simpleConfig)).toContain('Mode: <mode>');
-    expect(generateVibeSkill(detailedConfig)).toContain('Mode: <mode>');
+  });
+
+  it('writes Done entries to changelog.md, not vibestate.md', () => {
+    const result = generateVibeSkill(simpleConfig);
+    expect(result).toContain('changelog.md');
   });
 });
 
 describe('generateSnapshotSkill', () => {
   it('has correct frontmatter name', () => {
-    const result = generateSnapshotSkill(simpleConfig);
-    expect(result).toContain('name: snapshot');
+    expect(generateSnapshotSkill(simpleConfig)).toContain('name: snapshot');
+  });
+
+  it('produces the same template structure regardless of mode', () => {
+    const simple = generateSnapshotSkill(simpleConfig);
+    const detailed = generateSnapshotSkill(detailedConfig);
+    expect(simple).toContain('simple');
+    expect(simple).toContain('detailed');
+    expect(detailed).toContain('simple');
+    expect(detailed).toContain('detailed');
   });
 
   it('checks for feature branch', () => {
-    const result = generateSnapshotSkill(simpleConfig);
-    expect(result).toContain('main');
+    expect(generateSnapshotSkill(simpleConfig)).toContain('main');
   });
 
   it('runs verify command', () => {
-    const result = generateSnapshotSkill(simpleConfig);
-    expect(result).toContain('npm test');
+    expect(generateSnapshotSkill(simpleConfig)).toContain('npm test');
   });
 
   it('commits with git add -A', () => {
-    const result = generateSnapshotSkill(simpleConfig);
-    expect(result).toContain('git add -A');
+    expect(generateSnapshotSkill(simpleConfig)).toContain('git add -A');
   });
 
-  it('updates vibestate.md', () => {
+  it('writes Done entry to changelog.md', () => {
+    expect(generateSnapshotSkill(simpleConfig)).toContain('changelog.md');
+  });
+
+  it('handles both simple and detailed mode at runtime', () => {
     const result = generateSnapshotSkill(simpleConfig);
-    expect(result).toContain('vibestate.md');
+    expect(result).toContain('simple');
+    expect(result).toContain('detailed');
   });
 });
 
 describe('generateRecapSkill', () => {
   it('has correct frontmatter name', () => {
-    const result = generateRecapSkill(simpleConfig);
-    expect(result).toContain('name: recap');
+    expect(generateRecapSkill(simpleConfig)).toContain('name: recap');
+  });
+
+  it('is a single unified template regardless of config', () => {
+    expect(generateRecapSkill(simpleConfig)).toBe(generateRecapSkill(detailedConfig));
   });
 
   it('is read-only — no file modifications', () => {
@@ -113,34 +114,65 @@ describe('generateRecapSkill', () => {
   });
 
   it('shows feature branches', () => {
+    expect(generateRecapSkill(simpleConfig)).toContain('feature/*');
+  });
+
+  it('reads both vibestate.md and changelog.md', () => {
     const result = generateRecapSkill(simpleConfig);
-    expect(result).toContain("feature/*");
+    expect(result).toContain('vibestate.md');
+    expect(result).toContain('changelog.md');
+  });
+
+  it('handles both simple and detailed mode at runtime', () => {
+    const result = generateRecapSkill(simpleConfig);
+    expect(result).toContain('simple');
+    expect(result).toContain('detailed');
   });
 });
 
 describe('generateLandSkill', () => {
   it('has correct frontmatter name', () => {
-    const result = generateLandSkill(simpleConfig);
-    expect(result).toContain('name: land');
+    expect(generateLandSkill(simpleConfig)).toContain('name: land');
   });
 
-  it('merges with --no-ff', () => {
-    const result = generateLandSkill(simpleConfig);
-    expect(result).toContain('--no-ff');
+  it('produces the same template structure regardless of mode', () => {
+    const simple = generateLandSkill(simpleConfig);
+    const detailed = generateLandSkill(detailedConfig);
+    expect(simple).toContain('simple');
+    expect(simple).toContain('detailed');
+    expect(detailed).toContain('simple');
+    expect(detailed).toContain('detailed');
   });
 
-  it('deletes the feature branch', () => {
+  it('handles both simple and detailed mode at runtime', () => {
     const result = generateLandSkill(simpleConfig);
-    expect(result).toContain('git branch -d');
+    expect(result).toContain('simple');
+    expect(result).toContain('detailed');
+  });
+
+  it('solo workflow: merges with --no-ff', () => {
+    expect(generateLandSkill(simpleConfig)).toContain('--no-ff');
+  });
+
+  it('solo workflow: deletes the feature branch', () => {
+    expect(generateLandSkill(simpleConfig)).toContain('git branch -d');
+  });
+
+  it('team workflow: opens PR with gh or manual link', () => {
+    const result = generateLandSkill(teamSimpleConfig);
+    expect(result).toContain('gh pr create');
+    expect(result).toContain('which gh');
   });
 
   it('runs verify command', () => {
-    const result = generateLandSkill(simpleConfig);
-    expect(result).toContain('npm test');
+    expect(generateLandSkill(simpleConfig)).toContain('npm test');
   });
 
-  it('updates vibestate.md', () => {
-    const result = generateLandSkill(simpleConfig);
-    expect(result).toContain('vibestate.md');
+  it('updates changelog.md', () => {
+    expect(generateLandSkill(simpleConfig)).toContain('changelog.md');
+  });
+
+  it('clears vibestate.md active feature', () => {
+    expect(generateLandSkill(simpleConfig)).toContain('vibestate.md');
   });
 });

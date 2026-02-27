@@ -1,32 +1,6 @@
 import type { ProjectConfig } from '../types.js';
 
 export function generateSnapshotSkill(config: ProjectConfig): string {
-  if (config.mode === 'simple') {
-    return `---
-name: snapshot
-description: Save current progress with a commit on the feature branch
----
-
-# /snapshot — Save progress
-
-1. Check branch — if on \`main\`, say: "You're on main — use /vibe to start a feature first." Stop.
-
-2. Run \`${config.runCommand}\` — if it fails, say: "Something's broken, let me fix it first." Fix it, then try again.
-
-3. Infer a commit message from \`git diff --stat HEAD\`. Keep it short and plain.
-
-4. Commit:
-\`\`\`
-git add -A
-git commit -m "<message>"
-\`\`\`
-
-5. Update vibestate.md Done section with today's date and the message. Amend the commit to include it.
-
-6. Say: "Saved. Keep going or type /land when you're done."
-`;
-  }
-
   return `---
 name: snapshot
 description: Save current progress with a commit on the feature branch
@@ -38,26 +12,25 @@ description: Save current progress with a commit on the feature branch
 
 Run \`git branch --show-current\`.
 
-If on \`main\`: warn — "You're on main. Snapshot is for feature branches. Use /vibe to start a feature branch first." Stop.
+If on \`main\`:
+- **simple:** Say: "You're on main — use /vibe to start a feature first." Stop.
+- **detailed:** Warn: "You're on main. Snapshot is for feature branches. Use /vibe to start a feature branch first." Stop.
 
 ## Step 2: Run verify
 
 Run \`${config.runCommand}\`
 
 If it fails:
-- Show the error output
-- Do NOT commit
-- Say: "Verify failed. Fix the errors and try /snapshot again."
-- Stop here.
+- **simple:** Say: "Something's broken, let me fix it first." Fix it, then continue.
+- **detailed:** Show the error output. Do NOT commit. Say: "Verify failed. Fix the errors and try /snapshot again." Stop.
 
 ## Step 3: Describe changes
 
-If $ARGUMENTS is provided, use that as the commit message.
+If \$ARGUMENTS is provided, use that as the commit message.
 
 Otherwise, run \`git diff --stat HEAD\` and infer a short, descriptive commit message.
 
 Format: \`<verb> <what> — <brief detail if needed>\`
-Examples: "add search bar to header", "fix null check in auth middleware"
 
 ## Step 4: Commit
 
@@ -66,17 +39,18 @@ git add -A
 git commit -m "<message>"
 \`\`\`
 
-## Step 5: Update vibestate.md
+## Step 5: Update changelog.md
 
-Add an entry to the Done section:
+Add an entry to the Done section of \`changelog.md\`:
 \`\`\`
 - [YYYY-MM-DD] <message>
 \`\`\`
 
-Run \`git add vibestate.md && git commit --amend --no-edit\`.
+Run \`git add changelog.md && git commit --amend --no-edit\`.
 
 ## Step 6: Confirm
 
-Say: "Snapshot saved: <message>. Use /land when this feature is ready to merge."
+- **simple:** Say: "Saved. Keep going or type /land when you're done."
+- **detailed:** Say: "Snapshot saved: <message>. Use /land when this feature is ready to merge."
 `;
 }

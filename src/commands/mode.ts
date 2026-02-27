@@ -4,7 +4,6 @@ import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { writeFile } from '../utils/fs.js';
 import { generateRootClaudeMd } from '../scaffold/claude-md.js';
-import { generateVibeSkill } from '../scaffold/skills/vibe.js';
 import { generateTillerManifest } from '../scaffold/tiller-manifest.js';
 import type { ProjectConfig } from '../scaffold/types.js';
 
@@ -69,7 +68,6 @@ export async function modeCommand(newMode: string): Promise<void> {
 
   try {
     await writeFile('CLAUDE.md', generateRootClaudeMd(config));
-    await writeFile('.claude/skills/vibe/SKILL.md', generateVibeSkill(config));
     await writeFile('.claude/.tiller.json', generateTillerManifest(config, TILLER_VERSION));
     s.stop('Done!');
   } catch (err) {
