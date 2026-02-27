@@ -4,6 +4,7 @@
 
 ## Done
 
+- [2026-02-28] feat: team-aware vibe skill — dependency tags, TeamCreate/TaskCreate/SendMessage, sequential fallback
 - [2026-02-27] landed feature/bump-version-to-0-1-3
 - [2026-02-27] bump version to 0.1.3 — package.json, index.ts, tiller-manifest.ts, config.test.ts
 - [2026-02-27] landed feature/fix-gitignore-preservation

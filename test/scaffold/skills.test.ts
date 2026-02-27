@@ -72,6 +72,37 @@ describe('generateVibeSkill', () => {
     const result = generateVibeSkill(simpleConfig);
     expect(result).toContain('changelog.md');
   });
+
+  it('tags milestones with dependency annotations in plan step', () => {
+    const result = generateVibeSkill(simpleConfig);
+    expect(result).toContain('[independent]');
+    expect(result).toContain('[depends-on: N]');
+  });
+
+  it('includes TeamCreate and TaskCreate for parallel execution', () => {
+    const result = generateVibeSkill(simpleConfig);
+    expect(result).toContain('TeamCreate');
+    expect(result).toContain('TaskCreate');
+  });
+
+  it('includes SendMessage for worker coordination', () => {
+    expect(generateVibeSkill(simpleConfig)).toContain('SendMessage');
+  });
+
+  it('includes sequential fallback when all milestones depend on each other', () => {
+    const result = generateVibeSkill(simpleConfig);
+    expect(result).toContain('all milestones are sequential');
+  });
+
+  it('includes within-milestone split option', () => {
+    const result = generateVibeSkill(simpleConfig);
+    expect(result).toContain('Within-milestone split');
+  });
+
+  it('lead agent owns commits in team mode', () => {
+    const result = generateVibeSkill(simpleConfig);
+    expect(result).toContain('lead agent commits');
+  });
 });
 
 describe('generateSaveSkill', () => {
