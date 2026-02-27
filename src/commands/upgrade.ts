@@ -15,6 +15,13 @@ import { generateDotClaudeMd } from '../scaffold/claude-md.js';
 import { generateTillerManifest, MANAGED_FILES, TILLER_VERSION } from '../scaffold/tiller-manifest.js';
 import type { ProjectConfig } from '../scaffold/types.js';
 
+type Manifest = {
+  version: string;
+  mode: 'simple' | 'detailed';
+  workflow?: 'solo' | 'team';
+  runCommand: string;
+};
+
 export async function upgradeCommand(): Promise<void> {
   intro('tiller-ai upgrade — update hooks and skills');
 
@@ -25,7 +32,7 @@ export async function upgradeCommand(): Promise<void> {
     process.exit(1);
   }
 
-  let manifest: { version: string; mode: 'simple' | 'detailed'; runCommand: string; workflow?: 'solo' | 'team' };
+  let manifest: Manifest;
   try {
     const raw = await readFile(manifestPath, 'utf-8');
     manifest = JSON.parse(raw);
