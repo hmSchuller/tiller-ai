@@ -14,3 +14,4 @@
 - [2026-02-27] multi-dev support: workflow config, vibestate/changelog split, unified skills, team PR flow, per-dev mode
 - [2026-02-27] landed feature/multi-dev-support
 - [2026-02-27] update .claude/CLAUDE.md — add workflows section, per-dev overrides, changelog/vibestate notes
+- [2026-02-27] add tiller workflow command (solo/team, local + --project scope, 7 tests)
