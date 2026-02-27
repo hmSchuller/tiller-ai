@@ -1,5 +1,7 @@
 import type { ProjectConfig } from './types.js';
 
+export const TILLER_VERSION = '0.1.0';
+
 export const MANAGED_FILES = [
   '.claude/CLAUDE.md',
   '.claude/settings.json',
