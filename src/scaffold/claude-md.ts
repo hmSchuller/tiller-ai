@@ -94,7 +94,7 @@ Skills read \`.tiller.local.json\` first, then fall back to CLAUDE.md.
 ## Skills
 
 - **/setup** — first-run: understand the project and configure CLAUDE.md
-- **/vibe** [idea] — milestone-driven development: plan, build, test, auto-commit
+- **/vibe** [idea] — milestone-driven development: plan, build, test, auto-commit. Every 3 landed features, automatically runs a background tech debt cleanup before planning.
 - **/snapshot** — commit current progress on the feature branch
 - **/land** — merge or PR depending on workflow
 - **/recap** — read-only status of all work

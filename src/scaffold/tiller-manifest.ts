@@ -10,6 +10,7 @@ export const MANAGED_FILES = [
   '.claude/skills/snapshot/SKILL.md',
   '.claude/skills/recap/SKILL.md',
   '.claude/skills/land/SKILL.md',
+  '.claude/skills/tech-debt/SKILL.md',
 ];
 
 export function generateTillerManifest(config: ProjectConfig, version: string): string {

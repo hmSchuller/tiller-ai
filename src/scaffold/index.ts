@@ -16,6 +16,7 @@ import { generateSnapshotSkill } from './skills/snapshot.js';
 import { generateRecapSkill } from './skills/recap.js';
 import { generateLandSkill } from './skills/land.js';
 import { generateSetupSkill } from './skills/setup.js';
+import { generateTechDebtSkill } from './skills/tech-debt.js';
 
 const TILLER_VERSION = '0.1.0';
 
@@ -44,6 +45,7 @@ export async function scaffold(config: ProjectConfig, targetDir: string): Promis
   await writeFile(p('.claude/skills/snapshot/SKILL.md'), generateSnapshotSkill(config));
   await writeFile(p('.claude/skills/recap/SKILL.md'), generateRecapSkill(config));
   await writeFile(p('.claude/skills/land/SKILL.md'), generateLandSkill(config));
+  await writeFile(p('.claude/skills/tech-debt/SKILL.md'), generateTechDebtSkill(config));
 
   // Git
   if (!isGitRepo(targetDir)) {
