@@ -88,7 +88,7 @@ Then go to Step 6 (do NOT delete the branch locally — it will be deleted after
 
 ## Step 7: Confirm
 
-- **simple:** Say: "Done. Run \`/clear\` to reset context before starting your next feature, then \`/vibe\` to continue."
-- **detailed:** Say: "Feature landed on main. Run \`/clear\` to reset context before your next feature, then \`/vibe\` to continue."
+- **simple:** Say: "Done. Run \`/clear\` to reset context before starting your next feature, then \`/sail\` to continue."
+- **detailed:** Say: "Feature landed on main. Run \`/clear\` to reset context before your next feature, then \`/sail\` to continue."
 `;
 }
