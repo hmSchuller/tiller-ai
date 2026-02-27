@@ -7,39 +7,25 @@ description: Start or continue working on an idea. Usage: /vibe [idea descriptio
 
 ## Step 1: Orient
 
-Read these files to understand current state:
-- `CLAUDE.md` — project context, verify command, mode
-- `vibestate.md` — active feature, done log, notes
-- Run `git branch` and `git status`
-
-Summarize the current state in 2-3 sentences.
+Read `CLAUDE.md` and `vibestate.md`. Run `git branch` and `git status`. Do not narrate this.
 
 ## Step 2: Branch routing
 
-**$ARGUMENTS provided** → create `feature/<kebab-case-of-arguments>` from main (or switch if it already exists). State: "Starting work on: <idea>"
+**$ARGUMENTS provided** → create `feature/<kebab-case-of-arguments>` from main (or switch if it exists). Say: "On it."
 
-**Already on a feature branch** → stay on it. State: "Continuing work on: <branch-name>"
+**Already on a feature branch** → continue. Say nothing unless asked.
 
-**Neither** → list open feature branches as in-progress ideas, ask what to work on or if they want to start something new.
+**Neither** → list open feature branches briefly, ask what to work on.
 
-## Step 3: Plan
+## Step 3: Build
 
-Write out your proposed approach:
-- What you're going to build (3-5 bullets)
-- Which files you'll create or modify
-- Any decisions or trade-offs worth noting
+Just build. No plan narration, no step-by-step commentary.
 
-Wait for explicit confirmation before touching files.
+After each chunk: run ``. Fix failures silently before continuing.
 
-## Step 4: Build
+When done with a chunk, say what changed in one sentence. Then:
+- "Type /snapshot to save, /land when you're done."
 
-Implement in small, logical chunks. After each chunk:
-1. Run `npm test`
-2. Fix any failures before continuing
-3. Report what was done and whether verify passed
+## If something goes wrong
 
-## Step 5: Remind
-
-After each working chunk:
-- `/snapshot` to save progress on this feature
-- `/land` when the feature is complete and ready to merge
+Fix it yourself first. Only tell the user if you genuinely can't resolve it.

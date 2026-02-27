@@ -1,7 +1,7 @@
 {
   "version": "0.1.0",
-  "mode": "detailed",
-  "runCommand": "npm test",
+  "mode": "simple",
+  "runCommand": "",
   "managedFiles": [
     ".claude/CLAUDE.md",
     ".claude/settings.json",
