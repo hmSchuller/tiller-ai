@@ -1,4 +1,6 @@
 ---
+import '../styles/global.css';
+
 export interface Props {
   title?: string;
   description?: string;
@@ -41,29 +43,11 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/tiller-ai/favicon.svg" />
 
-    <!-- Fonts -->
+    <!-- Fonts: preload latin subset woff2 -->
     <link rel="preload" href="/tiller-ai/fonts/PlayfairDisplay-Regular.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/tiller-ai/fonts/PlayfairDisplay-Bold.woff2" as="font" type="font/woff2" crossorigin />
 
     <title>{title}</title>
-
-    <style is:global>
-      @font-face {
-        font-family: 'Playfair Display';
-        src: url('/tiller-ai/fonts/PlayfairDisplay-Regular.woff2') format('woff2');
-        font-weight: 400;
-        font-style: normal;
-        font-display: swap;
-      }
-
-      @font-face {
-        font-family: 'Playfair Display';
-        src: url('/tiller-ai/fonts/PlayfairDisplay-Bold.woff2') format('woff2');
-        font-weight: 700;
-        font-style: normal;
-        font-display: swap;
-      }
-    </style>
   </head>
   <body>
     <slot />
