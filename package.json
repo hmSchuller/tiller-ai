@@ -34,8 +34,14 @@
   "keywords": [
     "claude",
     "claude-code",
+    "ai",
+    "ai-workflow",
     "scaffold",
-    "vibe-coding"
+    "cli",
+    "vibe-coding",
+    "developer-tools",
+    "code-generation",
+    "project-scaffold"
   ],
   "license": "MIT"
 }
