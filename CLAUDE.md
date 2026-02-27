@@ -1,4 +1,4 @@
-# tiller-code
+# tiller-ai
 
 <!-- Run /setup to fill this in -->
 
