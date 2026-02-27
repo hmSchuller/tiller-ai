@@ -4,7 +4,12 @@
 
 ## Active feature
 
-None — on main, ready to start something.
+**Branch:** feature/readme
+**Status:** executing
+**Plan:** .claude/plans/joyful-whistling-origami.md
+
+- [x] Write README.md
+- [x] Verify (npm test)
 
 ## Done
 
