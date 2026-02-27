@@ -4,7 +4,7 @@
   "description": "Scaffold Claude Code projects with a structured vibe loop",
   "type": "module",
   "bin": {
-    "tiller": "./dist/index.js"
+    "tiller-ai": "./dist/index.js"
   },
   "main": "./dist/index.js",
   "files": [
