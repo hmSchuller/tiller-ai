@@ -1,0 +1,151 @@
+---
+export interface Props {
+  code: string;
+  language?: string;
+  label?: string;
+}
+
+const { code, language = 'bash', label } = Astro.props;
+const id = `code-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+<div class="code-block" data-code-block>
+  {label && <div class="code-label">{label}</div>}
+  <div class="code-wrap">
+    <pre class={`language-${language}`}><code id={id} class="code-content">{code}</code></pre>
+    <button
+      class="code-copy"
+      aria-label="Copy code"
+      data-target={id}
+    >
+      <svg class="icon-copy" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14" aria-hidden="true">
+        <rect x="5" y="5" width="9" height="9" rx="1.5"/>
+        <path d="M2 11V3a1 1 0 011-1h8"/>
+      </svg>
+      <svg class="icon-check" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" aria-hidden="true">
+        <path d="M2 8l4 4 8-8"/>
+      </svg>
+      <span class="copy-label">Copy</span>
+    </button>
+  </div>
+</div>
+
+<style>
+  .code-block {
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .code-label {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding: var(--space-2) var(--space-5);
+    font-size: var(--text-xs);
+    font-family: var(--font-mono);
+    color: var(--text-inverse-muted);
+    letter-spacing: 0.04em;
+  }
+
+  .code-wrap {
+    position: relative;
+    background-color: var(--navy-900);
+  }
+
+  pre {
+    margin: 0;
+    padding: var(--space-6) var(--space-6);
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.15) transparent;
+  }
+
+  pre::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  pre::-webkit-scrollbar-thumb {
+    background-color: rgba(255,255,255,0.15);
+    border-radius: 2px;
+  }
+
+  .code-content {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    color: var(--cream-100);
+    white-space: pre;
+    display: block;
+  }
+
+  .code-copy {
+    position: absolute;
+    top: var(--space-3);
+    right: var(--space-3);
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-3);
+    background-color: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: var(--radius-sm);
+    color: var(--navy-100);
+    font-size: var(--text-xs);
+    font-family: var(--font-sans);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .code-copy:hover {
+    background-color: rgba(255, 255, 255, 0.14);
+    color: var(--cream-100);
+  }
+
+  .code-copy.copied {
+    color: var(--teal-300);
+    border-color: rgba(46, 188, 188, 0.4);
+  }
+
+  .copy-label {
+    font-size: var(--text-xs);
+  }
+
+  .icon-check {
+    display: none;
+  }
+
+  .code-copy.copied .icon-copy {
+    display: none;
+  }
+
+  .code-copy.copied .icon-check {
+    display: block;
+  }
+</style>
+
+<script>
+  document.querySelectorAll('[data-code-block]').forEach((block) => {
+    const btn = block.querySelector<HTMLButtonElement>('.code-copy');
+    if (!btn) return;
+
+    btn.addEventListener('click', async () => {
+      const targetId = btn.dataset.target;
+      const codeEl = targetId ? document.getElementById(targetId) : null;
+      const text = codeEl?.textContent ?? '';
+
+      try {
+        await navigator.clipboard.writeText(text);
+        btn.classList.add('copied');
+        const label = btn.querySelector('.copy-label');
+        if (label) label.textContent = 'Copied!';
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          if (label) label.textContent = 'Copy';
+        }, 2000);
+      } catch {
+        // Clipboard not available
+      }
+    });
+  });
+</script>

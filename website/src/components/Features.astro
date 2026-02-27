@@ -1,0 +1,231 @@
+---
+const features = [
+  {
+    icon: 'anchor',
+    title: 'One-Command Setup',
+    body: 'Run <code>npx tiller-ai init</code> in any project. Tiller writes your CLAUDE.md, slash commands, and git hooks — then gets out of the way.',
+  },
+  {
+    icon: 'compass',
+    title: 'Slash Commands',
+    body: 'Built-in <code>/vibe</code>, <code>/snapshot</code>, <code>/land</code>, and <code>/recap</code> commands give Claude Code a coherent workflow vocabulary.',
+  },
+  {
+    icon: 'wheel',
+    title: 'Two Modes',
+    body: '<strong>Simple mode</strong> for non-technical users who want outcomes. <strong>Detailed mode</strong> for developers who want to review every decision.',
+  },
+  {
+    icon: 'shield',
+    title: 'Safety Hooks',
+    body: 'A secret-scanning hook blocks any tool write that would commit credentials or API keys. A post-write hook runs your formatter automatically.',
+  },
+  {
+    icon: 'rope',
+    title: 'Auto Tech Debt',
+    body: 'Every 3 landed features, Tiller runs a background tech debt sweep — refactoring without disrupting your current feature branch.',
+  },
+  {
+    icon: 'branch',
+    title: 'Branch Discipline',
+    body: 'All work happens on <code>feature/*</code> branches. <code>/land</code> merges cleanly to main, or opens a PR in team workflows.',
+  },
+];
+---
+
+<section class="features" id="features" aria-labelledby="features-heading">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-eyebrow">What you get</p>
+      <h2 id="features-heading" class="section-heading">
+        A complete workflow,<br/>
+        <em>not just a config file</em>
+      </h2>
+      <p class="section-subtitle">
+        Tiller installs a coherent system of conventions so Claude Code
+        knows how to work in your project from day one.
+      </p>
+    </div>
+
+    <div class="features-grid">
+      {features.map(({ icon, title, body }) => (
+        <article class="feature-card">
+          <div class={`feature-icon feature-icon--${icon}`} aria-hidden="true">
+            {icon === 'anchor' && (
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="5" r="2"/>
+                <line x1="12" y1="7" x2="12" y2="22"/>
+                <path d="M5 15l7 7 7-7"/>
+                <path d="M5 12h14"/>
+              </svg>
+            )}
+            {icon === 'compass' && (
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+              </svg>
+            )}
+            {icon === 'wheel' && (
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"/>
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="2" x2="12" y2="9"/>
+                <line x1="12" y1="15" x2="12" y2="22"/>
+                <line x1="2" y1="12" x2="9" y2="12"/>
+                <line x1="15" y1="12" x2="22" y2="12"/>
+                <line x1="4.93" y1="4.93" x2="9.17" y2="9.17"/>
+                <line x1="14.83" y1="14.83" x2="19.07" y2="19.07"/>
+                <line x1="14.83" y1="9.17" x2="19.07" y2="4.93"/>
+                <line x1="4.93" y1="19.07" x2="9.17" y2="14.83"/>
+              </svg>
+            )}
+            {icon === 'shield' && (
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+            )}
+            {icon === 'rope' && (
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 12c0-4 9-9 9-9s9 5 9 9c0 2.5-2 4.5-4.5 4.5S12 15.5 12 13c0-2.5 2-4.5 4.5-4.5"/>
+              </svg>
+            )}
+            {icon === 'branch' && (
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="6" y1="3" x2="6" y2="15"/>
+                <circle cx="18" cy="6" r="3"/>
+                <circle cx="6" cy="18" r="3"/>
+                <path d="M18 9a9 9 0 01-9 9"/>
+              </svg>
+            )}
+          </div>
+          <h3 class="feature-title">{title}</h3>
+          <p class="feature-body" set:html={body}></p>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .features {
+    padding: var(--space-24) 0;
+    background-color: var(--cream-100);
+  }
+
+  /* Section header */
+  .section-header {
+    text-align: center;
+    margin-bottom: var(--space-16);
+  }
+
+  .section-eyebrow {
+    display: inline-block;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--teal-500);
+    margin-bottom: var(--space-4);
+  }
+
+  .section-heading {
+    font-family: var(--font-serif);
+    font-size: clamp(var(--text-3xl), 4vw, var(--text-4xl));
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: var(--navy-900);
+    margin-bottom: var(--space-4);
+  }
+
+  .section-heading em {
+    font-style: italic;
+    color: var(--teal-600);
+  }
+
+  .section-subtitle {
+    font-size: var(--text-lg);
+    color: var(--text-secondary);
+    max-width: 520px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  /* Grid */
+  .features-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
+
+  @media (min-width: 560px) {
+    .features-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (min-width: 900px) {
+    .features-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  /* Card */
+  .feature-card {
+    background-color: var(--white);
+    border: 1px solid var(--cream-300);
+    border-radius: var(--radius-lg);
+    padding: var(--space-8);
+    transition: box-shadow var(--transition-base), transform var(--transition-base);
+  }
+
+  .feature-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+
+  .feature-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-md);
+    background-color: var(--navy-800);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--space-5);
+    color: var(--gold-300);
+  }
+
+  .feature-icon svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .feature-title {
+    font-family: var(--font-serif);
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--navy-900);
+    margin-bottom: var(--space-3);
+  }
+
+  .feature-body {
+    font-size: var(--text-base);
+    color: var(--text-secondary);
+    line-height: 1.65;
+  }
+
+  .feature-body code {
+    font-family: var(--font-mono);
+    font-size: 0.875em;
+    background-color: var(--cream-200);
+    color: var(--navy-700);
+    padding: 0.1em 0.35em;
+    border-radius: 3px;
+  }
+
+  .feature-body strong {
+    color: var(--navy-800);
+    font-weight: 600;
+  }
+</style>

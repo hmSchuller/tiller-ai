@@ -1,0 +1,240 @@
+---
+import CodeBlock from './CodeBlock.astro';
+
+const initCode = `# Install Tiller into your project
+npx tiller-ai init
+
+# Answer a few questions:
+#   Project name?  my-app
+#   Run command?   npm test
+#   Mode?          detailed`;
+
+const setupCode = `# Inside Claude Code, run:
+/setup
+
+# Tiller reads your project and configures:
+#  - CLAUDE.md with project context
+#  - .claude/CLAUDE.md with workflow rules
+#  - Verify command, mode, workflow`;
+
+const vibeCode = `# Start a feature with a plain-English description:
+/vibe add a search bar to the dashboard
+
+# Claude will:
+#  1. Orient — read context files
+#  2. Confirm — show a milestone plan
+#  3. Build — implement milestone by milestone
+#  4. Save — commit each milestone cleanly
+
+# When done, land the feature:
+/land`;
+---
+
+<section class="getting-started" id="getting-started" aria-labelledby="gs-heading">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-eyebrow">Ship it</p>
+      <h2 id="gs-heading" class="section-heading">
+        From zero to<br/>
+        <em>structured workflow</em>
+      </h2>
+      <p class="section-subtitle">
+        Three steps to turn any project into a Tiller-powered Claude Code workspace.
+      </p>
+    </div>
+
+    <div class="steps-list">
+      <!-- Step 1 -->
+      <div class="step-row">
+        <div class="step-meta">
+          <div class="step-badge">Step 1</div>
+          <h3 class="step-title">Initialize Tiller</h3>
+          <p class="step-description">
+            Run <code>npx tiller-ai init</code> in your project root.
+            Tiller scaffolds all the config files, slash commands, and
+            git hooks you need — committed straight to your repo.
+          </p>
+        </div>
+        <div class="step-code">
+          <CodeBlock code={initCode} language="bash" label="Terminal" />
+        </div>
+      </div>
+
+      <!-- Rope connector -->
+      <div class="rope-connector" aria-hidden="true">
+        <svg viewBox="0 0 60 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M30 0 C30 0 38 12 30 24 C22 36 30 48 30 48" stroke="currentColor" stroke-width="2" stroke-dasharray="4 3" opacity="0.25"/>
+        </svg>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step-row step-row--reverse">
+        <div class="step-meta">
+          <div class="step-badge">Step 2</div>
+          <h3 class="step-title">Run /setup</h3>
+          <p class="step-description">
+            Open Claude Code and run <code>/setup</code>. Claude reads
+            your project and fills in CLAUDE.md with the right context —
+            what the project does, what framework it uses, how to verify.
+          </p>
+        </div>
+        <div class="step-code">
+          <CodeBlock code={setupCode} language="bash" label="Claude Code" />
+        </div>
+      </div>
+
+      <!-- Rope connector -->
+      <div class="rope-connector" aria-hidden="true">
+        <svg viewBox="0 0 60 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M30 0 C30 0 22 12 30 24 C38 36 30 48 30 48" stroke="currentColor" stroke-width="2" stroke-dasharray="4 3" opacity="0.25"/>
+        </svg>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step-row">
+        <div class="step-meta">
+          <div class="step-badge">Step 3</div>
+          <h3 class="step-title">Start vibing</h3>
+          <p class="step-description">
+            Describe what you want to build. Claude plans it in milestones,
+            builds it cleanly, and commits each step. When you're happy,
+            <code>/land</code> ships it.
+          </p>
+        </div>
+        <div class="step-code">
+          <CodeBlock code={vibeCode} language="bash" label="Claude Code" />
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .getting-started {
+    padding: var(--space-24) 0;
+    background-color: var(--cream-200);
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: var(--space-16);
+  }
+
+  .section-eyebrow {
+    display: inline-block;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--teal-500);
+    margin-bottom: var(--space-4);
+  }
+
+  .section-heading {
+    font-family: var(--font-serif);
+    font-size: clamp(var(--text-3xl), 4vw, var(--text-4xl));
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: var(--navy-900);
+    margin-bottom: var(--space-4);
+  }
+
+  .section-heading em {
+    font-style: italic;
+    color: var(--teal-600);
+  }
+
+  .section-subtitle {
+    font-size: var(--text-lg);
+    color: var(--text-secondary);
+    max-width: 480px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  /* Steps */
+  .steps-list {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .step-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+    align-items: start;
+  }
+
+  @media (min-width: 768px) {
+    .step-row {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-12);
+      align-items: center;
+    }
+
+    .step-row--reverse .step-meta {
+      order: 2;
+    }
+
+    .step-row--reverse .step-code {
+      order: 1;
+    }
+  }
+
+  .step-meta {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .step-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-1) var(--space-3);
+    background-color: var(--navy-800);
+    color: var(--gold-300);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-radius: 100px;
+    align-self: flex-start;
+  }
+
+  .step-title {
+    font-family: var(--font-serif);
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    color: var(--navy-900);
+    line-height: 1.2;
+  }
+
+  .step-description {
+    font-size: var(--text-base);
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+
+  .step-description code {
+    font-family: var(--font-mono);
+    font-size: 0.875em;
+    background-color: var(--cream-300);
+    color: var(--navy-700);
+    padding: 0.1em 0.35em;
+    border-radius: 3px;
+  }
+
+  /* Rope connector */
+  .rope-connector {
+    display: flex;
+    justify-content: center;
+    padding: var(--space-4) 0;
+    color: var(--navy-600);
+  }
+
+  .rope-connector svg {
+    width: 40px;
+    height: 48px;
+  }
+</style>
