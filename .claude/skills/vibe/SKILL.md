@@ -44,11 +44,11 @@ Before planning, check if a tech debt cleanup is due:
 
 ## Step 3: Plan milestones
 
-**If mode is simple:** Explore the codebase and break the work into 2–5 milestones internally. Do not show this plan to the user.
+**If mode is simple:** Explore the codebase and break the work into 2–5 milestones internally. Do not show this plan to the user. Tag each milestone as `[independent]` or `[depends-on: N]` based on whether it can run in parallel with others.
 
 **If mode is detailed:** Call `EnterPlanMode`. In the plan file, write:
 - High-level approach (2–3 sentences)
-- 2–5 numbered milestones, each with: what gets built + what gets tested
+- 2–5 numbered milestones, each with: what gets built + what gets tested + a dependency tag: `[independent]` if it can run in parallel with other independent milestones, or `[depends-on: N]` if it requires milestone N to complete first
 - Files to create or modify
 - Any trade-offs worth noting
 - **Execution rules** (embed verbatim): After plan approval, read `vibestate.md` to find the milestone checklist, then execute the milestone loop: for each remaining milestone, announce "Milestone X/N: <description>", build functionality, add or update tests, run `npm test` and fix failures, run `git add -A && git commit -m "<milestone>"`, update `vibestate.md` checkboxes and `changelog.md` Done section then amend commit, report "Saved: <description> (X/N)". When all milestones are done, summarize what was built and suggest `/land`.
@@ -57,7 +57,11 @@ Before planning, check if a tech debt cleanup is due:
 
 ## Step 4: Build milestone by milestone
 
-For each milestone:
+After planning, look at the dependency tags on your milestones:
+
+### If all milestones are sequential (all tagged `[depends-on: N]`)
+
+Execute them one by one:
 1. **detailed only:** Announce: "Milestone X/N: <description>"
 2. Build the functionality
 3. Add or update tests for what was built
@@ -65,6 +69,39 @@ For each milestone:
 5. `git add -A && git commit -m "<milestone description>"`
 6. Update `vibestate.md` milestone checkboxes (detailed) and add entry to `changelog.md` Done section. Amend: `git commit --amend --no-edit`
 7. **simple:** Say: "Saved: <what changed>". **detailed:** Report: "Saved: <description> (X/N)"
+
+### If independent milestones exist
+
+Use agent teams to parallelize independent work:
+
+**Setup:**
+1. Use `TeamCreate` to create a team named after the feature branch (e.g. `feature-x`)
+2. For each independent milestone, use `TaskCreate` to create a task with the milestone description and full context (branch name, files involved, verify command: `npm test`)
+3. For each independent milestone, spawn a `general-purpose` agent via the `Task` tool with `team_name` set. Provide each agent its task description and these instructions:
+   - Work on branch `<feature-branch>` (already checked out — do not switch branches)
+   - Implement only the files in your milestone scope
+   - Run `npm test` before reporting done — fix any failures
+   - Do NOT commit — the lead agent commits
+   - Report done via `SendMessage` to the lead with a summary of what you changed
+
+**Coordination:**
+4. While workers run, the lead agent handles any sequential milestones that are unblocked
+5. Use `TaskList` to monitor progress
+6. When a worker sends a completion message, update `TaskUpdate` to mark it completed
+7. Once all independent milestones are done, shut down the team via `SendMessage` with `type: "shutdown_request"`
+8. Run `npm test` once across all changes — fix any failures as lead
+9. `git add -A && git commit -m "<feature>: parallel milestones <list>"`
+10. Update `vibestate.md` and `changelog.md`. Amend: `git commit --amend --no-edit`
+
+**Then continue** with any remaining sequential milestones using the sequential loop above.
+
+### Within-milestone split (optional)
+
+For a large milestone where implementation and tests are clearly separable, the lead can spawn a single worker agent to write tests while it implements:
+- Lead implements the feature code
+- Worker (spawned via `Task` tool, no team needed) writes the tests in parallel
+- Worker reports back via `SendMessage` when done
+- Lead reviews, runs `npm test`, commits
 
 ## Step 5: Complete
 

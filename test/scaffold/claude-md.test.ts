@@ -69,6 +69,17 @@ describe('generateDotClaudeMd', () => {
     const result = generateDotClaudeMd(simpleConfig);
     expect(result).toContain('.tiller.local.json');
   });
+
+  it('mentions agent team parallelization in vibe loop description', () => {
+    const result = generateDotClaudeMd(simpleConfig);
+    expect(result).toContain('agent teams');
+    expect(result).toContain('[independent]');
+  });
+
+  it('describes agent team usage in /vibe skill listing', () => {
+    const result = generateDotClaudeMd(simpleConfig);
+    expect(result).toContain('parallelized');
+  });
 });
 
 describe('generateRootClaudeMd — workflow section', () => {
