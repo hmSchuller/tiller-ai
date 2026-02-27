@@ -5,6 +5,7 @@ export const simpleConfig: ProjectConfig = {
   description: 'A test project for unit tests',
   runCommand: 'npm test',
   mode: 'simple',
+  workflow: 'solo',
 };
 
 export const detailedConfig: ProjectConfig = {
@@ -12,4 +13,21 @@ export const detailedConfig: ProjectConfig = {
   description: 'A project with detailed mode',
   runCommand: 'npm run verify',
   mode: 'detailed',
+  workflow: 'solo',
+};
+
+export const teamSimpleConfig: ProjectConfig = {
+  projectName: 'team-project',
+  description: 'A team project with simple mode',
+  runCommand: 'npm test',
+  mode: 'simple',
+  workflow: 'team',
+};
+
+export const teamDetailedConfig: ProjectConfig = {
+  projectName: 'team-project-detailed',
+  description: 'A team project with detailed mode',
+  runCommand: 'npm run verify',
+  mode: 'detailed',
+  workflow: 'team',
 };

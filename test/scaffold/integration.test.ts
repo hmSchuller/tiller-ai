@@ -10,6 +10,7 @@ const config: ProjectConfig = {
   description: 'Integration test project',
   runCommand: 'echo ok',
   mode: 'simple',
+  workflow: 'solo',
 };
 
 let tmpDir: string;
@@ -59,13 +60,27 @@ describe('scaffold integration', () => {
     expect(await exists('.claude/.tiller.json')).toBe(true);
     const content = JSON.parse(await read('.claude/.tiller.json'));
     expect(content.mode).toBe('simple');
+    expect(content.workflow).toBe('solo');
     expect(content.runCommand).toBe('echo ok');
   });
 
-  it('creates vibestate.md', async () => {
+  it('creates vibestate.md (local active-feature state)', async () => {
     expect(await exists('vibestate.md')).toBe(true);
     const content = await read('vibestate.md');
+    expect(content).toContain('Active feature');
+  });
+
+  it('creates changelog.md (shared done log)', async () => {
+    expect(await exists('changelog.md')).toBe(true);
+    const content = await read('changelog.md');
     expect(content).toContain('smoke-test');
+    expect(content).toContain('v0 — initial scaffold');
+  });
+
+  it('.gitignore excludes vibestate.md and .tiller.local.json', async () => {
+    const content = await read('.gitignore');
+    expect(content).toContain('vibestate.md');
+    expect(content).toContain('.tiller.local.json');
   });
 
   it('creates .gitignore', async () => {

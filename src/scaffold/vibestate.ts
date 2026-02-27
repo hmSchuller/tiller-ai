@@ -1,18 +1,13 @@
 import type { ProjectConfig } from './types.js';
 
-export function generateVibestate(config: ProjectConfig): string {
-  const today = new Date().toISOString().split('T')[0];
-  return `# vibestate.md — ${config.projectName}
+export function generateVibestate(_config: ProjectConfig): string {
+  return `# vibestate.md — local only, do not commit
 
-> This file tracks project state. Updated by /vibe, /snapshot, and /land.
+> Tracks your active feature work. Gitignored — each dev has their own copy.
 
 ## Active feature
 
 None — on main, ready to start something.
-
-## Done
-
-- [${today}] v0 — initial scaffold
 
 ## Notes
 
