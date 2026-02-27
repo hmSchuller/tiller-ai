@@ -8,7 +8,7 @@ const program = new Command();
 program
   .name('tiller')
   .description('Scaffold Claude Code projects with a structured vibe loop')
-  .version('0.1.2');
+  .version('0.1.3');
 
 program
   .command('init')
