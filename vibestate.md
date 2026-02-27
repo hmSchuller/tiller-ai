@@ -1,6 +1,6 @@
-# vibestate.md — tiller-code
+# vibestate.md — local only, do not commit
 
-> This file tracks project state. Updated by /snapshot and /land.
+> Tracks your active feature work. Gitignored — each dev has their own copy.
 
 ## Active feature
 
@@ -12,19 +12,7 @@
 - [x] Milestone 2: Split vibestate into `changelog.md` (committed) + `vibestate.md` (gitignored)
 - [x] Milestone 3: Unified skill templates (mode-agnostic)
 - [x] Milestone 4: PR-based `/land` for team workflow
-- [ ] Milestone 5: Per-dev mode via `.tiller.local.json`
-
-
-
-## Done
-
-- [2026-02-27] v0 — initial scaffold
-- [2026-02-27] vibe skill resumes existing feature branches instead of recreating them
-- [2026-02-27] landed feature/vibe-resume-existing-branch
-- [2026-02-27] ask user to continue or revisit plan when resuming an existing branch
-- [2026-02-27] landed feature/vibe-resume-ask-user
-- [2026-02-27] state current mode before vibing a new feature
-- [2026-02-27] landed feature/state-current-mode-before-vibe
+- [x] Milestone 5: Per-dev mode via `.tiller.local.json`
 
 ## Notes
 

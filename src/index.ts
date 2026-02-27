@@ -24,6 +24,7 @@ program
   .command('mode')
   .description('Switch between simple and detailed mode')
   .argument('<mode>', 'Mode: simple or detailed')
+  .option('--project', 'Set the shared project default instead of your personal override')
   .action(modeCommand);
 
 program.parse();

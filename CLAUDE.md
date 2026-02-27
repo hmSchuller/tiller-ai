@@ -11,3 +11,7 @@
 ## Mode
 
 detailed
+
+## Workflow
+
+solo
