@@ -18,3 +18,5 @@
 - [2026-02-27] landed feature/add-workflow-command
 - [2026-02-27] tech debt skill: background agent every 3 features, guardrails, stash/restore, mode-aware reporting
 - [2026-02-27] landed feature/tech-debt-skill
+- [2026-02-27] rewrote README to reflect actual feature set (file tree, workflows, CLI, skills)
+- [2026-02-27] landed feature/sync-readme
