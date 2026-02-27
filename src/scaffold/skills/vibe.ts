@@ -15,7 +15,9 @@ Read \`CLAUDE.md\` and \`vibestate.md\`. Run \`git branch\` and \`git status\`. 
 
 ## Step 2: Branch routing
 
-**$ARGUMENTS provided** → create \`feature/<kebab-case-of-arguments>\` from main (or switch if it exists). Say: "On it."
+**$ARGUMENTS provided** → check if a branch named \`feature/<kebab-case-of-arguments>\` already exists locally or remotely.
+  - If it exists: switch to it and resume work. Say: "Resuming work on: feature/<name>"
+  - If it doesn't exist: create it from main. Say: "On it."
 
 **Already on a feature branch** → continue. Say nothing unless asked.
 
@@ -63,7 +65,9 @@ Summarize the current state in 2-3 sentences.
 
 ## Step 2: Branch routing
 
-**$ARGUMENTS provided** → create \`feature/<kebab-case-of-arguments>\` from main (or switch if it already exists). State: "Starting work on: <idea>"
+**$ARGUMENTS provided** → check if a branch named \`feature/<kebab-case-of-arguments>\` already exists locally or remotely.
+  - If it exists: switch to it, read \`vibestate.md\` to find remaining milestones. State: "Resuming work on: feature/<name>"
+  - If it doesn't exist: create it from main. State: "Starting work on: <idea>"
 
 **Already on a feature branch** → stay on it. State: "Continuing work on: <branch-name>"
 

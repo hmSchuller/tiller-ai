@@ -16,24 +16,28 @@ Run all of these before writing any output:
 3. `git branch --list 'feature/*'`
 4. For each feature branch: `git log main..<branch> --oneline`
 
-## Then produce a single output block
+## Then produce a single plain-English output
+
+Translate git commit messages into natural language. No hashes, no branch names, no git jargon.
+
+Format:
 
 ---
 
-**Active:** <active feature from vibestate.md, or "none">
+**Working on:** <what's currently being built, from vibestate.md — or "nothing, ready to start">
 
-**Completed (main)**
-<hash> <message>
-<hash> <message>
+**Done**
+- <plain English description of what was built>
+- <plain English description of what was built>
 ...
 
 **In progress**
-feature/<name>
-  <hash> <message>
-  ...
-
-<X> features landed, <Y> in progress.
+- <plain English description of what's being worked on>
+...
 
 ---
 
-Nothing else. No commentary, no second-guessing, no re-running commands.
+If there's nothing in progress: omit the "In progress" section.
+If there's nothing done yet: say "Nothing completed yet."
+
+Nothing else. No commentary, no suggestions, no second-guessing.
