@@ -4,6 +4,7 @@
 
 ## Done
 
+- [2026-02-27] landed feature/fix-nodejs-version-requirement
 - [2026-02-27] fix website Node.js version requirement: 18+ → 22+ (matches package.json engines field)
 
 - [2026-02-27] rename /snapshot to /save — shorter, more intuitive, matches skill output
