@@ -1,13 +1,13 @@
 # tiller-code
 
-<!-- Run /setup to fill this in -->
+An npm CLI that scaffolds Claude Code projects with a structured vibe loop (orient → confirm → build → save). Built with TypeScript, commander, @clack/prompts, tsup, and vitest. Developed using tiller itself.
 
 ## Verify command
 
 ```
-# not set — run /setup to configure
+npm test
 ```
 
 ## Mode
 
-simple
+detailed
