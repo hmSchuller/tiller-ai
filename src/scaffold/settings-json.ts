@@ -43,6 +43,7 @@ export function generateSettingsJson(_config: ProjectConfig): string {
         'Bash(npm:*)',
         'Bash(npx:*)',
         'Bash(node:*)',
+        'Bash(echo:*)',
       ],
     },
   };

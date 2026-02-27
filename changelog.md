@@ -20,3 +20,4 @@
 - [2026-02-27] landed feature/tech-debt-skill
 - [2026-02-27] rewrote README to reflect actual feature set (file tree, workflows, CLI, skills)
 - [2026-02-27] landed feature/sync-readme
+- [2026-02-27] add Bash(echo:*) to permissions allowlist

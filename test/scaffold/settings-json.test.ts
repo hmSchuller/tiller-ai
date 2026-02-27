@@ -37,6 +37,11 @@ describe('generateSettingsJson', () => {
     expect(result.permissions.allow).toContain('Bash(git:*)');
   });
 
+  it('includes echo permission', () => {
+    const result = JSON.parse(generateSettingsJson(simpleConfig));
+    expect(result.permissions.allow).toContain('Bash(echo:*)');
+  });
+
   it('includes SessionStart hook with clear matcher', () => {
     const result = JSON.parse(generateSettingsJson(simpleConfig));
     const sessionHooks = result.hooks.SessionStart;
