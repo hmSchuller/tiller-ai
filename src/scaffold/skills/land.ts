@@ -26,7 +26,7 @@ git branch -d <feature-branch>
 
 6. Update vibestate.md: clear Active feature, add Done entry. Commit.
 
-7. Say: "Done. What's next?"
+7. Say: "Done. Run \`/clear\` to reset context before starting your next feature, then \`/vibe\` to continue."
 `;
   }
 
@@ -84,6 +84,6 @@ git branch -d <feature-branch>
 
 ## Step 7: Confirm
 
-Say: "Feature landed on main. /vibe to start the next thing."
+Say: "Feature landed on main. Run \`/clear\` to reset context before your next feature, then \`/vibe\` to continue."
 `;
 }

@@ -4,7 +4,7 @@
 
 ## Active feature
 
-None — on main, ready to start something.
+feature/context-management — remind users to /clear context after /land
 
 ## Done
 
