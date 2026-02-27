@@ -4,6 +4,7 @@
 
 ## Done
 
+- [2026-02-28] landed feature/can-tiller-spawn-agent-teams
 - [2026-02-28] docs: generated CLAUDE.md updated — agent team parallelization in vibe loop and skills listing
 - [2026-02-28] feat: team-aware vibe skill — dependency tags, TeamCreate/TaskCreate/SendMessage, sequential fallback
 - [2026-02-27] landed feature/bump-version-to-0-1-3
