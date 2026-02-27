@@ -14,6 +14,7 @@ export async function initCommand(): Promise<void> {
     description: '',
     runCommand: '',
     mode: 'simple',
+    workflow: 'solo',
   };
 
   const s = spinner();
