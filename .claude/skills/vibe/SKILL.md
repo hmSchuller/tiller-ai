@@ -11,7 +11,9 @@ Read `CLAUDE.md` and `vibestate.md`. Run `git branch` and `git status`. Do not n
 
 ## Step 2: Branch routing
 
-**$ARGUMENTS provided** → create `feature/<kebab-case-of-arguments>` from main (or switch if it exists). Say: "On it."
+**$ARGUMENTS provided** → check if a branch named `feature/<kebab-case-of-arguments>` already exists locally or remotely.
+  - If it exists: switch to it and resume work. Say: "Resuming work on: feature/<name>"
+  - If it doesn't exist: create it from main. Say: "On it."
 
 **Already on a feature branch** → continue. Say nothing unless asked.
 
