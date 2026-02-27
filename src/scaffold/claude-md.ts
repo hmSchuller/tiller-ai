@@ -72,7 +72,7 @@ Every piece of work follows this loop:
 
 1. **Orient** — read CLAUDE.md, vibestate.md (local), and changelog.md (shared)
 2. **Confirm** — in detailed mode, enter plan mode with milestones and wait for approval
-3. **Build** — implement milestone by milestone; each milestone includes tests, verify, and auto-commit
+3. **Build** — implement milestone by milestone; milestones tagged \`[independent]\` may be parallelized using agent teams (TeamCreate + Task tool); each milestone includes tests, verify, and auto-commit
 4. **Complete** — announce feature done, suggest /land
 
 ## File discipline
@@ -94,7 +94,7 @@ Skills read \`.tiller.local.json\` first, then fall back to CLAUDE.md.
 ## Skills
 
 - **/setup** — first-run: understand the project and configure CLAUDE.md
-- **/vibe** [idea] — milestone-driven development: plan, build, test, auto-commit. Every 3 landed features, automatically runs a background tech debt cleanup before planning.
+- **/vibe** [idea] — milestone-driven development: plan, build, test, auto-commit. Independent milestones are parallelized using agent teams. Every 3 landed features, automatically runs a tech debt cleanup before planning.
 - **/save** — commit current progress on the feature branch
 - **/land** — merge or PR depending on workflow
 - **/recap** — read-only status of all work
