@@ -23,11 +23,3 @@ export const teamSimpleConfig: ProjectConfig = {
   mode: 'simple',
   workflow: 'team',
 };
-
-export const teamDetailedConfig: ProjectConfig = {
-  projectName: 'team-project-detailed',
-  description: 'A team project with detailed mode',
-  runCommand: 'npm run verify',
-  mode: 'detailed',
-  workflow: 'team',
-};
