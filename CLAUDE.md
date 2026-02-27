@@ -10,4 +10,4 @@
 
 ## Mode
 
-simple
+detailed
