@@ -11,3 +11,5 @@
 - [2026-02-27] landed feature/vibe-resume-ask-user
 - [2026-02-27] state current mode before vibing a new feature
 - [2026-02-27] landed feature/state-current-mode-before-vibe
+- [2026-02-27] multi-dev support: workflow config, vibestate/changelog split, unified skills, team PR flow, per-dev mode
+- [2026-02-27] landed feature/multi-dev-support
