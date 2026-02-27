@@ -4,7 +4,7 @@ export function generateVibestate(config: ProjectConfig): string {
   const today = new Date().toISOString().split('T')[0];
   return `# vibestate.md — ${config.projectName}
 
-> This file tracks project state. Updated by /snapshot and /land.
+> This file tracks project state. Updated by /vibe, /snapshot, and /land.
 
 ## Active feature
 

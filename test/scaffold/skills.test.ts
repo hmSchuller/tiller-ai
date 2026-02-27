@@ -16,15 +16,45 @@ describe('generateVibeSkill', () => {
     expect(result).toContain('$ARGUMENTS');
   });
 
-  it('simple mode skips plan narration', () => {
+  it('simple mode plans milestones internally', () => {
     const result = generateVibeSkill(simpleConfig);
-    expect(result).toContain('Just build');
+    expect(result).toContain('Plan milestones (internal)');
     expect(result).not.toContain('Wait for explicit confirmation');
   });
 
-  it('detailed mode requires explicit confirmation before building', () => {
+  it('detailed mode enters plan mode', () => {
     const result = generateVibeSkill(detailedConfig);
-    expect(result).toContain('Wait for explicit confirmation');
+    expect(result).toContain('EnterPlanMode');
+  });
+
+  it('both modes build milestone by milestone', () => {
+    expect(generateVibeSkill(simpleConfig)).toContain('Build milestone by milestone');
+    expect(generateVibeSkill(detailedConfig)).toContain('Build milestone by milestone');
+  });
+
+  it('both modes require adding or updating tests', () => {
+    expect(generateVibeSkill(simpleConfig)).toContain('Add or update tests');
+    expect(generateVibeSkill(detailedConfig)).toContain('Add or update tests');
+  });
+
+  it('both modes auto-commit after each milestone', () => {
+    expect(generateVibeSkill(simpleConfig)).toContain('git add -A && git commit');
+    expect(generateVibeSkill(detailedConfig)).toContain('git add -A && git commit');
+  });
+
+  it('both modes announce feature complete', () => {
+    expect(generateVibeSkill(simpleConfig)).toContain('Feature complete');
+    expect(generateVibeSkill(detailedConfig)).toContain('/land');
+  });
+
+  it('simple mode hides milestones from user', () => {
+    const result = generateVibeSkill(simpleConfig);
+    expect(result).toContain('Do not show this plan to the user');
+  });
+
+  it('detailed mode embeds execution rules in plan', () => {
+    const result = generateVibeSkill(detailedConfig);
+    expect(result).toContain('Execution rules');
   });
 
   it('includes the verify command', () => {

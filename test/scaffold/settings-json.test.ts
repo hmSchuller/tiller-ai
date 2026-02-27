@@ -36,4 +36,16 @@ describe('generateSettingsJson', () => {
     const result = JSON.parse(generateSettingsJson(simpleConfig));
     expect(result.permissions.allow).toContain('Bash(git:*)');
   });
+
+  it('includes SessionStart hook with clear matcher', () => {
+    const result = JSON.parse(generateSettingsJson(simpleConfig));
+    const sessionHooks = result.hooks.SessionStart;
+    expect(sessionHooks).toBeDefined();
+    expect(sessionHooks[0].matcher).toBe('clear');
+  });
+
+  it('references session-resume.sh', () => {
+    const result = generateSettingsJson(simpleConfig);
+    expect(result).toContain('session-resume.sh');
+  });
 });

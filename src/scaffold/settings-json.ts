@@ -25,6 +25,17 @@ export function generateSettingsJson(_config: ProjectConfig): string {
           ],
         },
       ],
+      SessionStart: [
+        {
+          matcher: 'clear',
+          hooks: [
+            {
+              type: 'command',
+              command: 'bash .claude/hooks/session-resume.sh',
+            },
+          ],
+        },
+      ],
     },
     permissions: {
       allow: [

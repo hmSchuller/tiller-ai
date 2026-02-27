@@ -80,6 +80,10 @@ describe('scaffold integration', () => {
     expect(await exists('.claude/hooks/secret-scan.sh')).toBe(true);
   });
 
+  it('creates session-resume.sh hook', async () => {
+    expect(await exists('.claude/hooks/session-resume.sh')).toBe(true);
+  });
+
   it('creates all five skills', async () => {
     expect(await exists('.claude/skills/setup/SKILL.md')).toBe(true);
     expect(await exists('.claude/skills/vibe/SKILL.md')).toBe(true);

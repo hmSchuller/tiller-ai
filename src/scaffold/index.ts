@@ -9,6 +9,7 @@ import { generateGitignore } from './gitignore.js';
 import { generateTillerManifest } from './tiller-manifest.js';
 import { generatePostWriteHook } from './hooks/post-write.js';
 import { generateSecretScanHook } from './hooks/secret-scan.js';
+import { generateSessionResumeHook } from './hooks/session-resume.js';
 import { generateVibeSkill } from './skills/vibe.js';
 import { generateSnapshotSkill } from './skills/snapshot.js';
 import { generateRecapSkill } from './skills/recap.js';
@@ -33,6 +34,7 @@ export async function scaffold(config: ProjectConfig, targetDir: string): Promis
   // Hooks
   await writeFile(p('.claude/hooks/post-write.sh'), generatePostWriteHook(config));
   await writeFile(p('.claude/hooks/secret-scan.sh'), generateSecretScanHook(config));
+  await writeFile(p('.claude/hooks/session-resume.sh'), generateSessionResumeHook(config));
 
   // Skills
   await writeFile(p('.claude/skills/setup/SKILL.md'), generateSetupSkill(config));

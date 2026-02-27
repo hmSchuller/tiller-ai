@@ -37,7 +37,7 @@ describe('generateDotClaudeMd', () => {
     expect(result).toContain('Orient');
     expect(result).toContain('Confirm');
     expect(result).toContain('Build');
-    expect(result).toContain('Save');
+    expect(result).toContain('Complete');
   });
 
   it('lists all four skills', () => {
