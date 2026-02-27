@@ -4,7 +4,7 @@ Scaffold Claude Code projects with a structured vibe loop — branch, build, com
 
 ## What is this?
 
-Tiller is a thin scaffold for Claude Code that turns a blank repo into a project Claude knows how to navigate. It installs a set of slash commands (skills), two `CLAUDE.md` files (one user-facing, one Tiller-managed), hooks for formatting and secret scanning, and shared tracking files. Once scaffolded, you describe work with `/vibe`, save checkpoints with `/snapshot`, and ship with `/land` — and Claude follows the loop without you having to re-explain your workflow every session.
+Tiller is a thin scaffold for Claude Code that turns a blank repo into a project Claude knows how to navigate. It installs a set of slash commands (skills), two `CLAUDE.md` files (one user-facing, one Tiller-managed), hooks for formatting and secret scanning, and shared tracking files. Once scaffolded, you describe work with `/vibe`, save checkpoints with `/save`, and ship with `/land` — and Claude follows the loop without you having to re-explain your workflow every session.
 
 ## Quick start
 
@@ -25,7 +25,7 @@ npx tiller-ai init
 |---|---|
 | `/setup` | First-run: understand the project and fill in `CLAUDE.md` |
 | `/vibe [idea]` | Start or continue work on something |
-| `/snapshot` | Commit current progress on the feature branch |
+| `/save` | Commit current progress on the feature branch |
 | `/land` | Merge completed feature to main (solo) or open a PR (team) |
 | `/recap` | Read-only status — active feature, notes |
 
@@ -81,7 +81,7 @@ your-project/
 │   └── skills/
 │       ├── setup/SKILL.md                 # /setup skill
 │       ├── vibe/SKILL.md                  # /vibe skill
-│       ├── snapshot/SKILL.md              # /snapshot skill
+│       ├── save/SKILL.md                  # /save skill
 │       ├── land/SKILL.md                  # /land skill
 │       └── recap/SKILL.md                 # /recap skill
 ```
@@ -95,7 +95,7 @@ Every piece of work follows this loop:
 1. **Orient** — Claude reads `CLAUDE.md` and `vibestate.md` to understand project state and pick up any in-progress work
 2. **Confirm** — in `detailed` mode, Claude writes out the proposed approach and waits for a go-ahead before touching files
 3. **Build** — Claude implements, runs the verify command after each chunk, and fixes failures before moving on
-4. **Save** — Claude reminds you to `/snapshot` when stable and `/land` when the feature is done
+4. **Save** — Claude reminds you to `/save` when stable and `/land` when the feature is done
 
 `vibestate.md` tracks the active branch, milestone checklist, and session notes. `changelog.md` is the shared done log — updated by `/land` whenever a feature merges, so team members can see what's been shipped.
 

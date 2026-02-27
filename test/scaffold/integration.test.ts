@@ -109,7 +109,7 @@ describe('scaffold integration', () => {
   it('creates all skills including tech-debt', async () => {
     expect(await exists('.claude/skills/setup/SKILL.md')).toBe(true);
     expect(await exists('.claude/skills/vibe/SKILL.md')).toBe(true);
-    expect(await exists('.claude/skills/snapshot/SKILL.md')).toBe(true);
+    expect(await exists('.claude/skills/save/SKILL.md')).toBe(true);
     expect(await exists('.claude/skills/recap/SKILL.md')).toBe(true);
     expect(await exists('.claude/skills/land/SKILL.md')).toBe(true);
     expect(await exists('.claude/skills/tech-debt/SKILL.md')).toBe(true);

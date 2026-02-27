@@ -79,7 +79,7 @@ Every piece of work follows this loop:
 
 - Never commit directly to main
 - Always work on a feature branch (feature/<name>)
-- Run the verify command before every snapshot and land
+- Run the verify command before every save and land
 - \`vibestate.md\` is gitignored — it tracks your local active feature state
 - \`changelog.md\` is committed and shared — it tracks the project's done log
 
@@ -95,7 +95,7 @@ Skills read \`.tiller.local.json\` first, then fall back to CLAUDE.md.
 
 - **/setup** — first-run: understand the project and configure CLAUDE.md
 - **/vibe** [idea] — milestone-driven development: plan, build, test, auto-commit. Every 3 landed features, automatically runs a background tech debt cleanup before planning.
-- **/snapshot** — commit current progress on the feature branch
+- **/save** — commit current progress on the feature branch
 - **/land** — merge or PR depending on workflow
 - **/recap** — read-only status of all work
 

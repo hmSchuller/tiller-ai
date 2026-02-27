@@ -7,7 +7,7 @@ export const MANAGED_FILES = [
   '.claude/hooks/secret-scan.sh',
   '.claude/skills/setup/SKILL.md',
   '.claude/skills/vibe/SKILL.md',
-  '.claude/skills/snapshot/SKILL.md',
+  '.claude/skills/save/SKILL.md',
   '.claude/skills/recap/SKILL.md',
   '.claude/skills/land/SKILL.md',
   '.claude/skills/tech-debt/SKILL.md',

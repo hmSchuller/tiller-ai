@@ -1,7 +1,7 @@
 import { writeFile, readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { generateVibeSkill } from '../src/scaffold/skills/vibe.ts';
-import { generateSnapshotSkill } from '../src/scaffold/skills/snapshot.ts';
+import { generateSaveSkill } from '../src/scaffold/skills/save.ts';
 import { generateRecapSkill } from '../src/scaffold/skills/recap.ts';
 import { generateLandSkill } from '../src/scaffold/skills/land.ts';
 import type { ProjectConfig } from '../src/scaffold/types.ts';
@@ -21,7 +21,7 @@ const config: ProjectConfig = {
 };
 
 await writeFile('.claude/skills/vibe/SKILL.md', generateVibeSkill(config));
-await writeFile('.claude/skills/snapshot/SKILL.md', generateSnapshotSkill(config));
+await writeFile('.claude/skills/save/SKILL.md', generateSaveSkill(config));
 await writeFile('.claude/skills/recap/SKILL.md', generateRecapSkill(config));
 await writeFile('.claude/skills/land/SKILL.md', generateLandSkill(config));
 

@@ -43,7 +43,7 @@ describe('generateDotClaudeMd', () => {
   it('lists all four skills', () => {
     const result = generateDotClaudeMd(simpleConfig);
     expect(result).toContain('/vibe');
-    expect(result).toContain('/snapshot');
+    expect(result).toContain('/save');
     expect(result).toContain('/land');
     expect(result).toContain('/recap');
   });
