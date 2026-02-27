@@ -5,6 +5,7 @@
 ## Done
 
 - [2026-02-27] rename /snapshot to /save — shorter, more intuitive, matches skill output
+- [2026-02-27] landed feature/evaluate-if-snapshot-and-recap-are-good-names
 
 - [2026-02-27] renamed CLI intro strings from `tiller` to `tiller-ai` to match bin name
 - [2026-02-27] landed feature/create-static-promotional-website-for-github-pages
