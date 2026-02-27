@@ -1,9 +1,9 @@
 ---
-name: vibe
-description: Start or continue working on an idea. Usage: /vibe [idea description]
+name: sail
+description: Start or continue working on an idea. Usage: /sail [idea description]
 ---
 
-# /vibe — Start or continue work
+# /sail — Start or continue work
 
 ## Step 1: Orient
 

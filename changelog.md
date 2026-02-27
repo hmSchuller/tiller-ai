@@ -1,9 +1,10 @@
 # changelog.md — tiller-ai
 
-> Shared project history. Updated by /vibe, /save, and /land. Committed and shared.
+> Shared project history. Updated by /sail, /anchor, and /land. Committed and shared.
 
 ## Done
 
+- [2026-02-28] feat: update README, website, local skills and CLAUDE.md for /sail and /anchor rename
 - [2026-02-28] feat: rename /vibe → /sail and /save → /anchor — source files, generators, tests, upgrade
 - [2026-02-28] landed feature/can-tiller-spawn-agent-teams
 - [2026-02-28] docs: generated CLAUDE.md updated — agent team parallelization in vibe loop and skills listing
