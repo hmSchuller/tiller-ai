@@ -25,7 +25,7 @@ export async function modeCommand(newMode: string): Promise<void> {
     process.exit(1);
   }
 
-  let manifest: { version: string; mode: 'simple' | 'detailed'; runCommand: string; projectName?: string; description?: string };
+  let manifest: { version: string; mode: 'simple' | 'detailed'; workflow?: 'solo' | 'team'; runCommand: string; projectName?: string; description?: string };
   try {
     const raw = await readFile(manifestPath, 'utf-8');
     manifest = JSON.parse(raw);
@@ -61,6 +61,7 @@ export async function modeCommand(newMode: string): Promise<void> {
     description,
     runCommand: manifest.runCommand,
     mode: newMode as 'simple' | 'detailed',
+    workflow: manifest.workflow ?? 'solo',
   };
 
   const s = spinner();

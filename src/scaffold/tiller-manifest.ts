@@ -16,6 +16,7 @@ export function generateTillerManifest(config: ProjectConfig, version: string): 
   const manifest = {
     version,
     mode: config.mode,
+    workflow: config.workflow,
     runCommand: config.runCommand,
     managedFiles: MANAGED_FILES,
   };

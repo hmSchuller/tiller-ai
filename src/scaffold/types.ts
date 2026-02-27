@@ -3,4 +3,5 @@ export interface ProjectConfig {
   description: string;
   runCommand: string;
   mode: 'simple' | 'detailed';
+  workflow: 'solo' | 'team';
 }

@@ -10,6 +10,7 @@ const config: ProjectConfig = {
   description: 'Integration test project',
   runCommand: 'echo ok',
   mode: 'simple',
+  workflow: 'solo',
 };
 
 let tmpDir: string;
@@ -59,6 +60,7 @@ describe('scaffold integration', () => {
     expect(await exists('.claude/.tiller.json')).toBe(true);
     const content = JSON.parse(await read('.claude/.tiller.json'));
     expect(content.mode).toBe('simple');
+    expect(content.workflow).toBe('solo');
     expect(content.runCommand).toBe('echo ok');
   });
 
