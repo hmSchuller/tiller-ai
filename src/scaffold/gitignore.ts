@@ -1,5 +1,7 @@
 import type { ProjectConfig } from './types.js';
 
+export const TILLER_GITIGNORE_ENTRIES = ['vibestate.md', '.tiller.local.json'];
+
 export function generateGitignore(_config: ProjectConfig): string {
   return `# Dependencies
 node_modules/

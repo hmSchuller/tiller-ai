@@ -1,4 +1,5 @@
 import { join } from 'node:path';
+import { readFile } from 'node:fs/promises';
 import { writeFile } from '../utils/fs.js';
 import { isGitRepo, gitInit, gitAdd, gitCommit } from '../utils/git.js';
 import type { ProjectConfig } from './types.js';
@@ -6,7 +7,7 @@ import { generateRootClaudeMd, generateDotClaudeMd } from './claude-md.js';
 import { generateVibestate } from './vibestate.js';
 import { generateChangelog } from './changelog.js';
 import { generateSettingsJson } from './settings-json.js';
-import { generateGitignore } from './gitignore.js';
+import { generateGitignore, TILLER_GITIGNORE_ENTRIES } from './gitignore.js';
 import { generateTillerManifest, TILLER_VERSION } from './tiller-manifest.js';
 import { generatePostWriteHook } from './hooks/post-write.js';
 import { generateSecretScanHook } from './hooks/secret-scan.js';
@@ -24,7 +25,25 @@ export async function scaffold(config: ProjectConfig, targetDir: string): Promis
 
   // Root files
   await writeFile(p('CLAUDE.md'), generateRootClaudeMd(config));
-  await writeFile(p('.gitignore'), generateGitignore(config));
+
+  // .gitignore: preserve existing content, only append missing tiller entries
+  let existingGitignore: string | null = null;
+  try {
+    existingGitignore = await readFile(p('.gitignore'), 'utf-8');
+  } catch {
+    // file doesn't exist — write the full template below
+  }
+  if (existingGitignore !== null) {
+    const missing = TILLER_GITIGNORE_ENTRIES.filter(
+      (entry) => !existingGitignore!.split('\n').some((line) => line.trim() === entry)
+    );
+    if (missing.length > 0) {
+      const appendBlock = '\n# Tiller\n' + missing.join('\n') + '\n';
+      await writeFile(p('.gitignore'), existingGitignore + appendBlock);
+    }
+  } else {
+    await writeFile(p('.gitignore'), generateGitignore(config));
+  }
   await writeFile(p('changelog.md'), generateChangelog(config));
   await writeFile(p('vibestate.md'), generateVibestate(config));
 
