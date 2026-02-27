@@ -1,8 +1,14 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import Footer from '../components/Footer.astro';
 ---
 
 <Layout>
-  <h1>Hello Tiller</h1>
-  <p>Pipeline verification placeholder.</p>
+  <Header />
+  <main id="main-content">
+    <Hero />
+  </main>
+  <Footer />
 </Layout>
