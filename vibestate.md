@@ -4,7 +4,11 @@
 
 ## Active feature
 
-None — on main, ready to start something.
+**Branch:** feature/state-current-mode-before-vibe
+**Status:** executing
+**Plan:** /Users/hasc/.claude/plans/rustling-wobbling-wolf.md
+
+- [x] Milestone 1: Add mode announcement to vibe skill generator + regenerate + test
 
 
 

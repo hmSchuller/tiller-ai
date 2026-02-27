@@ -12,7 +12,7 @@ Read these files to understand current state:
 - `vibestate.md` — active feature, done log, notes
 - Run `git branch` and `git status`
 
-Summarize the current state in 2-3 sentences.
+State the current mode from CLAUDE.md: "Mode: <mode>". Summarize the current state in 2-3 sentences.
 
 ## Step 2: Branch routing
 

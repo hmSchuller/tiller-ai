@@ -66,6 +66,11 @@ describe('generateVibeSkill', () => {
     const result = generateVibeSkill(simpleConfig);
     expect(result).toContain('feature/');
   });
+
+  it('both modes announce the current mode', () => {
+    expect(generateVibeSkill(simpleConfig)).toContain('Mode: <mode>');
+    expect(generateVibeSkill(detailedConfig)).toContain('Mode: <mode>');
+  });
 });
 
 describe('generateSnapshotSkill', () => {
