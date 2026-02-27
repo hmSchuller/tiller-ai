@@ -7,7 +7,7 @@ import { generateVibestate } from './vibestate.js';
 import { generateChangelog } from './changelog.js';
 import { generateSettingsJson } from './settings-json.js';
 import { generateGitignore } from './gitignore.js';
-import { generateTillerManifest } from './tiller-manifest.js';
+import { generateTillerManifest, TILLER_VERSION } from './tiller-manifest.js';
 import { generatePostWriteHook } from './hooks/post-write.js';
 import { generateSecretScanHook } from './hooks/secret-scan.js';
 import { generateSessionResumeHook } from './hooks/session-resume.js';
@@ -18,8 +18,6 @@ import { generateLandSkill } from './skills/land.js';
 import { generateSetupSkill } from './skills/setup.js';
 import { generateTechDebtSkill } from './skills/tech-debt.js';
 import { generateTechDebtState } from './tech-debt-state.js';
-
-const TILLER_VERSION = '0.1.0';
 
 export async function scaffold(config: ProjectConfig, targetDir: string): Promise<void> {
   const p = (rel: string) => join(targetDir, rel);
