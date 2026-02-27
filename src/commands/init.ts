@@ -7,7 +7,7 @@ export async function initCommand(): Promise<void> {
   const targetDir = resolve(process.cwd());
   const projectName = basename(targetDir);
 
-  intro('tiller init');
+  intro('tiller-ai init');
 
   const config: ProjectConfig = {
     projectName,

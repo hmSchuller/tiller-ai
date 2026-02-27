@@ -8,7 +8,7 @@ description: First-run setup — understand the project and configure CLAUDE.md
 
 # /setup — Configure this project
 
-> Run this once after \`tiller init\`.
+> Run this once after \`tiller-ai init\`.
 
 ## Step 1: Ask about mode first
 

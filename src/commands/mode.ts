@@ -10,7 +10,7 @@ import type { ProjectConfig } from '../scaffold/types.js';
 const TILLER_VERSION = '0.1.0';
 
 export async function modeCommand(newMode: string, options: { project?: boolean }): Promise<void> {
-  intro('tiller mode — switch between simple and detailed');
+  intro('tiller-ai mode — switch between simple and detailed');
 
   if (newMode !== 'simple' && newMode !== 'detailed') {
     cancel('Mode must be "simple" or "detailed".');

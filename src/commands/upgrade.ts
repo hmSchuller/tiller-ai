@@ -18,12 +18,12 @@ import type { ProjectConfig } from '../scaffold/types.js';
 const TILLER_VERSION = '0.1.0';
 
 export async function upgradeCommand(): Promise<void> {
-  intro('tiller upgrade — update hooks and skills');
+  intro('tiller-ai upgrade — update hooks and skills');
 
   const manifestPath = resolve(process.cwd(), '.claude/.tiller.json');
 
   if (!existsSync(manifestPath)) {
-    cancel('No .claude/.tiller.json found. Is this a Tiller project? Run tiller init to start a new project.');
+    cancel('No .claude/.tiller.json found. Is this a Tiller project? Run tiller-ai init to start a new project.');
     process.exit(1);
   }
 

@@ -9,7 +9,7 @@ import type { ProjectConfig } from '../scaffold/types.js';
 const TILLER_VERSION = '0.1.0';
 
 export async function workflowCommand(newWorkflow: string, options: { project?: boolean }): Promise<void> {
-  intro('tiller workflow — switch between solo and team');
+  intro('tiller-ai workflow — switch between solo and team');
 
   if (newWorkflow !== 'solo' && newWorkflow !== 'team') {
     cancel('Workflow must be "solo" or "team".');
