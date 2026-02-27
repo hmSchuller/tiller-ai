@@ -7,25 +7,39 @@ description: Start or continue working on an idea. Usage: /vibe [idea descriptio
 
 ## Step 1: Orient
 
-Read `CLAUDE.md` and `vibestate.md`. Run `git branch` and `git status`. Do not narrate this.
+Read these files to understand current state:
+- `CLAUDE.md` — project context, verify command, mode
+- `vibestate.md` — active feature, done log, notes
+- Run `git branch` and `git status`
+
+Summarize the current state in 2-3 sentences.
 
 ## Step 2: Branch routing
 
-**$ARGUMENTS provided** → create `feature/<kebab-case-of-arguments>` from main (or switch if it exists). Say: "On it."
+**$ARGUMENTS provided** → create `feature/<kebab-case-of-arguments>` from main (or switch if it already exists). State: "Starting work on: <idea>"
 
-**Already on a feature branch** → continue. Say nothing unless asked.
+**Already on a feature branch** → stay on it. State: "Continuing work on: <branch-name>"
 
-**Neither** → list open feature branches briefly, ask what to work on.
+**Neither** → list open feature branches as in-progress ideas, ask what to work on or if they want to start something new.
 
-## Step 3: Build
+## Step 3: Plan
 
-Just build. No plan narration, no step-by-step commentary.
+Write out your proposed approach:
+- What you're going to build (3-5 bullets)
+- Which files you'll create or modify
+- Any decisions or trade-offs worth noting
 
-After each chunk: run ``. Fix failures silently before continuing.
+Wait for explicit confirmation before touching files.
 
-When done with a chunk, say what changed in one sentence. Then:
-- "Type /snapshot to save, /land when you're done."
+## Step 4: Build
 
-## If something goes wrong
+Implement in small, logical chunks. After each chunk:
+1. Run `npm test`
+2. Fix any failures before continuing
+3. Report what was done and whether verify passed
 
-Fix it yourself first. Only tell the user if you genuinely can't resolve it.
+## Step 5: Remind
+
+After each working chunk:
+- `/snapshot` to save progress on this feature
+- `/land` when the feature is complete and ready to merge
