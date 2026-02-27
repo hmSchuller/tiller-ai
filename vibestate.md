@@ -4,11 +4,7 @@
 
 ## Active feature
 
-**Branch:** feature/state-current-mode-before-vibe
-**Status:** executing
-**Plan:** /Users/hasc/.claude/plans/rustling-wobbling-wolf.md
-
-- [x] Milestone 1: Add mode announcement to vibe skill generator + regenerate + test
+None — on main, ready to start something.
 
 
 
@@ -19,6 +15,8 @@
 - [2026-02-27] landed feature/vibe-resume-existing-branch
 - [2026-02-27] ask user to continue or revisit plan when resuming an existing branch
 - [2026-02-27] landed feature/vibe-resume-ask-user
+- [2026-02-27] state current mode before vibing a new feature
+- [2026-02-27] landed feature/state-current-mode-before-vibe
 
 ## Notes
 
