@@ -9,7 +9,7 @@
 **Plan:** /Users/hasc/.claude/plans/rustling-wobbling-wolf.md
 
 - [x] Milestone 1: Add `workflow` to ProjectConfig and `.tiller.json`
-- [ ] Milestone 2: Split vibestate into `changelog.md` (committed) + `vibestate.md` (gitignored)
+- [x] Milestone 2: Split vibestate into `changelog.md` (committed) + `vibestate.md` (gitignored)
 - [ ] Milestone 3: Unified skill templates (mode-agnostic)
 - [ ] Milestone 4: PR-based `/land` for team workflow
 - [ ] Milestone 5: Per-dev mode via `.tiller.local.json`

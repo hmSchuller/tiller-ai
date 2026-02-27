@@ -28,5 +28,9 @@ npm-debug.log*
 
 # TypeScript
 *.tsbuildinfo
+
+# Tiller — local-only files (per-dev, not shared)
+vibestate.md
+.tiller.local.json
 `;
 }

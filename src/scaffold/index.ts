@@ -4,6 +4,7 @@ import { isGitRepo, gitInit, gitAdd, gitCommit } from '../utils/git.js';
 import type { ProjectConfig } from './types.js';
 import { generateRootClaudeMd, generateDotClaudeMd } from './claude-md.js';
 import { generateVibestate } from './vibestate.js';
+import { generateChangelog } from './changelog.js';
 import { generateSettingsJson } from './settings-json.js';
 import { generateGitignore } from './gitignore.js';
 import { generateTillerManifest } from './tiller-manifest.js';
@@ -24,6 +25,7 @@ export async function scaffold(config: ProjectConfig, targetDir: string): Promis
   // Root files
   await writeFile(p('CLAUDE.md'), generateRootClaudeMd(config));
   await writeFile(p('.gitignore'), generateGitignore(config));
+  await writeFile(p('changelog.md'), generateChangelog(config));
   await writeFile(p('vibestate.md'), generateVibestate(config));
 
   // .claude/ files
