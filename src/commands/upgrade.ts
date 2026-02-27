@@ -10,6 +10,7 @@ import { generateVibeSkill } from '../scaffold/skills/vibe.js';
 import { generateSnapshotSkill } from '../scaffold/skills/snapshot.js';
 import { generateRecapSkill } from '../scaffold/skills/recap.js';
 import { generateLandSkill } from '../scaffold/skills/land.js';
+import { generateTechDebtSkill } from '../scaffold/skills/tech-debt.js';
 import { generateDotClaudeMd } from '../scaffold/claude-md.js';
 import { generateTillerManifest, MANAGED_FILES } from '../scaffold/tiller-manifest.js';
 import type { ProjectConfig } from '../scaffold/types.js';
@@ -26,7 +27,7 @@ export async function upgradeCommand(): Promise<void> {
     process.exit(1);
   }
 
-  let manifest: { version: string; mode: 'simple' | 'detailed'; runCommand: string };
+  let manifest: { version: string; mode: 'simple' | 'detailed'; runCommand: string; workflow?: 'solo' | 'team' };
   try {
     const raw = await readFile(manifestPath, 'utf-8');
     manifest = JSON.parse(raw);
@@ -49,6 +50,7 @@ export async function upgradeCommand(): Promise<void> {
     description: '',
     runCommand: manifest.runCommand,
     mode: manifest.mode,
+    workflow: manifest.workflow ?? 'solo',
   };
 
   const s = spinner();
@@ -63,6 +65,7 @@ export async function upgradeCommand(): Promise<void> {
     await writeFile('.claude/skills/snapshot/SKILL.md', generateSnapshotSkill(config));
     await writeFile('.claude/skills/recap/SKILL.md', generateRecapSkill(config));
     await writeFile('.claude/skills/land/SKILL.md', generateLandSkill(config));
+    await writeFile('.claude/skills/tech-debt/SKILL.md', generateTechDebtSkill(config));
     await writeFile('.claude/.tiller.json', generateTillerManifest(config, TILLER_VERSION));
     s.stop('Done!');
   } catch (err) {
