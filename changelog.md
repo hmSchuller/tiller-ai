@@ -16,3 +16,4 @@
 - [2026-02-27] update .claude/CLAUDE.md — add workflows section, per-dev overrides, changelog/vibestate notes
 - [2026-02-27] add tiller workflow command (solo/team, local + --project scope, 7 tests)
 - [2026-02-27] landed feature/add-workflow-command
+- [2026-02-27] tech debt skill: background agent every 3 features, guardrails, stash/restore, mode-aware reporting

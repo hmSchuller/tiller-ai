@@ -34,6 +34,17 @@ State the current mode from CLAUDE.md: "Mode: <mode>".
 
 **Neither** → list open feature branches briefly, ask what to work on.
 
+## Step 2.5: Tech debt check
+
+Before planning, check if a tech debt cleanup is due:
+
+1. Count lines in \`changelog.md\` matching the pattern \`- [` + `[^]]*] landed feature/\` — this is \`landedCount\`
+2. Read \`.claude/.tiller-tech-debt.json\` — get \`lastTechDebtAtFeature\` and \`threshold\` (default threshold: 3)
+3. If \`(landedCount - lastTechDebtAtFeature) >= threshold\`:
+   - Use the **Task tool** (foreground, \`subagent_type: "general-purpose"\`) with the contents of \`.claude/skills/tech-debt/SKILL.md\` as the prompt
+   - Wait for the agent to complete before continuing
+4. Continue to Step 3 regardless of whether the tech debt agent ran
+
 ## Step 3: Plan milestones
 
 **If mode is simple:** Explore the codebase and break the work into 2–5 milestones internally. Do not show this plan to the user.

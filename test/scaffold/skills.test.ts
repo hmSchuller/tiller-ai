@@ -3,6 +3,7 @@ import { generateVibeSkill } from '../../src/scaffold/skills/vibe.js';
 import { generateSnapshotSkill } from '../../src/scaffold/skills/snapshot.js';
 import { generateRecapSkill } from '../../src/scaffold/skills/recap.js';
 import { generateLandSkill } from '../../src/scaffold/skills/land.js';
+import { generateTechDebtSkill } from '../../src/scaffold/skills/tech-debt.js';
 import { simpleConfig, detailedConfig, teamSimpleConfig } from '../helpers/fixtures.js';
 
 describe('generateVibeSkill', () => {
@@ -53,6 +54,18 @@ describe('generateVibeSkill', () => {
 
   it('announces the current mode', () => {
     expect(generateVibeSkill(simpleConfig)).toContain('Mode: <mode>');
+  });
+
+  it('includes tech debt check step between branch routing and planning', () => {
+    const result = generateVibeSkill(simpleConfig);
+    expect(result).toContain('Step 2.5');
+    expect(result).toContain('tech debt');
+    expect(result).toContain('.tiller-tech-debt.json');
+    expect(result).toContain('landedCount');
+  });
+
+  it('instructs vibe to use Task tool for tech debt agent', () => {
+    expect(generateVibeSkill(simpleConfig)).toContain('Task tool');
   });
 
   it('writes Done entries to changelog.md, not vibestate.md', () => {
@@ -127,6 +140,53 @@ describe('generateRecapSkill', () => {
     const result = generateRecapSkill(simpleConfig);
     expect(result).toContain('simple');
     expect(result).toContain('detailed');
+  });
+});
+
+describe('generateTechDebtSkill', () => {
+  it('has correct frontmatter name', () => {
+    expect(generateTechDebtSkill(simpleConfig)).toContain('name: tech-debt');
+  });
+
+  it('is not user-invocable (marked as internal)', () => {
+    expect(generateTechDebtSkill(simpleConfig)).toContain('Not user-invocable');
+  });
+
+  it('includes guardrails section', () => {
+    expect(generateTechDebtSkill(simpleConfig)).toContain('Guardrails');
+    expect(generateTechDebtSkill(simpleConfig)).toContain('MUST NOT');
+  });
+
+  it('includes verify command', () => {
+    expect(generateTechDebtSkill(simpleConfig)).toContain('npm test');
+  });
+
+  it('includes stash/restore steps', () => {
+    const result = generateTechDebtSkill(simpleConfig);
+    expect(result).toContain('git stash');
+    expect(result).toContain('stash pop');
+  });
+
+  it('includes chore branch creation and merge', () => {
+    const result = generateTechDebtSkill(simpleConfig);
+    expect(result).toContain('chore/tech-debt-');
+    expect(result).toContain('--no-ff');
+  });
+
+  it('updates .tiller-tech-debt.json state', () => {
+    expect(generateTechDebtSkill(simpleConfig)).toContain('.tiller-tech-debt.json');
+  });
+
+  it('includes simple and detailed mode reporting', () => {
+    const result = generateTechDebtSkill(simpleConfig);
+    expect(result).toContain('simple mode');
+    expect(result).toContain('detailed mode');
+    expect(result).toContain('Cleaned up a bit');
+  });
+
+  it('uses verify command from config', () => {
+    const result = generateTechDebtSkill(detailedConfig);
+    expect(result).toContain('npm run verify');
   });
 });
 
