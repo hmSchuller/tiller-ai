@@ -1,4 +1,4 @@
-# tiller-code
+# tiller-ai
 
 Scaffold Claude Code projects with a structured vibe loop — branch, build, commit, land.
 
@@ -10,7 +10,7 @@ Tiller is a thin scaffold for Claude Code that turns a blank repo into a project
 
 ```bash
 # 1. Scaffold a new project
-npx tiller-code init
+npx tiller-ai init
 
 # 2. Open in Claude Code and run setup
 /setup
@@ -40,14 +40,14 @@ Tiller has two modes that control how Claude communicates:
 Switch modes at any time:
 
 ```bash
-npx tiller-code mode simple
-npx tiller-code mode detailed
+npx tiller-ai mode simple
+npx tiller-ai mode detailed
 ```
 
 Use `--project` to update the shared project default instead of your personal override:
 
 ```bash
-npx tiller-code mode detailed --project
+npx tiller-ai mode detailed --project
 ```
 
 Or just update the `Mode:` line in your root `CLAUDE.md`.
@@ -101,30 +101,30 @@ Every piece of work follows this loop:
 
 ## CLI reference
 
-### `npx tiller-code init`
+### `npx tiller-ai init`
 
 Scaffold a new project interactively. Prompts for project name, description, run/verify command, mode, and workflow. Writes all files and makes an initial git commit.
 
 ```bash
-npx tiller-code init
+npx tiller-ai init
 ```
 
-### `npx tiller-code upgrade`
+### `npx tiller-ai upgrade`
 
 Update Tiller-managed files (`.claude/CLAUDE.md`, `settings.json`, hooks, skills) to the latest version without touching your `CLAUDE.md`, `vibestate.md`, or `changelog.md`.
 
 ```bash
-npx tiller-code upgrade
+npx tiller-ai upgrade
 ```
 
-### `npx tiller-code mode <mode>`
+### `npx tiller-ai mode <mode>`
 
 Switch the project mode between `simple` and `detailed`. Without `--project`, writes to `.tiller.local.json` (your personal override). With `--project`, updates the shared `CLAUDE.md`.
 
 ```bash
-npx tiller-code mode simple
-npx tiller-code mode detailed
-npx tiller-code mode detailed --project   # update shared project default
+npx tiller-ai mode simple
+npx tiller-ai mode detailed
+npx tiller-ai mode detailed --project   # update shared project default
 ```
 
 ## Requirements
