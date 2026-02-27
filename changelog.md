@@ -4,6 +4,7 @@
 
 ## Done
 
+- [2026-02-27] static promotional website for GitHub Pages (Astro, nautical theme, navy/teal/gold palette, self-hosted Playfair Display, Hero/Features/HowItWorks/GettingStarted/Footer, GitHub Actions deploy pipeline)
 - [2026-02-27] renamed package from tiller-code to tiller-ai
 - [2026-02-27] landed feature/rename-package-to-tiller-ai
 

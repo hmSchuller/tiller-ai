@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Compass circle -->
+  <circle cx="16" cy="16" r="15" fill="#0f2040" stroke="#c89b3c" stroke-width="1.5"/>
+  <!-- Compass rose petals - N/S (navy points) -->
+  <path d="M16 3 L18.5 14 L16 12 L13.5 14 Z" fill="#faf7f0"/>
+  <path d="M16 29 L18.5 18 L16 20 L13.5 18 Z" fill="#8aabd6"/>
+  <!-- Compass rose petals - E/W -->
+  <path d="M29 16 L18 13.5 L20 16 L18 18.5 Z" fill="#8aabd6"/>
+  <path d="M3 16 L14 13.5 L12 16 L14 18.5 Z" fill="#8aabd6"/>
+  <!-- Center dot -->
+  <circle cx="16" cy="16" r="2.5" fill="#c89b3c"/>
+  <!-- N label -->
+  <text x="16" y="9.5" text-anchor="middle" font-size="4" font-family="serif" font-weight="700" fill="#c89b3c">N</text>
+</svg>

@@ -1,0 +1,251 @@
+---
+const steps = [
+  {
+    number: '01',
+    label: 'Orient',
+    title: 'Read the context',
+    body: 'Claude reads CLAUDE.md, vibestate.md, and changelog.md to understand the project, active feature, and history before touching any code.',
+    color: 'navy',
+  },
+  {
+    number: '02',
+    label: 'Confirm',
+    title: 'Plan before building',
+    body: 'In detailed mode, Claude writes out milestones and waits for your go-ahead. No surprises, no unilateral architectural choices.',
+    color: 'teal',
+  },
+  {
+    number: '03',
+    label: 'Build',
+    title: 'Milestone by milestone',
+    body: 'Each milestone includes implementation, tests, and a snapshot commit. Claude narrates decisions and surfaces trade-offs as it goes.',
+    color: 'gold',
+  },
+  {
+    number: '04',
+    label: 'Save',
+    title: 'Commit and land',
+    body: 'When the feature is done, /land merges to main (or opens a PR in team mode). Changelog updated, branch cleaned up, everything tidy.',
+    color: 'cream',
+  },
+];
+---
+
+<section class="how-it-works" id="how-it-works" aria-labelledby="hiw-heading">
+  <!-- Background wave in -->
+  <div class="section-wave-in" aria-hidden="true">
+    <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path d="M0 60 C360 20 720 60 1080 20 C1260 0 1380 40 1440 20 L1440 0 L0 0 Z" fill="#faf7f0"/>
+    </svg>
+  </div>
+
+  <div class="hiw-body">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-eyebrow">The vibe loop</p>
+        <h2 id="hiw-heading" class="section-heading">
+          How it works
+        </h2>
+        <p class="section-subtitle">
+          Every feature follows the same four-step loop — keeping AI sessions
+          predictable and your codebase clean.
+        </p>
+      </div>
+
+      <div class="steps">
+        {steps.map((step, i) => (
+          <div class={`step step--${step.color}`}>
+            <!-- Connector rope line (not last) -->
+            {i < steps.length - 1 && (
+              <div class="step-connector" aria-hidden="true">
+                <svg viewBox="0 0 40 80" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+                  <path
+                    d="M20 0 C20 0, 28 20, 20 40 C12 60, 20 80, 20 80"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-dasharray="4 4"
+                    opacity="0.3"
+                  />
+                </svg>
+              </div>
+            )}
+
+            <div class="step-inner">
+              <div class="step-number-wrap">
+                <span class="step-number">{step.number}</span>
+                <span class="step-label">{step.label}</span>
+              </div>
+              <div class="step-content">
+                <h3 class="step-title">{step.title}</h3>
+                <p class="step-body">{step.body}</p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  <!-- Wave out -->
+  <div class="section-wave-out" aria-hidden="true">
+    <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path d="M0 0 C360 40 720 0 1080 40 C1260 60 1380 20 1440 40 L1440 60 L0 60 Z" fill="#faf7f0"/>
+    </svg>
+  </div>
+</section>
+
+<style>
+  .how-it-works {
+    background-color: var(--navy-800);
+    color: var(--text-inverse);
+  }
+
+  .section-wave-in,
+  .section-wave-out {
+    line-height: 0;
+  }
+
+  .section-wave-in svg,
+  .section-wave-out svg {
+    display: block;
+    width: 100%;
+    height: 60px;
+  }
+
+  .hiw-body {
+    padding: var(--space-20) 0;
+  }
+
+  /* Section header */
+  .section-header {
+    text-align: center;
+    margin-bottom: var(--space-16);
+  }
+
+  .section-eyebrow {
+    display: inline-block;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold-300);
+    margin-bottom: var(--space-4);
+  }
+
+  .section-heading {
+    font-family: var(--font-serif);
+    font-size: clamp(var(--text-3xl), 4vw, var(--text-4xl));
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: var(--cream-100);
+    margin-bottom: var(--space-4);
+  }
+
+  .section-subtitle {
+    font-size: var(--text-lg);
+    color: var(--text-inverse-muted);
+    max-width: 520px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  /* Steps */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  @media (min-width: 768px) {
+    .steps {
+      flex-direction: row;
+      align-items: stretch;
+      gap: var(--space-4);
+      max-width: 100%;
+    }
+  }
+
+  .step {
+    position: relative;
+    flex: 1;
+  }
+
+  .step-connector {
+    display: flex;
+    justify-content: center;
+    height: 40px;
+    color: var(--navy-200);
+  }
+
+  .step-connector svg {
+    height: 40px;
+    width: 30px;
+  }
+
+  @media (min-width: 768px) {
+    .step-connector {
+      display: none;
+    }
+  }
+
+  .step-inner {
+    background-color: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-lg);
+    padding: var(--space-8);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    transition: background-color var(--transition-base);
+  }
+
+  .step-inner:hover {
+    background-color: rgba(255, 255, 255, 0.07);
+  }
+
+  .step-number-wrap {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-3);
+  }
+
+  .step-number {
+    font-family: var(--font-serif);
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .step--navy .step-number { color: var(--navy-200); }
+  .step--teal .step-number { color: var(--teal-300); }
+  .step--gold .step-number { color: var(--gold-300); }
+  .step--cream .step-number { color: var(--cream-200); }
+
+  .step-label {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-inverse-muted);
+    opacity: 0.7;
+  }
+
+  .step-title {
+    font-family: var(--font-serif);
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--cream-100);
+    margin: 0;
+  }
+
+  .step-body {
+    font-size: var(--text-base);
+    color: var(--text-inverse-muted);
+    line-height: 1.65;
+    margin: 0;
+  }
+</style>
