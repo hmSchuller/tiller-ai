@@ -40,7 +40,10 @@ Before planning, check if a tech debt cleanup is due:
 3. If `(landedCount - lastTechDebtAtFeature) >= threshold`:
    - Use the **Task tool** (foreground, `subagent_type: "general-purpose"`) with the contents of `.claude/skills/tech-debt/SKILL.md` as the prompt
    - Wait for the agent to complete before continuing
-4. Continue to Step 3 regardless of whether the tech debt agent ran
+4. If `tech-backlog.md` exists, check it for any `[critical]` items:
+   - If critical items are found: **alert the user** before planning: "Critical debt items exist: <list them>. Proceed with the feature, or address critical debt first?"
+   - Wait for user response before continuing to Step 3
+5. Continue to Step 3 regardless of whether the tech debt agent ran or critical items were found (unless user chooses to address debt first)
 
 ## Step 3: Plan milestones
 
@@ -94,6 +97,28 @@ Use agent teams to parallelize independent work:
 10. Update `vibestate.md` and `changelog.md`. Amend: `git commit --amend --no-edit`
 
 **Then continue** with any remaining sequential milestones using the sequential loop above.
+
+## Step 4.5: Code Review
+
+After all milestones are built and committed, spawn the Quartermaster to review the feature branch:
+
+1. Use the **Task tool** (foreground, `subagent_type: "general-purpose"`, **`model: "opus"`**) with the contents of `.claude/agents/quartermaster.md` as the prompt
+2. Wait for the Quartermaster's verdict
+
+**On PASS:**
+- Proceed to Step 5
+
+**On FAIL:**
+- Review the issues list
+- Fix the issues, then present a rebuttal to the Quartermaster: re-spawn via Task tool with the original prompt plus the rebuttal context
+- If Quartermaster returns PASS (or PASS WITH NOTES): proceed to Step 5
+- If Quartermaster returns FAIL again and says "ESCALATE TO CAPTAIN":
+  - Spawn the Captain via the **Task tool** (foreground, `subagent_type: "general-purpose"`, **`model: "opus"`**) with the contents of `.claude/agents/captain.md` as the prompt, plus a summary of: the disputed issues, the Sailing Agent's rebuttal, and the Quartermaster's maintained objections
+  - Wait for the Captain's ruling
+  - Present the Captain's ruling to the user
+  - If ruling is AGREE WITH QUARTERMASTER: fix the required items before docking
+  - If ruling is AGREE WITH SAILING AGENT: proceed to Step 5
+  - If ruling is COMPROMISE: fix the blocking items, log the rest to `tech-backlog.md`, proceed to Step 5
 
 ### Within-milestone split (optional)
 
