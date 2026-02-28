@@ -50,7 +50,7 @@ Run \`git add changelog.md && git commit --amend --no-edit\`.
 
 ## Step 6: Confirm
 
-- **simple:** Say: "Anchored. Keep going or type /land when you're done."
-- **detailed:** Say: "Anchored: <message>. Use /land when this feature is ready to merge."
+- **simple:** Say: "Anchored. Keep going or type /dock when you're done."
+- **detailed:** Say: "Anchored: <message>. Use /dock when this feature is ready to merge."
 `;
 }

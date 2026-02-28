@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { generateSailSkill } from '../../src/scaffold/skills/sail.js';
 import { generateAnchorSkill } from '../../src/scaffold/skills/anchor.js';
 import { generateRecapSkill } from '../../src/scaffold/skills/recap.js';
-import { generateLandSkill } from '../../src/scaffold/skills/land.js';
+import { generateDockSkill } from '../../src/scaffold/skills/dock.js';
 import { generateTechDebtSkill } from '../../src/scaffold/skills/tech-debt.js';
 import { simpleConfig, detailedConfig, teamSimpleConfig } from '../helpers/fixtures.js';
 
@@ -221,14 +221,14 @@ describe('generateTechDebtSkill', () => {
   });
 });
 
-describe('generateLandSkill', () => {
+describe('generateDockSkill', () => {
   it('has correct frontmatter name', () => {
-    expect(generateLandSkill(simpleConfig)).toContain('name: land');
+    expect(generateDockSkill(simpleConfig)).toContain('name: dock');
   });
 
   it('produces the same template structure regardless of mode', () => {
-    const simple = generateLandSkill(simpleConfig);
-    const detailed = generateLandSkill(detailedConfig);
+    const simple = generateDockSkill(simpleConfig);
+    const detailed = generateDockSkill(detailedConfig);
     expect(simple).toContain('simple');
     expect(simple).toContain('detailed');
     expect(detailed).toContain('simple');
@@ -236,34 +236,34 @@ describe('generateLandSkill', () => {
   });
 
   it('handles both simple and detailed mode at runtime', () => {
-    const result = generateLandSkill(simpleConfig);
+    const result = generateDockSkill(simpleConfig);
     expect(result).toContain('simple');
     expect(result).toContain('detailed');
   });
 
   it('solo workflow: merges with --no-ff', () => {
-    expect(generateLandSkill(simpleConfig)).toContain('--no-ff');
+    expect(generateDockSkill(simpleConfig)).toContain('--no-ff');
   });
 
   it('solo workflow: deletes the feature branch', () => {
-    expect(generateLandSkill(simpleConfig)).toContain('git branch -d');
+    expect(generateDockSkill(simpleConfig)).toContain('git branch -d');
   });
 
   it('team workflow: opens PR with gh or manual link', () => {
-    const result = generateLandSkill(teamSimpleConfig);
+    const result = generateDockSkill(teamSimpleConfig);
     expect(result).toContain('gh pr create');
     expect(result).toContain('which gh');
   });
 
   it('runs verify command', () => {
-    expect(generateLandSkill(simpleConfig)).toContain('npm test');
+    expect(generateDockSkill(simpleConfig)).toContain('npm test');
   });
 
   it('updates changelog.md', () => {
-    expect(generateLandSkill(simpleConfig)).toContain('changelog.md');
+    expect(generateDockSkill(simpleConfig)).toContain('changelog.md');
   });
 
   it('clears vibestate.md active feature', () => {
-    expect(generateLandSkill(simpleConfig)).toContain('vibestate.md');
+    expect(generateDockSkill(simpleConfig)).toContain('vibestate.md');
   });
 });

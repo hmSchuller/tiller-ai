@@ -15,7 +15,7 @@ import { generateSessionResumeHook } from './hooks/session-resume.js';
 import { generateSailSkill } from './skills/sail.js';
 import { generateAnchorSkill } from './skills/anchor.js';
 import { generateRecapSkill } from './skills/recap.js';
-import { generateLandSkill } from './skills/land.js';
+import { generateDockSkill } from './skills/dock.js';
 import { generateSetupSkill } from './skills/setup.js';
 import { generateTechDebtSkill } from './skills/tech-debt.js';
 import { generateTechDebtState } from './tech-debt-state.js';
@@ -63,7 +63,7 @@ export async function scaffold(config: ProjectConfig, targetDir: string): Promis
   await writeFile(p('.claude/skills/sail/SKILL.md'), generateSailSkill(config));
   await writeFile(p('.claude/skills/anchor/SKILL.md'), generateAnchorSkill(config));
   await writeFile(p('.claude/skills/recap/SKILL.md'), generateRecapSkill(config));
-  await writeFile(p('.claude/skills/land/SKILL.md'), generateLandSkill(config));
+  await writeFile(p('.claude/skills/dock/SKILL.md'), generateDockSkill(config));
   await writeFile(p('.claude/skills/tech-debt/SKILL.md'), generateTechDebtSkill(config));
 
   // Git

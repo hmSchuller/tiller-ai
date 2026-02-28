@@ -18,7 +18,7 @@ export const MANAGED_FILES = [
   '.claude/skills/sail/SKILL.md',
   '.claude/skills/anchor/SKILL.md',
   '.claude/skills/recap/SKILL.md',
-  '.claude/skills/land/SKILL.md',
+  '.claude/skills/dock/SKILL.md',
   '.claude/skills/tech-debt/SKILL.md',
 ];
 

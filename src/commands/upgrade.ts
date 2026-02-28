@@ -9,7 +9,7 @@ import { generateSetupSkill } from '../scaffold/skills/setup.js';
 import { generateSailSkill } from '../scaffold/skills/sail.js';
 import { generateAnchorSkill } from '../scaffold/skills/anchor.js';
 import { generateRecapSkill } from '../scaffold/skills/recap.js';
-import { generateLandSkill } from '../scaffold/skills/land.js';
+import { generateDockSkill } from '../scaffold/skills/dock.js';
 import { generateTechDebtSkill } from '../scaffold/skills/tech-debt.js';
 import { generateDotClaudeMd } from '../scaffold/claude-md.js';
 import { generateTillerManifest, MANAGED_FILES, TILLER_VERSION, type TillerManifest } from '../scaffold/tiller-manifest.js';
@@ -62,7 +62,7 @@ export async function upgradeCommand(): Promise<void> {
     await writeFile('.claude/skills/sail/SKILL.md', generateSailSkill(config));
     await writeFile('.claude/skills/anchor/SKILL.md', generateAnchorSkill(config));
     await writeFile('.claude/skills/recap/SKILL.md', generateRecapSkill(config));
-    await writeFile('.claude/skills/land/SKILL.md', generateLandSkill(config));
+    await writeFile('.claude/skills/dock/SKILL.md', generateDockSkill(config));
     await writeFile('.claude/skills/tech-debt/SKILL.md', generateTechDebtSkill(config));
     await writeFile('.claude/.tiller.json', generateTillerManifest(config, TILLER_VERSION));
     s.stop('Done!');

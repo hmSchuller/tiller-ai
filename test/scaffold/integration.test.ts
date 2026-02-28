@@ -111,7 +111,7 @@ describe('scaffold integration', () => {
     expect(await exists('.claude/skills/sail/SKILL.md')).toBe(true);
     expect(await exists('.claude/skills/anchor/SKILL.md')).toBe(true);
     expect(await exists('.claude/skills/recap/SKILL.md')).toBe(true);
-    expect(await exists('.claude/skills/land/SKILL.md')).toBe(true);
+    expect(await exists('.claude/skills/dock/SKILL.md')).toBe(true);
     expect(await exists('.claude/skills/tech-debt/SKILL.md')).toBe(true);
   });
 
