@@ -83,4 +83,4 @@ git add CLAUDE.md .claude/.tiller.json
 git commit -m "chore: configure project via /setup"
 ```
 
-Say: "All set. Use /vibe to start working."
+Say: "All set. Use /sail to start working."
