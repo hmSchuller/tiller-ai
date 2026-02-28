@@ -3,7 +3,6 @@ import { mkdtemp, rm, readFile, writeFile, mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { generateTillerManifest } from '../../src/scaffold/tiller-manifest.js';
-import { generateRootClaudeMd } from '../../src/scaffold/claude-md.js';
 
 vi.mock('@clack/prompts', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@clack/prompts')>();
@@ -29,7 +28,6 @@ async function setupProject(
   await mkdir(join(tmpDir, '.claude'), { recursive: true });
   const config = { projectName: 'test-proj', description: 'desc', runCommand: 'npm test', mode, workflow };
   await writeFile(join(tmpDir, '.claude/.tiller.json'), generateTillerManifest(config, TILLER_VERSION), 'utf-8');
-  await writeFile(join(tmpDir, 'CLAUDE.md'), generateRootClaudeMd(config), 'utf-8');
 }
 
 describe('configCommand', () => {
@@ -116,11 +114,6 @@ describe('configCommand', () => {
     const manifest = JSON.parse(await readFile(join(tmpDir, '.claude/.tiller.json'), 'utf-8'));
     expect(manifest.mode).toBe('simple');
     expect(manifest.workflow).toBe('team');
-
-    // Root CLAUDE.md should not contain mode/workflow — config lives in .tiller.json
-    const claudeMd = await readFile(join(tmpDir, 'CLAUDE.md'), 'utf-8');
-    expect(claudeMd).not.toContain('## Mode');
-    expect(claudeMd).not.toContain('## Workflow');
   });
 
   it('shows no-op message when local values already match', async () => {

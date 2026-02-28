@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { writeFile } from '../utils/fs.js';
 import { isGitRepo, gitInit, gitAdd, gitCommit } from '../utils/git.js';
 import type { ProjectConfig } from './types.js';
-import { generateRootClaudeMd, generateDotClaudeMd } from './claude-md.js';
+import { generateDotClaudeMd } from './claude-md.js';
 import { generateCompass } from './compass.js';
 import { generateChangelog } from './changelog.js';
 import { generateSettingsJson } from './settings-json.js';
@@ -26,9 +26,6 @@ import { generateTechBacklog } from './tech-backlog.js';
 
 export async function scaffold(config: ProjectConfig, targetDir: string): Promise<void> {
   const p = (rel: string) => join(targetDir, rel);
-
-  // Root files
-  await writeFile(p('CLAUDE.md'), generateRootClaudeMd(config));
 
   // .gitignore: preserve existing content, only append missing tiller entries
   let existingGitignore: string | null = null;

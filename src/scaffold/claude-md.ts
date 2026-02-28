@@ -1,14 +1,5 @@
 import type { ProjectConfig } from './types.js';
 
-export function generateRootClaudeMd(config: ProjectConfig): string {
-  const description = config.description || '<!-- Run /setup to fill this in -->';
-
-  return `# ${config.projectName}
-
-${description}
-`;
-}
-
 export function generateDotClaudeMd(_config: ProjectConfig): string {
   return `# Tiller — How to work
 

@@ -38,10 +38,8 @@ async function read(rel: string): Promise<string> {
 }
 
 describe('scaffold integration', () => {
-  it('creates root CLAUDE.md', async () => {
-    expect(await exists('CLAUDE.md')).toBe(true);
-    const content = await read('CLAUDE.md');
-    expect(content).toContain('# smoke-test');
+  it('does not create root CLAUDE.md', async () => {
+    expect(await exists('CLAUDE.md')).toBe(false);
   });
 
   it('creates .claude/CLAUDE.md', async () => {

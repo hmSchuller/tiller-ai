@@ -1,25 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { generateRootClaudeMd, generateDotClaudeMd } from '../../src/scaffold/claude-md.js';
+import { generateDotClaudeMd } from '../../src/scaffold/claude-md.js';
 import { simpleConfig } from '../helpers/fixtures.js';
-
-describe('generateRootClaudeMd', () => {
-  it('includes project name as h1', () => {
-    const result = generateRootClaudeMd(simpleConfig);
-    expect(result).toContain('# test-project');
-  });
-
-  it('includes description', () => {
-    const result = generateRootClaudeMd(simpleConfig);
-    expect(result).toContain('A test project for unit tests');
-  });
-
-  it('does not include verify command, mode, or workflow', () => {
-    const result = generateRootClaudeMd(simpleConfig);
-    expect(result).not.toContain('## Verify command');
-    expect(result).not.toContain('## Mode');
-    expect(result).not.toContain('## Workflow');
-  });
-});
 
 describe('generateDotClaudeMd', () => {
   it('contains vibe loop instructions', () => {

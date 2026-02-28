@@ -44,14 +44,12 @@ Look at the project files silently. Do not ask the user about this.
 - \`Makefile\` with a \`test\` target → \`make test\`
 - Nothing recognizable → \`echo ok\` (can be updated later)
 
-**Step 4: Update CLAUDE.md and commit**
-
-Rewrite \`CLAUDE.md\` with the project name and their description only (no mode/workflow/verify sections).
+**Step 4: Update .tiller.json and commit**
 
 Update \`runCommand\` and \`mode\` in \`.claude/.tiller.json\`.
 
 \`\`\`
-git add CLAUDE.md .claude/.tiller.json
+git add .claude/.tiller.json
 git commit -m "chore: configure project via /setup"
 \`\`\`
 
@@ -75,14 +73,12 @@ Ask: "What command should I run to verify everything's working after a change?"
 
 Give suggestions based on what you see in the project. If they don't know yet, suggest \`echo ok\` as a placeholder.
 
-**Step 4: Update CLAUDE.md and commit**
-
-Rewrite \`CLAUDE.md\` with the project name and description only (no mode/workflow/verify sections).
+**Step 4: Update .tiller.json and commit**
 
 Update \`runCommand\` and \`mode\` in \`.claude/.tiller.json\`.
 
 \`\`\`
-git add CLAUDE.md .claude/.tiller.json
+git add .claude/.tiller.json
 git commit -m "chore: configure project via /setup"
 \`\`\`
 
