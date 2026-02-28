@@ -13,11 +13,15 @@ program
 program
   .command('init')
   .description('Scaffold Tiller files in the current directory')
+  .option('-y, --yes', 'Skip interactive prompts using defaults')
+  .option('--mode <mode>', 'Mode to use: simple or detailed (default: simple)')
+  .option('--workflow <workflow>', 'Workflow to use: solo or team (default: solo)')
   .action(initCommand);
 
 program
   .command('upgrade')
   .description('Update hooks and skills in an existing Tiller project')
+  .option('-y, --yes', 'Skip confirmation prompt')
   .action(upgradeCommand);
 
 program

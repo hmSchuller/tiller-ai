@@ -9,6 +9,7 @@ vi.mock('@clack/prompts', async (importOriginal) => {
     ...actual,
     intro: vi.fn(),
     outro: vi.fn(),
+    cancel: vi.fn(),
     spinner: vi.fn(() => ({ start: vi.fn(), stop: vi.fn() })),
     select: vi.fn(),
     isCancel: vi.fn((val) => val === Symbol.for('clack/cancel')),
@@ -85,6 +86,65 @@ describe('initCommand', () => {
 
     await expect(initCommand()).rejects.toThrow('process.exit called');
     expect(exitSpy).toHaveBeenCalledWith(0);
+  });
+
+  it('--yes uses simple+solo defaults when no mode/workflow provided', async () => {
+    const { scaffold } = await import('../../src/scaffold/index.js');
+    const { initCommand } = await import('../../src/commands/init.js');
+
+    await initCommand({ yes: true });
+
+    expect(scaffold).toHaveBeenCalledWith(
+      expect.objectContaining({ mode: 'simple', workflow: 'solo' }),
+      expect.any(String),
+    );
+  });
+
+  it('--yes uses provided mode and workflow flags', async () => {
+    const { scaffold } = await import('../../src/scaffold/index.js');
+    const { initCommand } = await import('../../src/commands/init.js');
+
+    await initCommand({ yes: true, mode: 'detailed', workflow: 'team' });
+
+    expect(scaffold).toHaveBeenCalledWith(
+      expect.objectContaining({ mode: 'detailed', workflow: 'team' }),
+      expect.any(String),
+    );
+  });
+
+  it('--yes exits with error on invalid mode', async () => {
+    const prompts = await import('@clack/prompts');
+    const exitSpy = vi.spyOn(process, 'exit').mockImplementation((() => {
+      throw new Error('process.exit called');
+    }) as never);
+
+    const { initCommand } = await import('../../src/commands/init.js');
+
+    await expect(initCommand({ yes: true, mode: 'invalid' })).rejects.toThrow('process.exit called');
+    expect(exitSpy).toHaveBeenCalledWith(1);
+    expect(prompts.cancel).toHaveBeenCalledWith(expect.stringContaining('mode'));
+  });
+
+  it('--yes exits with error on invalid workflow', async () => {
+    const prompts = await import('@clack/prompts');
+    const exitSpy = vi.spyOn(process, 'exit').mockImplementation((() => {
+      throw new Error('process.exit called');
+    }) as never);
+
+    const { initCommand } = await import('../../src/commands/init.js');
+
+    await expect(initCommand({ yes: true, workflow: 'invalid' })).rejects.toThrow('process.exit called');
+    expect(exitSpy).toHaveBeenCalledWith(1);
+    expect(prompts.cancel).toHaveBeenCalledWith(expect.stringContaining('workflow'));
+  });
+
+  it('--yes does not call select prompts', async () => {
+    const prompts = await import('@clack/prompts');
+    const { initCommand } = await import('../../src/commands/init.js');
+
+    await initCommand({ yes: true });
+
+    expect(prompts.select).not.toHaveBeenCalled();
   });
 
   it('exits when user cancels workflow selection', async () => {
