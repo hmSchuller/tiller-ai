@@ -1,9 +1,10 @@
 # changelog.md — tiller-ai
 
-> Shared project history. Updated by /sail, /anchor, and /land. Committed and shared.
+> Shared project history. Updated by /sail, /anchor, and /dock. Committed and shared.
 
 ## Done
 
+- [2026-02-28] rename skill /land → /dock — README, website, local skill dirs, CLAUDE.md
 - [2026-02-28] rename skill /land → /dock — source files, generators, tests
 - [2026-02-28] landed feature/fix-land-team-workflow-double-ci-push
 - [2026-02-28] fix: commit changelog before push in team workflow — prevent double CI run
