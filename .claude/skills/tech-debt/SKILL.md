@@ -1,6 +1,6 @@
 ---
 name: tech-debt
-description: Internal skill — spawned by /vibe to fix one small tech debt item. Not user-invocable directly.
+description: Internal skill — spawned by /sail to fix one small tech debt item. Not user-invocable directly.
 ---
 
 # Tech Debt Skill
