@@ -4,6 +4,7 @@
 
 ## Done
 
+- [2026-02-28] docked feature/ships-crew-agents
 - [2026-02-28] feature/ships-crew-agents — quartermaster, bosun, captain agents + tech-backlog.md
 - [2026-02-28] docked feature/upgrade-without-interactive-prompt
 - [2026-02-28] feat: add --yes/-y non-interactive flag to init and upgrade commands
