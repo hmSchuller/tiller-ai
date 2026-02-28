@@ -22,7 +22,7 @@ Run all of these before writing any output:
 
 ## Then produce output based on mode
 
-Read mode from CLAUDE.md.
+Read mode from \`.claude/.tiller.json\` (or \`.tiller.local.json\` if it exists and overrides).
 
 **If mode is simple:** Translate everything into plain English. No hashes, no branch names, no git jargon.
 
