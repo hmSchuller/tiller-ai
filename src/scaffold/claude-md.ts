@@ -2,27 +2,10 @@ import type { ProjectConfig } from './types.js';
 
 export function generateRootClaudeMd(config: ProjectConfig): string {
   const description = config.description || '<!-- Run /setup to fill this in -->';
-  const runCommand = config.runCommand || '# not set — run /setup to configure';
-  const modeLabel = config.mode === 'detailed' ? 'detailed' : 'simple';
-  const workflowLabel = config.workflow === 'team' ? 'team' : 'solo';
 
   return `# ${config.projectName}
 
 ${description}
-
-## Verify command
-
-\`\`\`
-${runCommand}
-\`\`\`
-
-## Mode
-
-${modeLabel}
-
-## Workflow
-
-${workflowLabel}
 `;
 }
 
@@ -33,7 +16,7 @@ export function generateDotClaudeMd(_config: ProjectConfig): string {
 
 ## Modes
 
-The mode is set in CLAUDE.md (or overridden locally in \`.tiller.local.json\`). Read it at the start of every session.
+The mode is set in \`.claude/.tiller.json\` (or overridden locally in \`.tiller.local.json\`). Read it at the start of every session.
 
 ### simple
 
@@ -56,7 +39,7 @@ The user is technical and wants to stay in control.
 
 ## Workflows
 
-The workflow is set in CLAUDE.md (or overridden locally in \`.tiller.local.json\`).
+The workflow is set in \`.claude/.tiller.json\` (or overridden locally in \`.tiller.local.json\`).
 
 ### solo
 
@@ -70,7 +53,7 @@ Multiple developers. /dock pushes the feature branch and opens a PR. Merging hap
 
 Every piece of work follows this loop:
 
-1. **Orient** — read CLAUDE.md, vibestate.md (local), and changelog.md (shared)
+1. **Orient** — read \`.claude/.tiller.json\` (and \`.tiller.local.json\` if present), vibestate.md (local), and changelog.md (shared)
 2. **Confirm** — in detailed mode, enter plan mode with milestones and wait for approval
 3. **Build** — implement milestone by milestone; milestones tagged \`[independent]\` may be parallelized using agent teams (TeamCreate + Task tool); each milestone includes tests, verify, and auto-commit
 4. **Complete** — announce feature done, suggest /dock
@@ -89,7 +72,7 @@ Create \`.tiller.local.json\` (gitignored) to override mode or workflow personal
 \`\`\`json
 { "mode": "simple", "workflow": "solo" }
 \`\`\`
-Skills read \`.tiller.local.json\` first, then fall back to CLAUDE.md.
+Skills read \`.tiller.local.json\` first, then fall back to \`.claude/.tiller.json\`.
 
 ## Skills
 

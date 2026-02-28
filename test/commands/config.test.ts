@@ -101,7 +101,7 @@ describe('configCommand', () => {
     expect(content.someOtherKey).toBe(true); // existing key preserved
   });
 
-  it('updates .tiller.json and CLAUDE.md for project scope', async () => {
+  it('updates .tiller.json for project scope (not CLAUDE.md)', async () => {
     await setupProject(tmpDir, { mode: 'detailed', workflow: 'solo' });
 
     const prompts = await import('@clack/prompts');
@@ -117,9 +117,10 @@ describe('configCommand', () => {
     expect(manifest.mode).toBe('simple');
     expect(manifest.workflow).toBe('team');
 
+    // Root CLAUDE.md should not contain mode/workflow — config lives in .tiller.json
     const claudeMd = await readFile(join(tmpDir, 'CLAUDE.md'), 'utf-8');
-    expect(claudeMd).toContain('simple');
-    expect(claudeMd).toContain('team');
+    expect(claudeMd).not.toContain('## Mode');
+    expect(claudeMd).not.toContain('## Workflow');
   });
 
   it('shows no-op message when local values already match', async () => {

@@ -7,10 +7,10 @@ description: Start or continue working on an idea. Usage: /sail [idea descriptio
 
 ## Step 1: Orient
 
-Read `CLAUDE.md`, `vibestate.md`, and `changelog.md` to understand current state.
+Read `.claude/.tiller.json` (and `.tiller.local.json` if it exists), `vibestate.md`, and `changelog.md` to understand current state.
 Run `git branch` and `git status`.
 
-State the current mode from CLAUDE.md: "Mode: <mode>".
+State the current mode from `.claude/.tiller.json` (or `.tiller.local.json` if it overrides): "Mode: <mode>".
 
 **If mode is simple:** Do not narrate the orient step.
 **If mode is detailed:** Summarize the current state in 2-3 sentences.

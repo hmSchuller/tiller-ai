@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { generateRootClaudeMd, generateDotClaudeMd } from '../../src/scaffold/claude-md.js';
-import { simpleConfig, detailedConfig, teamSimpleConfig } from '../helpers/fixtures.js';
+import { simpleConfig } from '../helpers/fixtures.js';
 
 describe('generateRootClaudeMd', () => {
   it('includes project name as h1', () => {
@@ -13,21 +13,11 @@ describe('generateRootClaudeMd', () => {
     expect(result).toContain('A test project for unit tests');
   });
 
-  it('includes verify command', () => {
+  it('does not include verify command, mode, or workflow', () => {
     const result = generateRootClaudeMd(simpleConfig);
-    expect(result).toContain('npm test');
-  });
-
-  it('describes simple mode correctly', () => {
-    const result = generateRootClaudeMd(simpleConfig);
-    expect(result).toContain('simple');
-    expect(result).not.toContain('wait for confirmation');
-  });
-
-  it('describes detailed mode correctly', () => {
-    const result = generateRootClaudeMd(detailedConfig);
-    expect(result).toContain('detailed');
-    expect(result).not.toContain('simple');
+    expect(result).not.toContain('## Verify command');
+    expect(result).not.toContain('## Mode');
+    expect(result).not.toContain('## Workflow');
   });
 });
 
@@ -82,16 +72,15 @@ describe('generateDotClaudeMd', () => {
   });
 });
 
-describe('generateRootClaudeMd — workflow section', () => {
-  it('includes workflow section for solo', () => {
-    const result = generateRootClaudeMd(simpleConfig);
-    expect(result).toContain('## Workflow');
-    expect(result).toContain('solo');
+describe('generateDotClaudeMd — config source', () => {
+  it('references .tiller.json for mode, not CLAUDE.md', () => {
+    const result = generateDotClaudeMd(simpleConfig);
+    expect(result).toContain('.claude/.tiller.json');
+    expect(result).not.toContain('mode is set in CLAUDE.md');
   });
 
-  it('includes workflow section for team', () => {
-    const result = generateRootClaudeMd(teamSimpleConfig);
-    expect(result).toContain('## Workflow');
-    expect(result).toContain('team');
+  it('references .tiller.json for workflow, not CLAUDE.md', () => {
+    const result = generateDotClaudeMd(simpleConfig);
+    expect(result).not.toContain('workflow is set in CLAUDE.md');
   });
 });

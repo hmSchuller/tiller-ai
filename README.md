@@ -43,7 +43,6 @@ Switch modes at any time with the interactive config command:
 npx tiller-ai config
 ```
 
-Or update the `Mode:` line in your root `CLAUDE.md` directly.
 
 ## Workflows
 
@@ -59,7 +58,7 @@ The workflow is set during `init` and stored in `.claude/.tiller.json`. Each dev
 
 ```
 your-project/
-├── CLAUDE.md                              # User-facing: project context, verify command, mode, workflow
+├── CLAUDE.md                              # User-facing: project name and description
 ├── .gitignore                             # Ignores vibestate.md, .tiller.local.json, common build artifacts
 ├── changelog.md                           # Shared done log — updated by /dock on each merge
 ├── vibestate.md                           # Per-dev: active feature, milestone checklist, notes (gitignored)
@@ -86,7 +85,7 @@ your-project/
 
 Every piece of work follows this loop:
 
-1. **Orient** — Claude reads `CLAUDE.md` and `vibestate.md` to understand project state and pick up any in-progress work
+1. **Orient** — Claude reads `.claude/.tiller.json` and `vibestate.md` to understand project state and pick up any in-progress work
 2. **Confirm** — in `detailed` mode, Claude writes out the proposed approach and waits for a go-ahead before touching files
 3. **Build** — Claude implements milestone by milestone, running the verify command after each. Independent milestones are parallelized using agent teams.
 4. **Anchor** — Claude reminds you to `/anchor` when stable and `/dock` when the feature is done
@@ -113,7 +112,7 @@ npx tiller-ai upgrade
 
 ### `npx tiller-ai config`
 
-Interactively update mode and workflow. Prompts for mode (`simple`/`detailed`), workflow (`solo`/`team`), and scope (`local` writes to `.tiller.local.json`, `project` updates the shared `CLAUDE.md` and `.tiller.json`).
+Interactively update mode and workflow. Prompts for mode (`simple`/`detailed`), workflow (`solo`/`team`), and scope (`local` writes to `.tiller.local.json`, `project` updates the shared `.tiller.json`).
 
 ```bash
 npx tiller-ai config

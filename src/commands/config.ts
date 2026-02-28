@@ -2,7 +2,6 @@ import { intro, outro, spinner, select, isCancel, cancel } from '@clack/prompts'
 import { readFile, writeFile as fsWriteFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { generateRootClaudeMd } from '../scaffold/claude-md.js';
 import { generateTillerManifest, TILLER_VERSION } from '../scaffold/tiller-manifest.js';
 import type { ProjectConfig } from '../scaffold/types.js';
 
@@ -109,33 +108,15 @@ export async function configCommand(): Promise<void> {
   if (isProjectScope) {
     s.start('Updating project settings...');
 
-    // Read root CLAUDE.md to extract projectName/description
-    const rootClaudePath = resolve(process.cwd(), 'CLAUDE.md');
-    let projectName = manifest.projectName ?? '';
-    let description = manifest.description ?? '';
-
-    if (existsSync(rootClaudePath)) {
-      try {
-        const raw = await readFile(rootClaudePath, 'utf-8');
-        const nameMatch = raw.match(/^# (.+)$/m);
-        const descMatch = raw.match(/^# .+\n\n(.+)/m);
-        if (nameMatch) projectName = nameMatch[1];
-        if (descMatch) description = descMatch[1];
-      } catch {
-        // ignore
-      }
-    }
-
     const config: ProjectConfig = {
-      projectName,
-      description,
+      projectName: manifest.projectName ?? '',
+      description: manifest.description ?? '',
       runCommand: manifest.runCommand,
       mode: newMode,
       workflow: newWorkflow,
     };
 
     try {
-      await fsWriteFile(rootClaudePath, generateRootClaudeMd(config), 'utf-8');
       await fsWriteFile(manifestPath, generateTillerManifest(config, TILLER_VERSION), 'utf-8');
       s.stop('Done!');
     } catch (err) {
@@ -143,7 +124,7 @@ export async function configCommand(): Promise<void> {
       throw err;
     }
 
-    outro('Project settings updated. Commit CLAUDE.md and .tiller.json to share with the team.');
+    outro('Project settings updated. Commit .claude/.tiller.json to share with the team.');
   } else {
     s.start('Saving personal settings...');
 
