@@ -261,6 +261,24 @@ describe('generateTechDebtSkill', () => {
     const result = generateTechDebtSkill(detailedConfig);
     expect(result).toContain('npm run verify');
   });
+
+  it('delegates to Bosun via Task tool', () => {
+    const result = generateTechDebtSkill(simpleConfig);
+    expect(result).toContain('bosun.md');
+    expect(result).toContain('Task tool');
+  });
+
+  it('checks tech-backlog.md for critical items before spawning Bosun', () => {
+    const result = generateTechDebtSkill(simpleConfig);
+    expect(result).toContain('tech-backlog.md');
+    expect(result).toContain('[critical]');
+    expect(result).toContain('Critical debt items found');
+  });
+
+  it('reports Bosun results in detailed mode', () => {
+    const result = generateTechDebtSkill(simpleConfig);
+    expect(result).toContain("Bosun's results");
+  });
 });
 
 describe('generateDockSkill', () => {
