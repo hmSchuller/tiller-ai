@@ -43,7 +43,7 @@ Look at the project files silently. Do not ask the user about this.
 
 **Step 4: Update CLAUDE.md and commit**
 
-Rewrite `CLAUDE.md` with the project name, their description, the verify command you derived, and mode: simple.
+Rewrite `CLAUDE.md` with the project name and their description only (no mode/workflow/verify sections).
 
 Update `runCommand` and `mode` in `.claude/.tiller.json`.
 
@@ -74,7 +74,7 @@ Give suggestions based on what you see in the project. If they don't know yet, s
 
 **Step 4: Update CLAUDE.md and commit**
 
-Rewrite `CLAUDE.md` with the project name, description, verify command, and mode: detailed.
+Rewrite `CLAUDE.md` with the project name and description only (no mode/workflow/verify sections).
 
 Update `runCommand` and `mode` in `.claude/.tiller.json`.
 

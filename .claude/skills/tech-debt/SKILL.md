@@ -38,7 +38,7 @@ Scan the codebase for ONE item from these categories (pick the smallest/safest):
 5. `git checkout main`
 6. Create a chore branch: `git checkout -b chore/tech-debt-<short-desc>` (use kebab-case, max 4 words)
 7. Fix the item
-8. Run `` — if it fails, revert the change and skip (report "skipped — verify failed")
+8. Run `npm test` — if it fails, revert the change and skip (report "skipped — verify failed")
 9. `git add -A && git commit -m "chore: tech debt — <short-desc>"`
 10. `git checkout main && git merge --no-ff chore/tech-debt-<short-desc> -m "chore: tech debt — <short-desc>"`
 11. `git branch -d chore/tech-debt-<short-desc>`
