@@ -64,9 +64,9 @@ describe('scaffold integration', () => {
     expect(content.runCommand).toBe('echo ok');
   });
 
-  it('creates vibestate.md (local active-feature state)', async () => {
-    expect(await exists('vibestate.md')).toBe(true);
-    const content = await read('vibestate.md');
+  it('creates compass.md (local active-feature state)', async () => {
+    expect(await exists('compass.md')).toBe(true);
+    const content = await read('compass.md');
     expect(content).toContain('Active feature');
   });
 
@@ -77,9 +77,9 @@ describe('scaffold integration', () => {
     expect(content).toContain('v0 — initial scaffold');
   });
 
-  it('.gitignore excludes vibestate.md and .tiller.local.json', async () => {
+  it('.gitignore excludes compass.md and .tiller.local.json', async () => {
     const content = await read('.gitignore');
-    expect(content).toContain('vibestate.md');
+    expect(content).toContain('compass.md');
     expect(content).toContain('.tiller.local.json');
   });
 
@@ -156,7 +156,7 @@ describe('scaffold integration — existing .gitignore', () => {
 
   it('appends missing tiller entries under a # Tiller comment', async () => {
     const content = await readFile(join(dir, '.gitignore'), 'utf-8');
-    expect(content).toContain('vibestate.md');
+    expect(content).toContain('compass.md');
     expect(content).toContain('.tiller.local.json');
     expect(content).toContain('# Tiller');
   });
@@ -164,7 +164,7 @@ describe('scaffold integration — existing .gitignore', () => {
   it('does not duplicate tiller entries when already present', async () => {
     const content = await readFile(join(dir, '.gitignore'), 'utf-8');
     const count = (str: string, sub: string) => str.split(sub).length - 1;
-    expect(count(content, 'vibestate.md')).toBe(1);
+    expect(count(content, 'compass.md')).toBe(1);
     expect(count(content, '.tiller.local.json')).toBe(1);
   });
 });

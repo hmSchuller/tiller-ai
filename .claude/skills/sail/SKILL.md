@@ -7,7 +7,7 @@ description: Start or continue working on an idea. Usage: /sail [idea descriptio
 
 ## Step 1: Orient
 
-Read `.claude/.tiller.json` (and `.tiller.local.json` if it exists), `vibestate.md`, and `changelog.md` to understand current state.
+Read `.claude/.tiller.json` (and `.tiller.local.json` if it exists), `compass.md`, and `changelog.md` to understand current state.
 Run `git branch` and `git status`.
 
 State the current mode from `.claude/.tiller.json` (or `.tiller.local.json` if it overrides): "Mode: <mode>".
@@ -18,7 +18,7 @@ State the current mode from `.claude/.tiller.json` (or `.tiller.local.json` if i
 ## Step 2: Branch routing
 
 **$ARGUMENTS provided** → check if a branch named `feature/<kebab-case-of-arguments>` already exists locally or remotely.
-  - If it exists: switch to it. Read `vibestate.md` for current state. Ask: "Found existing branch feature/<name>. Continue where we left off, or do you want to revisit the plan first?"
+  - If it exists: switch to it. Read `compass.md` for current state. Ask: "Found existing branch feature/<name>. Continue where we left off, or do you want to revisit the plan first?"
     - Continue → pick up from the next unchecked milestone
     - Revisit → summarize what's done so far, discuss before building
   - If it doesn't exist: create it from main.
@@ -54,9 +54,9 @@ Before planning, check if a tech debt cleanup is due:
 - 2–5 numbered milestones, each with: what gets built + what gets tested + a dependency tag: `[independent]` if it can run in parallel with other independent milestones, or `[depends-on: N]` if it requires milestone N to complete first
 - Files to create or modify
 - Any trade-offs worth noting
-- **Execution rules** (embed verbatim): After plan approval, read `vibestate.md` to find the milestone checklist, then execute the milestone loop: for each remaining milestone, announce "Milestone X/N: <description>", build functionality, add or update tests, run `npm test` and fix failures, run `git add -A && git commit -m "<milestone>"`, update `vibestate.md` checkboxes and `changelog.md` Done section then amend commit, report "Saved: <description> (X/N)". When all milestones are done, summarize what was built and suggest `/dock`.
+- **Execution rules** (embed verbatim): After plan approval, read `compass.md` to find the milestone checklist, then execute the milestone loop: for each remaining milestone, announce "Milestone X/N: <description>", build functionality, add or update tests, run `npm test` and fix failures, run `git add -A && git commit -m "<milestone>"`, update `compass.md` checkboxes and `changelog.md` Done section then amend commit, report "Saved: <description> (X/N)". When all milestones are done, summarize what was built and suggest `/dock`.
 
-  Before exiting plan mode, write the milestone checklist to the `Active feature` section of `vibestate.md` with `Status: executing` and the plan file path.
+  Before exiting plan mode, write the milestone checklist to the `Active feature` section of `compass.md` with `Status: executing` and the plan file path.
 
 ## Step 4: Build milestone by milestone
 
@@ -70,7 +70,7 @@ Execute them one by one:
 3. Add or update tests for what was built
 4. Run `npm test` — **simple:** fix failures silently. **detailed:** fix before continuing.
 5. `git add -A && git commit -m "<milestone description>"`
-6. Update `vibestate.md` milestone checkboxes (detailed) and add entry to `changelog.md` Done section. Amend: `git commit --amend --no-edit`
+6. Update `compass.md` milestone checkboxes (detailed) and add entry to `changelog.md` Done section. Amend: `git commit --amend --no-edit`
 7. **simple:** Say: "Saved: <what changed>". **detailed:** Report: "Saved: <description> (X/N)"
 
 ### If independent milestones exist
@@ -94,7 +94,7 @@ Use agent teams to parallelize independent work:
 7. Once all independent milestones are done, shut down the team via `SendMessage` with `type: "shutdown_request"`
 8. Run `npm test` once across all changes — fix any failures as lead
 9. `git add -A && git commit -m "<feature>: parallel milestones <list>"`
-10. Update `vibestate.md` and `changelog.md`. Amend: `git commit --amend --no-edit`
+10. Update `compass.md` and `changelog.md`. Amend: `git commit --amend --no-edit`
 
 **Then continue** with any remaining sequential milestones using the sequential loop above.
 

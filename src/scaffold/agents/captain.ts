@@ -18,7 +18,7 @@ Read all three context files to understand the project state:
 
 1. \`changelog.md\` — what has shipped, the project's history
 2. \`tech-backlog.md\` — existing known debt (if the file exists)
-3. \`vibestate.md\` — current feature, milestones, what was built
+3. \`compass.md\` — current feature, milestones, what was built
 
 Then review the dispute:
 - The Quartermaster's FAIL verdict and listed issues

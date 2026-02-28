@@ -53,7 +53,7 @@ Multiple developers. /dock pushes the feature branch and opens a PR. Merging hap
 
 Every piece of work follows this loop:
 
-1. **Orient** — read \`.claude/.tiller.json\` (and \`.tiller.local.json\` if present), vibestate.md (local), and changelog.md (shared)
+1. **Orient** — read \`.claude/.tiller.json\` (and \`.tiller.local.json\` if present), compass.md (local), and changelog.md (shared)
 2. **Confirm** — in detailed mode, enter plan mode with milestones and wait for approval
 3. **Build** — implement milestone by milestone; milestones tagged \`[independent]\` may be parallelized using agent teams (TeamCreate + Task tool); each milestone includes tests, verify, and auto-commit
 4. **Complete** — announce feature done, suggest /dock
@@ -63,7 +63,7 @@ Every piece of work follows this loop:
 - Never commit directly to main
 - Always work on a feature branch (feature/<name>)
 - Run the verify command before every anchor and dock
-- \`vibestate.md\` is gitignored — it tracks your local active feature state
+- \`compass.md\` is gitignored — it tracks your local active feature state
 - \`changelog.md\` is committed and shared — it tracks the project's done log
 
 ## Per-dev overrides

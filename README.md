@@ -61,10 +61,10 @@ The workflow is set during `init` and stored in `.claude/.tiller.json`. Each dev
 ```
 your-project/
 ├── CLAUDE.md                              # User-facing: project name and description
-├── .gitignore                             # Ignores vibestate.md, .tiller.local.json, common build artifacts
+├── .gitignore                             # Ignores compass.md, .tiller.local.json, common build artifacts
 ├── changelog.md                           # Shared done log — updated by /dock on each merge
 ├── tech-backlog.md                        # Persistent tech debt register — managed by Bosun
-├── vibestate.md                           # Per-dev: active feature, milestone checklist, notes (gitignored)
+├── compass.md                             # Per-dev: active feature, milestone checklist, notes (gitignored)
 ├── .claude/
 │   ├── CLAUDE.md                          # Tiller-managed: vibe loop rules, skill docs
 │   ├── settings.json                      # Hook registrations (PostToolUse, PreToolUse, UserPromptSubmit)
@@ -93,13 +93,13 @@ your-project/
 
 Every piece of work follows this loop:
 
-1. **Orient** — Claude reads `.claude/.tiller.json` and `vibestate.md` to understand project state and pick up any in-progress work
+1. **Orient** — Claude reads `.claude/.tiller.json` and `compass.md` to understand project state and pick up any in-progress work
 2. **Confirm** — in `detailed` mode, Claude writes out the proposed approach and waits for a go-ahead before touching files
 3. **Build** — Claude implements milestone by milestone, running the verify command after each. Independent milestones are parallelized using agent teams.
 4. **Review** — Quartermaster inspects the feature branch diff and issues PASS or FAIL before merging. One round of negotiation is allowed; unresolved disagreements go to the Captain.
 5. **Anchor** — Claude reminds you to `/anchor` when stable and `/dock` when the feature is done
 
-`vibestate.md` tracks the active branch, milestone checklist, and session notes. `changelog.md` is the shared done log — updated by `/dock` whenever a feature merges, so team members can see what's been shipped.
+`compass.md` tracks the active branch, milestone checklist, and session notes. `changelog.md` is the shared done log — updated by `/dock` whenever a feature merges, so team members can see what's been shipped.
 
 ## Agents
 
@@ -135,7 +135,7 @@ npx tiller-ai init --mode detailed --workflow team
 
 ### `npx tiller-ai upgrade`
 
-Update Tiller-managed files (`.claude/CLAUDE.md`, `settings.json`, hooks, skills, agents) to the latest version without touching your `CLAUDE.md`, `vibestate.md`, or `changelog.md`.
+Update Tiller-managed files (`.claude/CLAUDE.md`, `settings.json`, hooks, skills, agents) to the latest version without touching your `CLAUDE.md`, `compass.md`, or `changelog.md`.
 
 ```bash
 npx tiller-ai upgrade

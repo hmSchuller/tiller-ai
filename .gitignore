@@ -27,5 +27,5 @@ npm-debug.log*
 *.tsbuildinfo
 
 # Tiller — local-only files
-vibestate.md
+compass.md
 .tiller.local.json

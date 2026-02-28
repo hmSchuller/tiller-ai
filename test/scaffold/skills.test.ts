@@ -68,7 +68,7 @@ describe('generateSailSkill', () => {
     expect(generateSailSkill(simpleConfig)).toContain('Task tool');
   });
 
-  it('writes Done entries to changelog.md, not vibestate.md', () => {
+  it('writes Done entries to changelog.md, not compass.md', () => {
     const result = generateSailSkill(simpleConfig);
     expect(result).toContain('changelog.md');
   });
@@ -203,9 +203,9 @@ describe('generateRecapSkill', () => {
     expect(generateRecapSkill(simpleConfig)).toContain('feature/*');
   });
 
-  it('reads both vibestate.md and changelog.md', () => {
+  it('reads both compass.md and changelog.md', () => {
     const result = generateRecapSkill(simpleConfig);
-    expect(result).toContain('vibestate.md');
+    expect(result).toContain('compass.md');
     expect(result).toContain('changelog.md');
   });
 
@@ -323,7 +323,7 @@ describe('generateDockSkill', () => {
     expect(generateDockSkill(simpleConfig)).toContain('changelog.md');
   });
 
-  it('clears vibestate.md active feature', () => {
-    expect(generateDockSkill(simpleConfig)).toContain('vibestate.md');
+  it('clears compass.md active feature', () => {
+    expect(generateDockSkill(simpleConfig)).toContain('compass.md');
   });
 });

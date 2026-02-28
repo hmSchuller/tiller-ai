@@ -55,13 +55,13 @@ Then go to Step 6.
 
 ## Step 5b: Team — open PR
 
-First, update changelog and vibestate so the single push includes them:
+First, update changelog and compass so the single push includes them:
 
 1. Add an entry to the Done section of \`changelog.md\`: \`- [YYYY-MM-DD] PR opened: <feature-branch>\`
-2. Clear the \`Active feature\` section of \`vibestate.md\`: set it to "None — on main, ready to start something."
+2. Clear the \`Active feature\` section of \`compass.md\`: set it to "None — on main, ready to start something."
 3. Commit:
    \`\`\`
-   git add changelog.md vibestate.md && git commit -m "update changelog: docked <feature-branch>"
+   git add changelog.md compass.md && git commit -m "update changelog: docked <feature-branch>"
    \`\`\`
 
 Then push and open the PR:
@@ -87,10 +87,10 @@ Then go to Step 7 (do NOT delete the branch locally — it will be deleted after
 
 1. Add an entry to the Done section of \`changelog.md\`:
    - \`- [YYYY-MM-DD] docked <feature-branch>\`
-2. Clear the \`Active feature\` section of \`vibestate.md\`: set it to "None — on main, ready to start something."
+2. Clear the \`Active feature\` section of \`compass.md\`: set it to "None — on main, ready to start something."
 3. Commit:
    \`\`\`
-   git add changelog.md vibestate.md && git commit -m "update changelog: docked <feature-branch>"
+   git add changelog.md compass.md && git commit -m "update changelog: docked <feature-branch>"
    \`\`\`
 
 ## Step 7: Confirm

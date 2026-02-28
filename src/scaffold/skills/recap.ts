@@ -14,7 +14,7 @@ description: Read-only status of all work — completed and in progress
 
 Run all of these before writing any output:
 
-1. Read \`vibestate.md\` (active feature, local state)
+1. Read \`compass.md\` (active feature, local state)
 2. Read \`changelog.md\` (shared done log)
 3. \`git log main --oneline\`
 4. \`git branch --list 'feature/*'\`
@@ -30,7 +30,7 @@ Format:
 
 ---
 
-**Working on:** <what's currently being built, from vibestate.md — or "nothing, ready to start">
+**Working on:** <what's currently being built, from compass.md — or "nothing, ready to start">
 
 **Done**
 - <plain English description of what was built>
@@ -51,7 +51,7 @@ Format:
 
 ---
 
-**Active:** <active feature from vibestate.md, or "none">
+**Active:** <active feature from compass.md, or "none">
 
 **Completed (main)**
 <hash> <message>

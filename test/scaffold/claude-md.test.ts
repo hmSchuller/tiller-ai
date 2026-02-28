@@ -49,9 +49,9 @@ describe('generateDotClaudeMd', () => {
     expect(result).toContain('### team');
   });
 
-  it('explains vibestate.md vs changelog.md split', () => {
+  it('explains compass.md vs changelog.md split', () => {
     const result = generateDotClaudeMd(simpleConfig);
-    expect(result).toContain('vibestate.md');
+    expect(result).toContain('compass.md');
     expect(result).toContain('changelog.md');
   });
 
