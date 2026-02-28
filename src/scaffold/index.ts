@@ -19,6 +19,10 @@ import { generateDockSkill } from './skills/dock.js';
 import { generateSetupSkill } from './skills/setup.js';
 import { generateTechDebtSkill } from './skills/tech-debt.js';
 import { generateTechDebtState } from './tech-debt-state.js';
+import { generateQuartermasterAgent } from './agents/quartermaster.js';
+import { generateBosunAgent } from './agents/bosun.js';
+import { generateCaptainAgent } from './agents/captain.js';
+import { generateTechBacklog } from './tech-backlog.js';
 
 export async function scaffold(config: ProjectConfig, targetDir: string): Promise<void> {
   const p = (rel: string) => join(targetDir, rel);
@@ -65,6 +69,14 @@ export async function scaffold(config: ProjectConfig, targetDir: string): Promis
   await writeFile(p('.claude/skills/recap/SKILL.md'), generateRecapSkill(config));
   await writeFile(p('.claude/skills/dock/SKILL.md'), generateDockSkill(config));
   await writeFile(p('.claude/skills/tech-debt/SKILL.md'), generateTechDebtSkill(config));
+
+  // Agents
+  await writeFile(p('.claude/agents/quartermaster.md'), generateQuartermasterAgent(config));
+  await writeFile(p('.claude/agents/bosun.md'), generateBosunAgent(config));
+  await writeFile(p('.claude/agents/captain.md'), generateCaptainAgent(config));
+
+  // Shared tracking files
+  await writeFile(p('tech-backlog.md'), generateTechBacklog(config));
 
   // Git
   if (!isGitRepo(targetDir)) {

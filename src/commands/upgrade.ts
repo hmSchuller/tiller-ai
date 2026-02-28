@@ -12,6 +12,9 @@ import { generateRecapSkill } from '../scaffold/skills/recap.js';
 import { generateDockSkill } from '../scaffold/skills/dock.js';
 import { generateTechDebtSkill } from '../scaffold/skills/tech-debt.js';
 import { generateDotClaudeMd } from '../scaffold/claude-md.js';
+import { generateQuartermasterAgent } from '../scaffold/agents/quartermaster.js';
+import { generateBosunAgent } from '../scaffold/agents/bosun.js';
+import { generateCaptainAgent } from '../scaffold/agents/captain.js';
 import { generateTillerManifest, MANAGED_FILES, TILLER_VERSION, type TillerManifest } from '../scaffold/tiller-manifest.js';
 import type { ProjectConfig } from '../scaffold/types.js';
 
@@ -66,6 +69,9 @@ export async function upgradeCommand(opts: { yes?: boolean } = {}): Promise<void
     await writeFile('.claude/skills/recap/SKILL.md', generateRecapSkill(config));
     await writeFile('.claude/skills/dock/SKILL.md', generateDockSkill(config));
     await writeFile('.claude/skills/tech-debt/SKILL.md', generateTechDebtSkill(config));
+    await writeFile('.claude/agents/quartermaster.md', generateQuartermasterAgent(config));
+    await writeFile('.claude/agents/bosun.md', generateBosunAgent(config));
+    await writeFile('.claude/agents/captain.md', generateCaptainAgent(config));
     await writeFile('.claude/.tiller.json', generateTillerManifest(config, TILLER_VERSION));
     s.stop('Done!');
   } catch (err) {
