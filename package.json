@@ -43,5 +43,13 @@
     "code-generation",
     "project-scaffold"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hmSchuller/tiller-ai.git"
+  },
+  "homepage": "https://github.com/hmSchuller/tiller-ai#readme",
+  "bugs": {
+    "url": "https://github.com/hmSchuller/tiller-ai/issues"
+  }
 }
