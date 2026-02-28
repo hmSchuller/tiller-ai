@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { mkdtemp, rm, readFile, mkdir, writeFile } from 'node:fs/promises';
+import { mkdtemp, rm, readFile, mkdir, writeFile, stat } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { generateTillerManifest } from '../../src/scaffold/tiller-manifest.js';
+import { generateTillerManifest, MANAGED_FILES } from '../../src/scaffold/tiller-manifest.js';
 
 vi.mock('@clack/prompts', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@clack/prompts')>();
@@ -130,5 +130,60 @@ describe('upgradeCommand', () => {
     const { upgradeCommand } = await import('../../src/commands/upgrade.js');
     await expect(upgradeCommand()).rejects.toThrow('process.exit called');
     expect(exitSpy).toHaveBeenCalledWith(0);
+  });
+
+  describe('stale file removal', () => {
+    it('deletes files that were managed before but are no longer managed', async () => {
+      await setupProject(tmpDir);
+
+      // Inject a stale managed file into the old manifest
+      const staleFile = '.claude/skills/old-skill/SKILL.md';
+      await mkdir(join(tmpDir, '.claude', 'skills', 'old-skill'), { recursive: true });
+      await writeFile(join(tmpDir, staleFile), 'old content', 'utf-8');
+
+      // Overwrite manifest to include the stale file
+      const oldManifest = {
+        version: '0.1.0',
+        mode: 'detailed',
+        workflow: 'solo',
+        runCommand: 'npm test',
+        managedFiles: [...MANAGED_FILES, staleFile],
+      };
+      await writeFile(join(tmpDir, '.claude', '.tiller.json'), JSON.stringify(oldManifest, null, 2), 'utf-8');
+
+      const { upgradeCommand } = await import('../../src/commands/upgrade.js');
+      await upgradeCommand({ yes: true });
+
+      await expect(stat(join(tmpDir, staleFile))).rejects.toThrow();
+    });
+
+    it('silently skips stale files that do not exist on disk', async () => {
+      await setupProject(tmpDir);
+
+      // Manifest references a stale file that was never created
+      const oldManifest = {
+        version: '0.1.0',
+        mode: 'detailed',
+        workflow: 'solo',
+        runCommand: 'npm test',
+        managedFiles: [...MANAGED_FILES, '.claude/skills/ghost/SKILL.md'],
+      };
+      await writeFile(join(tmpDir, '.claude', '.tiller.json'), JSON.stringify(oldManifest, null, 2), 'utf-8');
+
+      const { upgradeCommand } = await import('../../src/commands/upgrade.js');
+      // Should not throw
+      await expect(upgradeCommand({ yes: true })).resolves.toBeUndefined();
+    });
+
+    it('does not remove current managed files from the manifest', async () => {
+      await setupProject(tmpDir);
+
+      const { upgradeCommand } = await import('../../src/commands/upgrade.js');
+      await upgradeCommand({ yes: true });
+
+      // Current managed files should still be listed in the updated manifest
+      const manifest = JSON.parse(await readFile(join(tmpDir, '.claude', '.tiller.json'), 'utf-8'));
+      expect(manifest.managedFiles).toContain('.claude/CLAUDE.md');
+    });
   });
 });

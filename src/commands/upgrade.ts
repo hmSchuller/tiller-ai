@@ -1,5 +1,5 @@
 import { intro, outro, confirm, spinner, isCancel, cancel } from '@clack/prompts';
-import { readFile } from 'node:fs/promises';
+import { readFile, unlink } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { writeFile } from '../utils/fs.js';
@@ -56,6 +56,16 @@ export async function upgradeCommand(opts: { yes?: boolean } = {}): Promise<void
     workflow: manifest.workflow ?? 'solo',
   };
 
+  // Remove files that were managed by the old version but are no longer managed
+  const staleFiles = (manifest.managedFiles ?? []).filter((f) => !MANAGED_FILES.includes(f));
+  for (const f of staleFiles) {
+    try {
+      await unlink(resolve(process.cwd(), f));
+    } catch {
+      // file already gone — skip
+    }
+  }
+
   const s = spinner();
   s.start('Upgrading...');
 
@@ -79,5 +89,6 @@ export async function upgradeCommand(opts: { yes?: boolean } = {}): Promise<void
     throw err;
   }
 
-  outro(`Upgraded to v${TILLER_VERSION}. Managed files: ${MANAGED_FILES.length}`);
+  const removedNote = staleFiles.length > 0 ? ` Removed ${staleFiles.length} stale file(s).` : '';
+  outro(`Upgraded to v${TILLER_VERSION}. Managed files: ${MANAGED_FILES.length}.${removedNote}`);
 }

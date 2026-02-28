@@ -9,6 +9,7 @@ export type TillerManifest = {
   runCommand: string;
   projectName?: string;
   description?: string;
+  managedFiles?: string[];
 };
 
 export const MANAGED_FILES = [
