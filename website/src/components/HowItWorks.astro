@@ -9,23 +9,30 @@ const steps = [
   },
   {
     number: '02',
-    label: 'Confirm',
-    title: 'Plan before building',
-    body: 'In detailed mode, Claude writes out milestones and waits for your go-ahead. No surprises, no unilateral architectural choices.',
+    label: 'Plan',
+    title: 'Milestones before code',
+    body: 'In detailed mode, Claude writes out milestones and waits for your go-ahead. Checks the tech backlog for critical debt before planning begins.',
     color: 'teal',
   },
   {
     number: '03',
     label: 'Build',
     title: 'Milestone by milestone',
-    body: 'Each milestone includes implementation, tests, and a save commit. Claude narrates decisions and surfaces trade-offs as it goes.',
+    body: 'Each milestone includes implementation, tests, and a commit. Independent milestones run in parallel via agent teams.',
     color: 'gold',
   },
   {
     number: '04',
-    label: 'Anchor',
-    title: 'Commit and dock',
-    body: 'When the feature is done, /dock merges to main (or opens a PR in team mode). Changelog updated, branch cleaned up, everything tidy.',
+    label: 'Review',
+    title: 'Quartermaster inspects',
+    body: 'An independent review agent checks the diff for test gaps, correctness risks, and code quality. No feature ships without a PASS verdict.',
+    color: 'teal',
+  },
+  {
+    number: '05',
+    label: 'Dock',
+    title: 'Merge and clean up',
+    body: 'When review passes, /dock merges to main (or opens a PR in team mode). Changelog updated, branch cleaned up, everything tidy.',
     color: 'cream',
   },
 ];
@@ -47,7 +54,7 @@ const steps = [
           How it works
         </h2>
         <p class="section-subtitle">
-          Every feature follows the same four-step loop — keeping AI sessions
+          Every feature follows the same five-step loop — keeping AI sessions
           predictable and your codebase clean.
         </p>
       </div>
