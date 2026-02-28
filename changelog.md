@@ -4,6 +4,7 @@
 
 ## Done
 
+- [2026-02-28] landed feature/fix-land-team-workflow-double-ci-push
 - [2026-02-28] fix: commit changelog before push in team workflow — prevent double CI run
 
 - [2026-02-28] landed feature/update-readme-sync-feature-set
