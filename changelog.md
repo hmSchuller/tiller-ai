@@ -4,6 +4,9 @@
 
 ## Done
 
+- [2026-02-28] docs: add agent team support to README intro, skills table, and Features card
+- [2026-02-28] docs: fix website — anchor/sail naming, tech debt description
+- [2026-02-28] docs: sync README — config command, tech-debt skill, agent teams
 - [2026-02-28] landed feature/rename-vibe-to-sail-save-to-anchor
 - [2026-02-28] feat: update README, website, local skills and CLAUDE.md for /sail and /anchor rename
 - [2026-02-28] feat: rename /vibe → /sail and /save → /anchor — source files, generators, tests, upgrade
