@@ -17,7 +17,7 @@ vi.mock('@clack/prompts', async (importOriginal) => {
   };
 });
 
-const TILLER_VERSION = '0.1.4';
+const TILLER_VERSION = '0.2.0';
 
 async function setupProject(tmpDir: string) {
   await mkdir(join(tmpDir, '.claude', 'hooks'), { recursive: true });
