@@ -35,7 +35,7 @@ git commit -m "wip: save before docking"
 
 ## Step 4: Check workflow
 
-Read workflow from `.tiller.local.json` if it exists, otherwise from CLAUDE.md or `.tiller.json`. Default: solo.
+Read workflow from `.tiller.local.json` if it exists, otherwise from `.claude/.tiller.json`. Default: solo.
 
 **If workflow is solo** → go to Step 5a (local merge).
 **If workflow is team** → go to Step 5b (open PR).
