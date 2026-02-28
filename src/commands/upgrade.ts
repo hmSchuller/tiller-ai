@@ -15,7 +15,7 @@ import { generateDotClaudeMd } from '../scaffold/claude-md.js';
 import { generateTillerManifest, MANAGED_FILES, TILLER_VERSION, type TillerManifest } from '../scaffold/tiller-manifest.js';
 import type { ProjectConfig } from '../scaffold/types.js';
 
-export async function upgradeCommand(): Promise<void> {
+export async function upgradeCommand(opts: { yes?: boolean } = {}): Promise<void> {
   intro('tiller-ai upgrade — update hooks and skills');
 
   const manifestPath = resolve(process.cwd(), '.claude/.tiller.json');
@@ -34,13 +34,15 @@ export async function upgradeCommand(): Promise<void> {
     process.exit(1);
   }
 
-  const go = await confirm({
-    message: `Upgrade Tiller files from v${manifest.version} to v${TILLER_VERSION}? (managed files will be overwritten)`,
-  });
+  if (!opts.yes) {
+    const go = await confirm({
+      message: `Upgrade Tiller files from v${manifest.version} to v${TILLER_VERSION}? (managed files will be overwritten)`,
+    });
 
-  if (isCancel(go) || !go) {
-    cancel('Upgrade cancelled.');
-    process.exit(0);
+    if (isCancel(go) || !go) {
+      cancel('Upgrade cancelled.');
+      process.exit(0);
+    }
   }
 
   const config: ProjectConfig = {
