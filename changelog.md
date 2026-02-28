@@ -4,6 +4,7 @@
 
 ## Done
 
+- [2026-02-28] landed feature/update-readme-sync-feature-set
 - [2026-02-28] docs: add agent team support to README intro, skills table, and Features card
 - [2026-02-28] docs: fix website — anchor/sail naming, tech debt description
 - [2026-02-28] docs: sync README — config command, tech-debt skill, agent teams
