@@ -1,20 +1,20 @@
 import { describe, it, expect } from 'vitest';
-import { generateVibeSkill } from '../../src/scaffold/skills/vibe.js';
-import { generateSaveSkill } from '../../src/scaffold/skills/save.js';
+import { generateSailSkill } from '../../src/scaffold/skills/sail.js';
+import { generateAnchorSkill } from '../../src/scaffold/skills/anchor.js';
 import { generateRecapSkill } from '../../src/scaffold/skills/recap.js';
 import { generateLandSkill } from '../../src/scaffold/skills/land.js';
 import { generateTechDebtSkill } from '../../src/scaffold/skills/tech-debt.js';
 import { simpleConfig, detailedConfig, teamSimpleConfig } from '../helpers/fixtures.js';
 
-describe('generateVibeSkill', () => {
+describe('generateSailSkill', () => {
   it('has correct frontmatter name', () => {
-    expect(generateVibeSkill(simpleConfig)).toContain('name: vibe');
+    expect(generateSailSkill(simpleConfig)).toContain('name: sail');
   });
 
   it('produces the same template structure regardless of mode', () => {
     // Both configs have same mode-agnostic structure; only runCommand differs
-    const simple = generateVibeSkill(simpleConfig);
-    const detailed = generateVibeSkill(detailedConfig);
+    const simple = generateSailSkill(simpleConfig);
+    const detailed = generateSailSkill(detailedConfig);
     expect(simple).toContain('If mode is simple');
     expect(simple).toContain('If mode is detailed');
     expect(detailed).toContain('If mode is simple');
@@ -22,42 +22,42 @@ describe('generateVibeSkill', () => {
   });
 
   it('includes $ARGUMENTS usage', () => {
-    expect(generateVibeSkill(simpleConfig)).toContain('$ARGUMENTS');
+    expect(generateSailSkill(simpleConfig)).toContain('$ARGUMENTS');
   });
 
   it('handles both simple and detailed mode at runtime', () => {
-    const result = generateVibeSkill(simpleConfig);
+    const result = generateSailSkill(simpleConfig);
     expect(result).toContain('simple');
     expect(result).toContain('detailed');
   });
 
   it('instructs detailed mode to enter plan mode', () => {
-    expect(generateVibeSkill(simpleConfig)).toContain('EnterPlanMode');
+    expect(generateSailSkill(simpleConfig)).toContain('EnterPlanMode');
   });
 
   it('instructs simple mode to plan internally', () => {
-    expect(generateVibeSkill(simpleConfig)).toContain('internally');
+    expect(generateSailSkill(simpleConfig)).toContain('internally');
   });
 
   it('includes verify command', () => {
-    expect(generateVibeSkill(simpleConfig)).toContain('npm test');
+    expect(generateSailSkill(simpleConfig)).toContain('npm test');
   });
 
   it('includes milestone build loop', () => {
-    expect(generateVibeSkill(simpleConfig)).toContain('Add or update tests');
-    expect(generateVibeSkill(simpleConfig)).toContain('git add -A && git commit');
+    expect(generateSailSkill(simpleConfig)).toContain('Add or update tests');
+    expect(generateSailSkill(simpleConfig)).toContain('git add -A && git commit');
   });
 
   it('mentions feature branch creation', () => {
-    expect(generateVibeSkill(simpleConfig)).toContain('feature/');
+    expect(generateSailSkill(simpleConfig)).toContain('feature/');
   });
 
   it('announces the current mode', () => {
-    expect(generateVibeSkill(simpleConfig)).toContain('Mode: <mode>');
+    expect(generateSailSkill(simpleConfig)).toContain('Mode: <mode>');
   });
 
   it('includes tech debt check step between branch routing and planning', () => {
-    const result = generateVibeSkill(simpleConfig);
+    const result = generateSailSkill(simpleConfig);
     expect(result).toContain('Step 2.5');
     expect(result).toContain('tech debt');
     expect(result).toContain('.tiller-tech-debt.json');
@@ -65,54 +65,54 @@ describe('generateVibeSkill', () => {
   });
 
   it('instructs vibe to use Task tool for tech debt agent', () => {
-    expect(generateVibeSkill(simpleConfig)).toContain('Task tool');
+    expect(generateSailSkill(simpleConfig)).toContain('Task tool');
   });
 
   it('writes Done entries to changelog.md, not vibestate.md', () => {
-    const result = generateVibeSkill(simpleConfig);
+    const result = generateSailSkill(simpleConfig);
     expect(result).toContain('changelog.md');
   });
 
   it('tags milestones with dependency annotations in plan step', () => {
-    const result = generateVibeSkill(simpleConfig);
+    const result = generateSailSkill(simpleConfig);
     expect(result).toContain('[independent]');
     expect(result).toContain('[depends-on: N]');
   });
 
   it('includes TeamCreate and TaskCreate for parallel execution', () => {
-    const result = generateVibeSkill(simpleConfig);
+    const result = generateSailSkill(simpleConfig);
     expect(result).toContain('TeamCreate');
     expect(result).toContain('TaskCreate');
   });
 
   it('includes SendMessage for worker coordination', () => {
-    expect(generateVibeSkill(simpleConfig)).toContain('SendMessage');
+    expect(generateSailSkill(simpleConfig)).toContain('SendMessage');
   });
 
   it('includes sequential fallback when all milestones depend on each other', () => {
-    const result = generateVibeSkill(simpleConfig);
+    const result = generateSailSkill(simpleConfig);
     expect(result).toContain('all milestones are sequential');
   });
 
   it('includes within-milestone split option', () => {
-    const result = generateVibeSkill(simpleConfig);
+    const result = generateSailSkill(simpleConfig);
     expect(result).toContain('Within-milestone split');
   });
 
   it('lead agent owns commits in team mode', () => {
-    const result = generateVibeSkill(simpleConfig);
+    const result = generateSailSkill(simpleConfig);
     expect(result).toContain('lead agent commits');
   });
 });
 
-describe('generateSaveSkill', () => {
+describe('generateAnchorSkill', () => {
   it('has correct frontmatter name', () => {
-    expect(generateSaveSkill(simpleConfig)).toContain('name: save');
+    expect(generateAnchorSkill(simpleConfig)).toContain('name: anchor');
   });
 
   it('produces the same template structure regardless of mode', () => {
-    const simple = generateSaveSkill(simpleConfig);
-    const detailed = generateSaveSkill(detailedConfig);
+    const simple = generateAnchorSkill(simpleConfig);
+    const detailed = generateAnchorSkill(detailedConfig);
     expect(simple).toContain('simple');
     expect(simple).toContain('detailed');
     expect(detailed).toContain('simple');
@@ -120,23 +120,23 @@ describe('generateSaveSkill', () => {
   });
 
   it('checks for feature branch', () => {
-    expect(generateSaveSkill(simpleConfig)).toContain('main');
+    expect(generateAnchorSkill(simpleConfig)).toContain('main');
   });
 
   it('runs verify command', () => {
-    expect(generateSaveSkill(simpleConfig)).toContain('npm test');
+    expect(generateAnchorSkill(simpleConfig)).toContain('npm test');
   });
 
   it('commits with git add -A', () => {
-    expect(generateSaveSkill(simpleConfig)).toContain('git add -A');
+    expect(generateAnchorSkill(simpleConfig)).toContain('git add -A');
   });
 
   it('writes Done entry to changelog.md', () => {
-    expect(generateSaveSkill(simpleConfig)).toContain('changelog.md');
+    expect(generateAnchorSkill(simpleConfig)).toContain('changelog.md');
   });
 
   it('handles both simple and detailed mode at runtime', () => {
-    const result = generateSaveSkill(simpleConfig);
+    const result = generateAnchorSkill(simpleConfig);
     expect(result).toContain('simple');
     expect(result).toContain('detailed');
   });

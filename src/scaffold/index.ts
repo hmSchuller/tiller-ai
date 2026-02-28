@@ -12,8 +12,8 @@ import { generateTillerManifest, TILLER_VERSION } from './tiller-manifest.js';
 import { generatePostWriteHook } from './hooks/post-write.js';
 import { generateSecretScanHook } from './hooks/secret-scan.js';
 import { generateSessionResumeHook } from './hooks/session-resume.js';
-import { generateVibeSkill } from './skills/vibe.js';
-import { generateSaveSkill } from './skills/save.js';
+import { generateSailSkill } from './skills/sail.js';
+import { generateAnchorSkill } from './skills/anchor.js';
 import { generateRecapSkill } from './skills/recap.js';
 import { generateLandSkill } from './skills/land.js';
 import { generateSetupSkill } from './skills/setup.js';
@@ -60,8 +60,8 @@ export async function scaffold(config: ProjectConfig, targetDir: string): Promis
 
   // Skills
   await writeFile(p('.claude/skills/setup/SKILL.md'), generateSetupSkill(config));
-  await writeFile(p('.claude/skills/vibe/SKILL.md'), generateVibeSkill(config));
-  await writeFile(p('.claude/skills/save/SKILL.md'), generateSaveSkill(config));
+  await writeFile(p('.claude/skills/sail/SKILL.md'), generateSailSkill(config));
+  await writeFile(p('.claude/skills/anchor/SKILL.md'), generateAnchorSkill(config));
   await writeFile(p('.claude/skills/recap/SKILL.md'), generateRecapSkill(config));
   await writeFile(p('.claude/skills/land/SKILL.md'), generateLandSkill(config));
   await writeFile(p('.claude/skills/tech-debt/SKILL.md'), generateTechDebtSkill(config));

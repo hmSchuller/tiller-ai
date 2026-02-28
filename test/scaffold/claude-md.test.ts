@@ -42,8 +42,8 @@ describe('generateDotClaudeMd', () => {
 
   it('lists all four skills', () => {
     const result = generateDotClaudeMd(simpleConfig);
-    expect(result).toContain('/vibe');
-    expect(result).toContain('/save');
+    expect(result).toContain('/sail');
+    expect(result).toContain('/anchor');
     expect(result).toContain('/land');
     expect(result).toContain('/recap');
   });
@@ -76,7 +76,7 @@ describe('generateDotClaudeMd', () => {
     expect(result).toContain('[independent]');
   });
 
-  it('describes agent team usage in /vibe skill listing', () => {
+  it('describes agent team usage in /sail skill listing', () => {
     const result = generateDotClaudeMd(simpleConfig);
     expect(result).toContain('parallelized');
   });
