@@ -4,6 +4,7 @@
 
 ## Done
 
+- [2026-02-28] docked feature/bump-version-to-0-1-4
 - [2026-02-28] bump version to 0.1.4 — package.json, index.ts, tiller-manifest.ts, config.test.ts
 - [2026-02-28] docked feature/remove-config-from-root-claude-md
 - [2026-02-28] update README, website, local CLAUDE.md — config reads from .tiller.json
