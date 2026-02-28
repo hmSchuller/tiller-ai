@@ -4,7 +4,7 @@ Scaffold Claude Code projects with a structured vibe loop — branch, build, com
 
 ## What is this?
 
-Tiller is a thin scaffold for Claude Code that turns a blank repo into a project Claude knows how to navigate. It installs a set of slash commands (skills), two `CLAUDE.md` files (one user-facing, one Tiller-managed), hooks for formatting and secret scanning, and shared tracking files. Once scaffolded, you describe work with `/sail`, anchor checkpoints with `/anchor`, and ship with `/land` — and Claude follows the loop without you having to re-explain your workflow every session.
+Tiller is a thin scaffold for Claude Code that turns a blank repo into a project Claude knows how to navigate. It installs a set of slash commands (skills), two `CLAUDE.md` files (one user-facing, one Tiller-managed), hooks for formatting and secret scanning, and shared tracking files. Once scaffolded, you describe work with `/sail`, anchor checkpoints with `/anchor`, and ship with `/land` — and Claude follows the loop without you having to re-explain your workflow every session. When milestones are independent, `/sail` spawns parallel agent workers to build them simultaneously.
 
 ## Quick start
 
@@ -24,7 +24,7 @@ npx tiller-ai init
 | Command | What it does |
 |---|---|
 | `/setup` | First-run: understand the project and fill in `CLAUDE.md` |
-| `/sail [idea]` | Start or continue work on something |
+| `/sail [idea]` | Start or continue work; parallelizes independent milestones using agent teams |
 | `/anchor` | Anchor current progress on the feature branch |
 | `/land` | Merge completed feature to main (solo) or open a PR (team) |
 | `/recap` | Read-only status — active feature, notes |
