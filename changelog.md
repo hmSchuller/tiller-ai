@@ -4,6 +4,7 @@
 
 ## Done
 
+- [2026-02-28] docs: update README to match current feature set — agents section, file tree, vibe loop step 4, CLI flags
 - [2026-02-28] docked feature/add-repository-homepage-bugs-to-package-json
 - [2026-02-28] add repository, homepage, bugs fields to package.json — npm listing links back to GitHub
 - [2026-02-28] docked feature/bump-version-to-0-2-0

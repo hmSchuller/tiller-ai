@@ -4,7 +4,9 @@ Scaffold Claude Code projects with a structured vibe loop — branch, build, com
 
 ## What is this?
 
-Tiller is a thin scaffold for Claude Code that turns a blank repo into a project Claude knows how to navigate. It installs a set of slash commands (skills), two `CLAUDE.md` files (one user-facing, one Tiller-managed), hooks for formatting and secret scanning, and shared tracking files. Once scaffolded, you describe work with `/sail`, anchor checkpoints with `/anchor`, and ship with `/dock` — and Claude follows the loop without you having to re-explain your workflow every session. When milestones are independent, `/sail` spawns parallel agent workers to build them simultaneously.
+Tiller is a thin scaffold for Claude Code that turns a blank repo into a project Claude knows how to navigate. It installs a set of slash commands (skills), two `CLAUDE.md` files (one user-facing, one Tiller-managed), hooks for formatting and secret scanning, and shared tracking files. Once scaffolded, you describe work with `/sail`, anchor checkpoints with `/anchor`, and ship with `/dock` — and Claude follows the loop without you having to re-explain your workflow every session.
+
+When milestones are independent, `/sail` spawns parallel agent workers to build them simultaneously. Every three features, a tech debt cleanup runs automatically. Before any `/dock`, a code review agent (Quartermaster) inspects the diff and must pass before merging — with a Captain agent available to arbitrate disagreements.
 
 ## Quick start
 
@@ -24,7 +26,7 @@ npx tiller-ai init
 | Command | What it does |
 |---|---|
 | `/setup` | First-run: understand the project and fill in `CLAUDE.md` |
-| `/sail [idea]` | Start or continue work; parallelizes independent milestones using agent teams |
+| `/sail [idea]` | Start or continue work; parallelizes independent milestones using agent teams; auto-runs tech debt cleanup every 3 features |
 | `/anchor` | Anchor current progress on the feature branch |
 | `/dock` | Merge completed feature to main (solo) or open a PR (team) |
 | `/recap` | Read-only status — active feature, notes |
@@ -61,11 +63,17 @@ your-project/
 ├── CLAUDE.md                              # User-facing: project name and description
 ├── .gitignore                             # Ignores vibestate.md, .tiller.local.json, common build artifacts
 ├── changelog.md                           # Shared done log — updated by /dock on each merge
+├── tech-backlog.md                        # Persistent tech debt register — managed by Bosun
 ├── vibestate.md                           # Per-dev: active feature, milestone checklist, notes (gitignored)
 ├── .claude/
 │   ├── CLAUDE.md                          # Tiller-managed: vibe loop rules, skill docs
 │   ├── settings.json                      # Hook registrations (PostToolUse, PreToolUse, UserPromptSubmit)
 │   ├── .tiller.json                       # Manifest: version, mode, workflow, runCommand, managedFiles
+│   ├── .tiller-tech-debt.json             # Tech debt state tracker (feature counter, last-run date)
+│   ├── agents/
+│   │   ├── quartermaster.md               # Code review agent — reviews diff before /dock
+│   │   ├── bosun.md                       # Tech debt agent — scans and fixes one item per run
+│   │   └── captain.md                     # Arbitration agent — resolves dev/quartermaster impasse
 │   ├── hooks/
 │   │   ├── post-write.sh                  # PostToolUse: run formatter after file writes
 │   │   ├── secret-scan.sh                 # PreToolUse: block writes containing secrets
@@ -88,9 +96,20 @@ Every piece of work follows this loop:
 1. **Orient** — Claude reads `.claude/.tiller.json` and `vibestate.md` to understand project state and pick up any in-progress work
 2. **Confirm** — in `detailed` mode, Claude writes out the proposed approach and waits for a go-ahead before touching files
 3. **Build** — Claude implements milestone by milestone, running the verify command after each. Independent milestones are parallelized using agent teams.
-4. **Anchor** — Claude reminds you to `/anchor` when stable and `/dock` when the feature is done
+4. **Review** — Quartermaster inspects the feature branch diff and issues PASS or FAIL before merging. One round of negotiation is allowed; unresolved disagreements go to the Captain.
+5. **Anchor** — Claude reminds you to `/anchor` when stable and `/dock` when the feature is done
 
 `vibestate.md` tracks the active branch, milestone checklist, and session notes. `changelog.md` is the shared done log — updated by `/dock` whenever a feature merges, so team members can see what's been shipped.
+
+## Agents
+
+Tiller ships three specialist agents that run automatically — you don't invoke them directly.
+
+**Quartermaster** — code reviewer. Spawned by `/sail` at the end of every feature. Reads the full diff against main and issues a PASS or FAIL verdict with specific comments. The sailing agent negotiates once; if they can't agree, the Captain arbitrates.
+
+**Bosun** — tech debt maintenance. Scans the codebase and logs issues to `tech-backlog.md` by severity. Fixes one small item per run. Auto-triggered by `/sail` every three features, so the backlog stays manageable without manual intervention.
+
+**Captain** — arbitrator. Only activated when the sailing agent and Quartermaster reach an impasse after one round of negotiation. Issues one of three rulings: agree with Quartermaster, agree with the sailing agent, or propose a compromise. Final word — no further escalation.
 
 ## CLI reference
 
@@ -100,15 +119,34 @@ Scaffold a new project interactively. Prompts for project name, description, run
 
 ```bash
 npx tiller-ai init
+
+# Skip prompts and use defaults
+npx tiller-ai init --yes
+
+# Set mode and workflow non-interactively
+npx tiller-ai init --mode detailed --workflow team
 ```
+
+| Flag | Description |
+|---|---|
+| `-y, --yes` | Skip all prompts and use defaults |
+| `--mode <mode>` | `simple` or `detailed` (default: `simple`) |
+| `--workflow <workflow>` | `solo` or `team` (default: `solo`) |
 
 ### `npx tiller-ai upgrade`
 
-Update Tiller-managed files (`.claude/CLAUDE.md`, `settings.json`, hooks, skills) to the latest version without touching your `CLAUDE.md`, `vibestate.md`, or `changelog.md`.
+Update Tiller-managed files (`.claude/CLAUDE.md`, `settings.json`, hooks, skills, agents) to the latest version without touching your `CLAUDE.md`, `vibestate.md`, or `changelog.md`.
 
 ```bash
 npx tiller-ai upgrade
+
+# Skip confirmation prompt
+npx tiller-ai upgrade --yes
 ```
+
+| Flag | Description |
+|---|---|
+| `-y, --yes` | Skip confirmation prompt |
 
 ### `npx tiller-ai config`
 
