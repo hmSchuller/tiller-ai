@@ -37,20 +37,13 @@ Tiller has two modes that control how Claude communicates:
 
 **`detailed`** — for technical users. Claude proposes an approach and waits for confirmation before touching files, narrates decisions, and surfaces trade-offs.
 
-Switch modes at any time:
+Switch modes at any time with the interactive config command:
 
 ```bash
-npx tiller-ai mode simple
-npx tiller-ai mode detailed
+npx tiller-ai config
 ```
 
-Use `--project` to update the shared project default instead of your personal override:
-
-```bash
-npx tiller-ai mode detailed --project
-```
-
-Or just update the `Mode:` line in your root `CLAUDE.md`.
+Or update the `Mode:` line in your root `CLAUDE.md` directly.
 
 ## Workflows
 
@@ -83,7 +76,8 @@ your-project/
 │       ├── sail/SKILL.md                  # /sail skill
 │       ├── anchor/SKILL.md                # /anchor skill
 │       ├── land/SKILL.md                  # /land skill
-│       └── recap/SKILL.md                 # /recap skill
+│       ├── recap/SKILL.md                 # /recap skill
+│       └── tech-debt/SKILL.md             # internal: auto-run by /sail every 3 features
 ```
 
 **Per-dev local overrides** — `.tiller.local.json` (gitignored, not scaffolded) lets individual developers override `mode` and `workflow` without touching shared files.
@@ -94,7 +88,7 @@ Every piece of work follows this loop:
 
 1. **Orient** — Claude reads `CLAUDE.md` and `vibestate.md` to understand project state and pick up any in-progress work
 2. **Confirm** — in `detailed` mode, Claude writes out the proposed approach and waits for a go-ahead before touching files
-3. **Build** — Claude implements, runs the verify command after each chunk, and fixes failures before moving on
+3. **Build** — Claude implements milestone by milestone, running the verify command after each. Independent milestones are parallelized using agent teams.
 4. **Anchor** — Claude reminds you to `/anchor` when stable and `/land` when the feature is done
 
 `vibestate.md` tracks the active branch, milestone checklist, and session notes. `changelog.md` is the shared done log — updated by `/land` whenever a feature merges, so team members can see what's been shipped.
@@ -117,14 +111,12 @@ Update Tiller-managed files (`.claude/CLAUDE.md`, `settings.json`, hooks, skills
 npx tiller-ai upgrade
 ```
 
-### `npx tiller-ai mode <mode>`
+### `npx tiller-ai config`
 
-Switch the project mode between `simple` and `detailed`. Without `--project`, writes to `.tiller.local.json` (your personal override). With `--project`, updates the shared `CLAUDE.md`.
+Interactively update mode and workflow. Prompts for mode (`simple`/`detailed`), workflow (`solo`/`team`), and scope (`local` writes to `.tiller.local.json`, `project` updates the shared `CLAUDE.md` and `.tiller.json`).
 
 ```bash
-npx tiller-ai mode simple
-npx tiller-ai mode detailed
-npx tiller-ai mode detailed --project   # update shared project default
+npx tiller-ai config
 ```
 
 ## Requirements
