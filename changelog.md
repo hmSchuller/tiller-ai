@@ -4,6 +4,7 @@
 
 ## Done
 
+- [2026-02-28] landed feature/rename-vibe-to-sail-save-to-anchor
 - [2026-02-28] feat: update README, website, local skills and CLAUDE.md for /sail and /anchor rename
 - [2026-02-28] feat: rename /vibe → /sail and /save → /anchor — source files, generators, tests, upgrade
 - [2026-02-28] landed feature/can-tiller-spawn-agent-teams
