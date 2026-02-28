@@ -2,17 +2,8 @@ import { intro, outro, spinner, select, isCancel, cancel } from '@clack/prompts'
 import { readFile, writeFile as fsWriteFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { generateTillerManifest, TILLER_VERSION } from '../scaffold/tiller-manifest.js';
+import { generateTillerManifest, TILLER_VERSION, type TillerManifest } from '../scaffold/tiller-manifest.js';
 import type { ProjectConfig } from '../scaffold/types.js';
-
-type Manifest = {
-  version: string;
-  mode: 'simple' | 'detailed';
-  workflow?: 'solo' | 'team';
-  runCommand: string;
-  projectName?: string;
-  description?: string;
-};
 
 export async function configCommand(): Promise<void> {
   intro('tiller-ai config — update mode and workflow');
@@ -24,7 +15,7 @@ export async function configCommand(): Promise<void> {
     process.exit(1);
   }
 
-  let manifest: Manifest;
+  let manifest: TillerManifest;
   try {
     const raw = await readFile(manifestPath, 'utf-8');
     manifest = JSON.parse(raw);
