@@ -70,6 +70,27 @@ describe('generateDotClaudeMd', () => {
     const result = generateDotClaudeMd(simpleConfig);
     expect(result).toContain('parallelized');
   });
+
+  it('has an Agents section listing all three agents', () => {
+    const result = generateDotClaudeMd(simpleConfig);
+    expect(result).toContain('## Agents');
+    expect(result).toContain('quartermaster');
+    expect(result).toContain('bosun');
+    expect(result).toContain('captain');
+  });
+
+  it('notes which agents require opus model', () => {
+    const result = generateDotClaudeMd(simpleConfig);
+    expect(result).toContain('model: "opus"');
+  });
+
+  it('Agents section appears after Skills section', () => {
+    const result = generateDotClaudeMd(simpleConfig);
+    const skillsIdx = result.indexOf('## Skills');
+    const agentsIdx = result.indexOf('## Agents');
+    expect(skillsIdx).toBeGreaterThan(-1);
+    expect(agentsIdx).toBeGreaterThan(skillsIdx);
+  });
 });
 
 describe('generateDotClaudeMd — config source', () => {
