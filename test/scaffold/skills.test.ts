@@ -103,6 +103,48 @@ describe('generateSailSkill', () => {
     const result = generateSailSkill(simpleConfig);
     expect(result).toContain('lead agent commits');
   });
+
+  it('includes Step 4.5 code review with Quartermaster', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('Step 4.5');
+    expect(result).toContain('Quartermaster');
+    expect(result).toContain('quartermaster.md');
+  });
+
+  it('spawns Quartermaster with opus model', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('model: "opus"');
+  });
+
+  it('escalates to Captain on unresolved disputes', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('Captain');
+    expect(result).toContain('captain.md');
+    expect(result).toContain('ESCALATE TO CAPTAIN');
+  });
+
+  it('spawns Captain with opus model', () => {
+    const result = generateSailSkill(simpleConfig);
+    // Should appear twice: once for Quartermaster, once for Captain
+    const matches = (result.match(/model: "opus"/g) || []).length;
+    expect(matches).toBeGreaterThanOrEqual(2);
+  });
+
+  it('handles PASS, FAIL, and Captain ruling outcomes', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('PASS');
+    expect(result).toContain('FAIL');
+    expect(result).toContain('AGREE WITH QUARTERMASTER');
+    expect(result).toContain('AGREE WITH SAILING AGENT');
+    expect(result).toContain('COMPROMISE');
+  });
+
+  it('Step 2.5 checks tech-backlog.md for critical items', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('tech-backlog.md');
+    expect(result).toContain('[critical]');
+    expect(result).toContain('Critical debt items');
+  });
 });
 
 describe('generateAnchorSkill', () => {
@@ -218,6 +260,24 @@ describe('generateTechDebtSkill', () => {
   it('uses verify command from config', () => {
     const result = generateTechDebtSkill(detailedConfig);
     expect(result).toContain('npm run verify');
+  });
+
+  it('delegates to Bosun via Task tool', () => {
+    const result = generateTechDebtSkill(simpleConfig);
+    expect(result).toContain('bosun.md');
+    expect(result).toContain('Task tool');
+  });
+
+  it('checks tech-backlog.md for critical items before spawning Bosun', () => {
+    const result = generateTechDebtSkill(simpleConfig);
+    expect(result).toContain('tech-backlog.md');
+    expect(result).toContain('[critical]');
+    expect(result).toContain('Critical debt items found');
+  });
+
+  it('reports Bosun results in detailed mode', () => {
+    const result = generateTechDebtSkill(simpleConfig);
+    expect(result).toContain("Bosun's results");
   });
 });
 

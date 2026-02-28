@@ -6,21 +6,31 @@ name: tech-debt
 description: Internal skill — spawned by /vibe to fix one small tech debt item. Not user-invocable directly.
 ---
 
-# Tech Debt Agent
+# Tech Debt Skill
 
-You are a focused tech debt cleanup agent. Your job: find and fix **one small, non-invasive tech debt item**, merge it to main, then exit cleanly.
+You are the Sailing Agent running a scheduled tech debt cleanup. Your job: delegate the cleanup work to the Bosun agent, then update the tech debt state tracker.
 
-## What to look for
+## Steps
 
-Scan the codebase for ONE item from these categories (pick the smallest/safest):
+1. If \`tech-backlog.md\` exists, check it for any \`[critical]\` items before proceeding.
+   - If critical items are found: announce them — "Critical debt items found: <list>." — before spawning the Bosun.
 
-- **Clutter:** dead code, unused imports/exports, stale TODOs, commented-out code
-- **Duplication:** duplicated logic extractable into a shared helper
-- **Readability:** functions with high cognitive complexity, unclear names, missing comments on non-obvious logic
-- **Correctness risks:** unhandled promise rejections, missing \`await\`, unsafe type assertions (\`as X\`), hardcoded values that should be constants
-- **Inconsistency:** patterns done differently in one place vs. the rest of the codebase
-- **Test health:** happy-path-only tests missing obvious error cases
-- **Dependency hygiene:** packages imported but barely used (could be inlined or removed)
+2. Use the **Task tool** (foreground, \`subagent_type: "general-purpose"\`) with the contents of \`.claude/agents/bosun.md\` as the prompt.
+   Wait for the Bosun to complete.
+
+3. After the Bosun finishes, update \`.claude/.tiller-tech-debt.json\`: set \`lastTechDebtAtFeature\` to the current count of landed features (count lines matching \`- [.*] landed feature/\` in \`changelog.md\`).
+
+4. Also run the branch management steps (the Bosun scans and fixes; you handle the chore branch):
+   - Note the current branch: \`git branch --show-current\`
+   - Stash any uncommitted work: \`git stash\`
+   - \`git checkout main\`
+   - Create a chore branch: \`git checkout -b chore/tech-debt-<short-desc>\` (use kebab-case, max 4 words)
+   - Apply the Bosun's fix
+   - Run \`${config.runCommand}\` — if it fails, revert and skip (report "skipped — verify failed")
+   - \`git add -A && git commit -m "chore: tech debt — <short-desc>"\`
+   - \`git checkout main && git merge --no-ff chore/tech-debt-<short-desc> -m "chore: tech debt — <short-desc>"\`
+   - \`git branch -d chore/tech-debt-<short-desc>\`
+   - \`git checkout <original-branch> && git stash pop\` (restore original state)
 
 ## Guardrails — you MUST NOT
 
@@ -32,26 +42,10 @@ Scan the codebase for ONE item from these categories (pick the smallest/safest):
 - Modify CI/CD, build config, or dependency versions
 - If nothing safe is found, skip entirely and report "codebase is clean"
 
-## Steps
-
-1. Explore the codebase and identify the single smallest, most non-invasive item to fix
-2. If nothing safe is found: skip to the "Report" step with "codebase is clean"
-3. Note the current branch: \`git branch --show-current\`
-4. Stash any uncommitted work: \`git stash\`
-5. \`git checkout main\`
-6. Create a chore branch: \`git checkout -b chore/tech-debt-<short-desc>\` (use kebab-case, max 4 words)
-7. Fix the item
-8. Run \`${config.runCommand}\` — if it fails, revert the change and skip (report "skipped — verify failed")
-9. \`git add -A && git commit -m "chore: tech debt — <short-desc>"\`
-10. \`git checkout main && git merge --no-ff chore/tech-debt-<short-desc> -m "chore: tech debt — <short-desc>"\`
-11. \`git branch -d chore/tech-debt-<short-desc>\`
-12. \`git checkout <original-branch> && git stash pop\` (restore original state)
-13. Update \`.claude/.tiller-tech-debt.json\`: set \`lastTechDebtAtFeature\` to the current count of landed features (lines matching \`- [.*] landed feature/\` in \`changelog.md\`)
-
 ## Report
 
 **simple mode:** "Cleaned up a bit."
-**detailed mode:** "Tech debt fixed: <what was done and why it mattered>"
+**detailed mode:** Report the Bosun's results: what was fixed, what was logged to tech-backlog.md, and the current backlog count.
 
 If skipped: **simple:** say nothing. **detailed:** "Tech debt check: codebase is clean."
 `;

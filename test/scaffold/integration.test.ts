@@ -115,6 +115,19 @@ describe('scaffold integration', () => {
     expect(await exists('.claude/skills/tech-debt/SKILL.md')).toBe(true);
   });
 
+  it('creates all agent files', async () => {
+    expect(await exists('.claude/agents/quartermaster.md')).toBe(true);
+    expect(await exists('.claude/agents/bosun.md')).toBe(true);
+    expect(await exists('.claude/agents/captain.md')).toBe(true);
+  });
+
+  it('creates tech-backlog.md', async () => {
+    expect(await exists('tech-backlog.md')).toBe(true);
+    const content = await read('tech-backlog.md');
+    expect(content).toContain('## Backlog');
+    expect(content).toContain('## Done');
+  });
+
   it('initializes a git repo with initial commit', async () => {
     expect(await exists('.git')).toBe(true);
   });

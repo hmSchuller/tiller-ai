@@ -82,6 +82,14 @@ Skills read \`.tiller.local.json\` first, then fall back to \`.claude/.tiller.js
 - **/dock** — merge or PR depending on workflow
 - **/recap** — read-only status of all work
 
+## Agents
+
+Tiller provides three specialist agents in \`.claude/agents/\`. They are spawned by skills via the Task tool — not invoked directly.
+
+- **quartermaster** — independent code reviewer. Spawned at end of sail (Step 4.5) to review the feature branch diff. Returns PASS or FAIL. Negotiates one round; escalates to Captain on impasse. Requires \`model: "opus"\`.
+- **bosun** — tech debt maintenance. Scans the codebase, logs issues to \`tech-backlog.md\` by severity, fixes one small item per run. Alerts on critical items.
+- **captain** — arbitration. Only activated when Quartermaster and Sailing Agent reach impasse. Issues one of three rulings: AGREE WITH QUARTERMASTER, AGREE WITH SAILING AGENT, or COMPROMISE. Requires \`model: "opus"\`.
+
 ## Rules
 
 - Do not skip the verify step
