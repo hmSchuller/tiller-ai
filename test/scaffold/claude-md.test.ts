@@ -44,7 +44,7 @@ describe('generateDotClaudeMd', () => {
     const result = generateDotClaudeMd(simpleConfig);
     expect(result).toContain('/sail');
     expect(result).toContain('/anchor');
-    expect(result).toContain('/land');
+    expect(result).toContain('/dock');
     expect(result).toContain('/recap');
   });
 

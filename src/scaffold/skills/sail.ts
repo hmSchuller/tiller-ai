@@ -54,7 +54,7 @@ Before planning, check if a tech debt cleanup is due:
 - 2–5 numbered milestones, each with: what gets built + what gets tested + a dependency tag: \`[independent]\` if it can run in parallel with other independent milestones, or \`[depends-on: N]\` if it requires milestone N to complete first
 - Files to create or modify
 - Any trade-offs worth noting
-- **Execution rules** (embed verbatim): After plan approval, read \`vibestate.md\` to find the milestone checklist, then execute the milestone loop: for each remaining milestone, announce "Milestone X/N: <description>", build functionality, add or update tests, run \`${config.runCommand}\` and fix failures, run \`git add -A && git commit -m "<milestone>"\`, update \`vibestate.md\` checkboxes and \`changelog.md\` Done section then amend commit, report "Saved: <description> (X/N)". When all milestones are done, summarize what was built and suggest \`/land\`.
+- **Execution rules** (embed verbatim): After plan approval, read \`vibestate.md\` to find the milestone checklist, then execute the milestone loop: for each remaining milestone, announce "Milestone X/N: <description>", build functionality, add or update tests, run \`${config.runCommand}\` and fix failures, run \`git add -A && git commit -m "<milestone>"\`, update \`vibestate.md\` checkboxes and \`changelog.md\` Done section then amend commit, report "Saved: <description> (X/N)". When all milestones are done, summarize what was built and suggest \`/dock\`.
 
   Before exiting plan mode, write the milestone checklist to the \`Active feature\` section of \`vibestate.md\` with \`Status: executing\` and the plan file path.
 
@@ -108,8 +108,8 @@ For a large milestone where implementation and tests are clearly separable, the 
 
 ## Step 5: Complete
 
-**simple:** Say: "Feature complete. Type /land when ready to merge."
-**detailed:** Summarize everything that was built across all milestones. Suggest \`/land\` to merge.
+**simple:** Say: "Feature complete. Type /dock when ready to merge."
+**detailed:** Summarize everything that was built across all milestones. Suggest \`/dock\` to merge.
 
 ## If something goes wrong
 

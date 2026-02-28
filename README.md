@@ -1,10 +1,10 @@
 # tiller-ai
 
-Scaffold Claude Code projects with a structured vibe loop — branch, build, commit, land.
+Scaffold Claude Code projects with a structured vibe loop — branch, build, commit, dock.
 
 ## What is this?
 
-Tiller is a thin scaffold for Claude Code that turns a blank repo into a project Claude knows how to navigate. It installs a set of slash commands (skills), two `CLAUDE.md` files (one user-facing, one Tiller-managed), hooks for formatting and secret scanning, and shared tracking files. Once scaffolded, you describe work with `/sail`, anchor checkpoints with `/anchor`, and ship with `/land` — and Claude follows the loop without you having to re-explain your workflow every session. When milestones are independent, `/sail` spawns parallel agent workers to build them simultaneously.
+Tiller is a thin scaffold for Claude Code that turns a blank repo into a project Claude knows how to navigate. It installs a set of slash commands (skills), two `CLAUDE.md` files (one user-facing, one Tiller-managed), hooks for formatting and secret scanning, and shared tracking files. Once scaffolded, you describe work with `/sail`, anchor checkpoints with `/anchor`, and ship with `/dock` — and Claude follows the loop without you having to re-explain your workflow every session. When milestones are independent, `/sail` spawns parallel agent workers to build them simultaneously.
 
 ## Quick start
 
@@ -26,7 +26,7 @@ npx tiller-ai init
 | `/setup` | First-run: understand the project and fill in `CLAUDE.md` |
 | `/sail [idea]` | Start or continue work; parallelizes independent milestones using agent teams |
 | `/anchor` | Anchor current progress on the feature branch |
-| `/land` | Merge completed feature to main (solo) or open a PR (team) |
+| `/dock` | Merge completed feature to main (solo) or open a PR (team) |
 | `/recap` | Read-only status — active feature, notes |
 
 ## Modes
@@ -47,11 +47,11 @@ Or update the `Mode:` line in your root `CLAUDE.md` directly.
 
 ## Workflows
 
-Tiller supports two workflows that affect how `/land` behaves:
+Tiller supports two workflows that affect how `/dock` behaves:
 
-**`solo`** — single developer. `/land` merges the feature branch into main locally and deletes the branch.
+**`solo`** — single developer. `/dock` merges the feature branch into main locally and deletes the branch.
 
-**`team`** — multiple developers. `/land` pushes the branch and opens a PR (via `gh` CLI if available, otherwise prints the URL). The branch is not deleted locally.
+**`team`** — multiple developers. `/dock` pushes the branch and opens a PR (via `gh` CLI if available, otherwise prints the URL). The branch is not deleted locally.
 
 The workflow is set during `init` and stored in `.claude/.tiller.json`. Each developer can override it locally in `.tiller.local.json` (gitignored).
 
@@ -61,7 +61,7 @@ The workflow is set during `init` and stored in `.claude/.tiller.json`. Each dev
 your-project/
 ├── CLAUDE.md                              # User-facing: project context, verify command, mode, workflow
 ├── .gitignore                             # Ignores vibestate.md, .tiller.local.json, common build artifacts
-├── changelog.md                           # Shared done log — updated by /land on each merge
+├── changelog.md                           # Shared done log — updated by /dock on each merge
 ├── vibestate.md                           # Per-dev: active feature, milestone checklist, notes (gitignored)
 ├── .claude/
 │   ├── CLAUDE.md                          # Tiller-managed: vibe loop rules, skill docs
@@ -75,7 +75,7 @@ your-project/
 │       ├── setup/SKILL.md                 # /setup skill
 │       ├── sail/SKILL.md                  # /sail skill
 │       ├── anchor/SKILL.md                # /anchor skill
-│       ├── land/SKILL.md                  # /land skill
+│       ├── dock/SKILL.md                  # /dock skill
 │       ├── recap/SKILL.md                 # /recap skill
 │       └── tech-debt/SKILL.md             # internal: auto-run by /sail every 3 features
 ```
@@ -89,9 +89,9 @@ Every piece of work follows this loop:
 1. **Orient** — Claude reads `CLAUDE.md` and `vibestate.md` to understand project state and pick up any in-progress work
 2. **Confirm** — in `detailed` mode, Claude writes out the proposed approach and waits for a go-ahead before touching files
 3. **Build** — Claude implements milestone by milestone, running the verify command after each. Independent milestones are parallelized using agent teams.
-4. **Anchor** — Claude reminds you to `/anchor` when stable and `/land` when the feature is done
+4. **Anchor** — Claude reminds you to `/anchor` when stable and `/dock` when the feature is done
 
-`vibestate.md` tracks the active branch, milestone checklist, and session notes. `changelog.md` is the shared done log — updated by `/land` whenever a feature merges, so team members can see what's been shipped.
+`vibestate.md` tracks the active branch, milestone checklist, and session notes. `changelog.md` is the shared done log — updated by `/dock` whenever a feature merges, so team members can see what's been shipped.
 
 ## CLI reference
 

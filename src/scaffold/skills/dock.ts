@@ -1,12 +1,12 @@
 import type { ProjectConfig } from '../types.js';
 
-export function generateLandSkill(config: ProjectConfig): string {
+export function generateDockSkill(config: ProjectConfig): string {
   return `---
-name: land
+name: dock
 description: Merge completed feature to main and clean up the branch
 ---
 
-# /land — Merge feature to main
+# /dock — Merge feature to main
 
 ## Step 1: Check branch
 
@@ -14,7 +14,7 @@ Run \`git branch --show-current\`.
 
 If on \`main\`:
 - **simple:** Say: "You're already on main." Stop.
-- **detailed:** Error: "You're already on main. Switch to the feature branch you want to land." Stop.
+- **detailed:** Error: "You're already on main. Switch to the feature branch you want to dock." Stop.
 
 Save the current branch name as \`<feature-branch>\`.
 
@@ -24,7 +24,7 @@ Run \`${config.runCommand}\`
 
 If it fails:
 - **simple:** Say: "Something's not working, let me sort it out." Fix it first.
-- **detailed:** Show the error output. Do NOT proceed. Say: "Verify failed. Fix the errors and try /land again." Stop.
+- **detailed:** Show the error output. Do NOT proceed. Say: "Verify failed. Fix the errors and try /dock again." Stop.
 
 ## Step 3: Commit any uncommitted changes
 
@@ -33,7 +33,7 @@ Run \`git status --porcelain\`.
 If there are uncommitted changes:
 \`\`\`
 git add -A
-git commit -m "wip: save before landing"
+git commit -m "wip: save before docking"
 \`\`\`
 
 ## Step 4: Check workflow
@@ -47,7 +47,7 @@ Read workflow from \`.tiller.local.json\` if it exists, otherwise from CLAUDE.md
 
 \`\`\`
 git checkout main
-git merge --no-ff <feature-branch> -m "land: <feature-branch>"
+git merge --no-ff <feature-branch> -m "dock: <feature-branch>"
 git branch -d <feature-branch>
 \`\`\`
 
@@ -61,7 +61,7 @@ First, update changelog and vibestate so the single push includes them:
 2. Clear the \`Active feature\` section of \`vibestate.md\`: set it to "None — on main, ready to start something."
 3. Commit:
    \`\`\`
-   git add changelog.md vibestate.md && git commit -m "update changelog: landed <feature-branch>"
+   git add changelog.md vibestate.md && git commit -m "update changelog: docked <feature-branch>"
    \`\`\`
 
 Then push and open the PR:
@@ -86,16 +86,16 @@ Then go to Step 7 (do NOT delete the branch locally — it will be deleted after
 ## Step 6: Update changelog.md (solo only)
 
 1. Add an entry to the Done section of \`changelog.md\`:
-   - \`- [YYYY-MM-DD] landed <feature-branch>\`
+   - \`- [YYYY-MM-DD] docked <feature-branch>\`
 2. Clear the \`Active feature\` section of \`vibestate.md\`: set it to "None — on main, ready to start something."
 3. Commit:
    \`\`\`
-   git add changelog.md vibestate.md && git commit -m "update changelog: landed <feature-branch>"
+   git add changelog.md vibestate.md && git commit -m "update changelog: docked <feature-branch>"
    \`\`\`
 
 ## Step 7: Confirm
 
 - **simple:** Say: "Done. Run \`/clear\` to reset context before starting your next feature, then \`/sail\` to continue."
-- **detailed:** Say: "Feature landed on main. Run \`/clear\` to reset context before your next feature, then \`/sail\` to continue."
+- **detailed:** Say: "Feature docked. Run \`/clear\` to reset context before your next feature, then \`/sail\` to continue."
 `;
 }
