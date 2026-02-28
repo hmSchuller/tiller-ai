@@ -4,6 +4,7 @@
 
 ## Done
 
+- [2026-02-28] slim root CLAUDE.md to name+desc only — move config to .tiller.json
 - [2026-02-28] docked feature/rename-skill-land-to-dock
 - [2026-02-28] rename skill /land → /dock — README, website, local skill dirs, CLAUDE.md
 - [2026-02-28] rename skill /land → /dock — source files, generators, tests
