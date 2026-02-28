@@ -2,6 +2,13 @@ import type { ProjectConfig } from './types.js';
 
 export const TILLER_VERSION = '0.1.3';
 
+export type TillerManifest = {
+  version: string;
+  mode: 'simple' | 'detailed';
+  workflow?: 'solo' | 'team';
+  runCommand: string;
+};
+
 export const MANAGED_FILES = [
   '.claude/CLAUDE.md',
   '.claude/settings.json',
