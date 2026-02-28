@@ -7,6 +7,8 @@ export type TillerManifest = {
   mode: 'simple' | 'detailed';
   workflow?: 'solo' | 'team';
   runCommand: string;
+  projectName?: string;
+  description?: string;
 };
 
 export const MANAGED_FILES = [
