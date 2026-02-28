@@ -4,6 +4,7 @@
 
 ## Done
 
+- [2026-02-28] docked feature/bump-version-to-0-2-0
 - [2026-02-28] bump version to 0.2.0 — package.json, index.ts, tiller-manifest.ts, .tiller.json, config.test.ts, upgrade.test.ts
 - [2026-02-28] docked feature/ships-crew-agents
 - [2026-02-28] feature/ships-crew-agents — quartermaster, bosun, captain agents + tech-backlog.md
