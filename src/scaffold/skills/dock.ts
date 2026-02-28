@@ -86,11 +86,11 @@ Then go to Step 7 (do NOT delete the branch locally — it will be deleted after
 ## Step 6: Update changelog.md (solo only)
 
 1. Add an entry to the Done section of \`changelog.md\`:
-   - \`- [YYYY-MM-DD] landed <feature-branch>\`
+   - \`- [YYYY-MM-DD] docked <feature-branch>\`
 2. Clear the \`Active feature\` section of \`vibestate.md\`: set it to "None — on main, ready to start something."
 3. Commit:
    \`\`\`
-   git add changelog.md vibestate.md && git commit -m "update changelog: landed <feature-branch>"
+   git add changelog.md vibestate.md && git commit -m "update changelog: docked <feature-branch>"
    \`\`\`
 
 ## Step 7: Confirm
