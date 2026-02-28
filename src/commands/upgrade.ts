@@ -12,15 +12,8 @@ import { generateRecapSkill } from '../scaffold/skills/recap.js';
 import { generateLandSkill } from '../scaffold/skills/land.js';
 import { generateTechDebtSkill } from '../scaffold/skills/tech-debt.js';
 import { generateDotClaudeMd } from '../scaffold/claude-md.js';
-import { generateTillerManifest, MANAGED_FILES, TILLER_VERSION } from '../scaffold/tiller-manifest.js';
+import { generateTillerManifest, MANAGED_FILES, TILLER_VERSION, type TillerManifest } from '../scaffold/tiller-manifest.js';
 import type { ProjectConfig } from '../scaffold/types.js';
-
-type Manifest = {
-  version: string;
-  mode: 'simple' | 'detailed';
-  workflow?: 'solo' | 'team';
-  runCommand: string;
-};
 
 export async function upgradeCommand(): Promise<void> {
   intro('tiller-ai upgrade — update hooks and skills');
@@ -32,7 +25,7 @@ export async function upgradeCommand(): Promise<void> {
     process.exit(1);
   }
 
-  let manifest: Manifest;
+  let manifest: TillerManifest;
   try {
     const raw = await readFile(manifestPath, 'utf-8');
     manifest = JSON.parse(raw);
