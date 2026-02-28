@@ -4,6 +4,7 @@
 
 ## Done
 
+- [2026-02-28] docked feature/upgrade-without-interactive-prompt
 - [2026-02-28] feat: add --yes/-y non-interactive flag to init and upgrade commands
 
 - [2026-02-28] docked feature/bump-version-to-0-1-4
