@@ -4,6 +4,8 @@ import { generateSailSkill } from '../src/scaffold/skills/sail.ts';
 import { generateAnchorSkill } from '../src/scaffold/skills/anchor.ts';
 import { generateRecapSkill } from '../src/scaffold/skills/recap.ts';
 import { generateDockSkill } from '../src/scaffold/skills/dock.ts';
+import { generateTechDebtSkill } from '../src/scaffold/skills/tech-debt.ts';
+import { generateCartographerAgent } from '../src/scaffold/agents/cartographer.ts';
 import type { ProjectConfig } from '../src/scaffold/types.ts';
 
 // Read config from .tiller.json + .tiller.local.json
@@ -24,5 +26,7 @@ await writeFile('.claude/skills/sail/SKILL.md', generateSailSkill(config));
 await writeFile('.claude/skills/anchor/SKILL.md', generateAnchorSkill(config));
 await writeFile('.claude/skills/recap/SKILL.md', generateRecapSkill(config));
 await writeFile('.claude/skills/dock/SKILL.md', generateDockSkill(config));
+await writeFile('.claude/skills/tech-debt/SKILL.md', generateTechDebtSkill(config));
+await writeFile('.claude/agents/cartographer.md', generateCartographerAgent(config));
 
 console.log(`Skills regenerated (mode: ${config.mode}, workflow: ${config.workflow})`);
