@@ -111,7 +111,6 @@ describe('generateCaptainAgent', () => {
     const result = generateCaptainAgent(simpleConfig);
     expect(result).toContain('changelog.md');
     expect(result).toContain('tech-backlog.md');
-    expect(result).toContain('compass.md');
   });
 
   it('adds pattern problems to tech-backlog regardless of ruling', () => {

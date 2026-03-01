@@ -11,11 +11,12 @@ description: Read-only status of all work — completed and in progress
 
 Run all of these before writing any output:
 
-1. Read `compass.md` (active feature, local state)
-2. Read `changelog.md` (shared done log)
-3. `git log main --oneline`
-4. `git branch --list 'feature/*'`
-5. For each feature branch: `git log main..<branch> --oneline`
+1. Read `changelog.md` (shared done log)
+2. `git branch --show-current`
+3. `git log --oneline -5`
+4. `git log main --oneline`
+5. `git branch --list 'feature/*'`
+6. For each feature branch: `git log main..<branch> --oneline`
 
 ## Then produce output based on mode
 
@@ -27,7 +28,11 @@ Format:
 
 ---
 
-**Working on:** <what's currently being built, from compass.md — or "nothing, ready to start">
+**Current branch:** <output of git branch --show-current>
+
+**Recent work:**
+- <plain English description from git log>
+...
 
 **Done**
 - <plain English description of what was built>
@@ -48,7 +53,11 @@ Format:
 
 ---
 
-**Active:** <active feature from compass.md, or "none">
+**Current branch:** <output of git branch --show-current>
+
+**Recent commits:**
+<hash> <message>
+...
 
 **Completed (main)**
 <hash> <message>

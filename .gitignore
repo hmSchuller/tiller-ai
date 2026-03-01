@@ -27,5 +27,4 @@ npm-debug.log*
 *.tsbuildinfo
 
 # Tiller — local-only files
-compass.md
 .tiller.local.json

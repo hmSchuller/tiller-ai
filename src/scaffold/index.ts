@@ -4,7 +4,6 @@ import { writeFile } from '../utils/fs.js';
 import { isGitRepo, gitInit, gitAdd, gitCommit } from '../utils/git.js';
 import type { ProjectConfig } from './types.js';
 import { generateDotClaudeMd } from './claude-md.js';
-import { generateCompass } from './compass.js';
 import { generateChangelog } from './changelog.js';
 import { generateSettingsJson } from './settings-json.js';
 import { generateGitignore, TILLER_GITIGNORE_ENTRIES } from './gitignore.js';
@@ -46,7 +45,6 @@ export async function scaffold(config: ProjectConfig, targetDir: string): Promis
     await writeFile(p('.gitignore'), generateGitignore(config));
   }
   await writeFile(p('changelog.md'), generateChangelog(config));
-  await writeFile(p('compass.md'), generateCompass(config));
 
   // .claude/ files
   await writeFile(p('.claude/CLAUDE.md'), generateDotClaudeMd(config));
