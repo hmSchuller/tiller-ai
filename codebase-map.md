@@ -2,125 +2,75 @@
 
 > Maintained by Cartographer. Updated at each /dock.
 
-### CLI Entry Point
+## Modules
 
-**Path:** `src/index.ts`
+### CLI Entry & Commands
 
-Defines the `tiller` CLI using commander with three commands: `init`, `upgrade`, and `config`. This is the binary entry point built by tsup into `dist/index.js`.
+**Path:** `src/index.ts`, `src/commands/`
 
-### Init Command
-
-**Path:** `src/commands/init.ts`
-
-Handles `tiller init` — prompts the user for mode (simple/detailed) and workflow (solo/team) via `@clack/prompts`, then delegates to the scaffold orchestrator to write all Tiller files into the current directory.
-
-### Upgrade Command
-
-**Path:** `src/commands/upgrade.ts`
-
-Handles `tiller upgrade` — reads the existing `.claude/.tiller.json` manifest, removes stale managed files from prior versions, and overwrites all managed Tiller files (hooks, skills, agents) with their current generated versions.
-
-### Config Command
-
-**Path:** `src/commands/config.ts`
-
-Handles `tiller config` — interactively updates mode and workflow settings either project-wide (writes to `.claude/.tiller.json`) or locally per-developer (writes to `.tiller.local.json`).
+Three CLI commands wired up via commander: `init` (interactive scaffold), `upgrade` (regenerate managed files into an existing project), and `config` (interactively change mode/workflow). `src/commands/init.ts` is the most important file — it drives the user-facing prompts via `@clack/prompts` and calls the scaffold orchestrator.
 
 ### Scaffold Orchestrator
 
-**Path:** `src/scaffold/index.ts`
+**Path:** `src/scaffold/index.ts`, `src/scaffold/types.ts`, `src/scaffold/tiller-manifest.ts`
 
-Top-level function that writes every Tiller file into a target directory: `.gitignore`, `changelog.md`, `.claude/` configs, hooks, skills, agents, and tracking files. Also runs `git init` and makes the initial commit if the directory is not already a git repo.
+Writes all files into the target directory in a single `scaffold()` call, then handles git init and initial commit. `tiller-manifest.ts` defines `MANAGED_FILES` and `TILLER_VERSION` — the canonical list of what Tiller owns and is responsible for regenerating on upgrade. Start here when adding or removing any generated file.
 
-### Project Config Type
+### File Generators
 
-**Path:** `src/scaffold/types.ts`
+**Path:** `src/scaffold/` (flat files), `src/scaffold/skills/`, `src/scaffold/hooks/`, `src/scaffold/agents/`
 
-Single shared TypeScript interface `ProjectConfig` (`projectName`, `description`, `runCommand`, `mode`, `workflow`) passed through all scaffold generators.
+Each generator is a pure function that returns a string — the content of a file to be written into the scaffolded project. Skills (`sail`, `anchor`, `dock`, `recap`, `setup`, `tech-debt`) produce `.claude/skills/*/SKILL.md`. Hooks (`post-write`, `secret-scan`, `session-resume`) produce `.claude/hooks/*.sh`. Agents (`quartermaster`, `bosun`, `captain`, `cartographer`) produce `.claude/agents/*.md`. `claude-md.ts`, `changelog.ts`, `gitignore.ts`, `settings-json.ts`, and `tech-backlog.ts` cover the remaining generated files.
 
-### Tiller Manifest Generator
+### Utilities
 
-**Path:** `src/scaffold/tiller-manifest.ts`
+**Path:** `src/utils/`
 
-Generates `.claude/.tiller.json` — the Tiller version manifest. Also exports `MANAGED_FILES` (the canonical list of files owned by Tiller) and `TILLER_VERSION`. Used by both scaffold and upgrade.
+Thin wrappers over Node built-ins. `fs.ts` provides `writeFile` (with auto-mkdir) used by the scaffold orchestrator. `git.ts` wraps `isGitRepo`, `gitInit`, `gitAdd`, and `gitCommit` for the post-scaffold commit. These two files are the only place I/O primitives should be imported directly.
 
-### CLAUDE.md Generators
-
-**Path:** `src/scaffold/claude-md.ts`
-
-Generates `.claude/CLAUDE.md` — the Tiller-managed rules file injected into every Claude session. Contains mode definitions, workflow rules, the vibe loop, skill references, and agent descriptions.
-
-### Settings Generator
-
-**Path:** `src/scaffold/settings-json.ts`
-
-Generates `.claude/settings.json` — Claude Code's hook configuration. Wires up `post-write.sh` as a PostToolUse hook, `secret-scan.sh` as a PreToolUse hook, and `session-resume.sh` as a SessionStart hook.
-
-### Hooks Generators
-
-**Path:** `src/scaffold/hooks/`
-
-Three hook generators:
-- `post-write.ts` — generates a shell script that runs a formatter after file edits.
-- `secret-scan.ts` — generates a shell script that scans for secrets before Bash commands; returns a `permissionDecision: deny` if secrets are detected.
-- `session-resume.ts` — generates a shell script that detects an active feature branch on session start and reminds the user to run `/sail`.
-
-### Skills Generators
-
-**Path:** `src/scaffold/skills/`
-
-Six skill generators (`sail.ts`, `anchor.ts`, `dock.ts`, `recap.ts`, `setup.ts`, `tech-debt.ts`). Each produces the `SKILL.md` file that Claude Code loads when the user runs the corresponding slash command (e.g. `/sail`, `/dock`). Output is mode- and workflow-aware.
-
-### Agent Generators
-
-**Path:** `src/scaffold/agents/`
-
-Four agent generators (`quartermaster.ts`, `bosun.ts`, `captain.ts`, `cartographer.ts`). Each produces the `.claude/agents/<name>.md` file that defines a specialist sub-agent spawned during the vibe loop (code review, tech debt, arbitration, and codebase mapping respectively).
-
-### Changelog Generator
-
-**Path:** `src/scaffold/changelog.ts`
-
-Generates the initial `changelog.md` stub written into scaffolded projects. The file is subsequently maintained by Claude during `/sail` and `/dock`.
-
-### Tech Backlog Generator
-
-**Path:** `src/scaffold/tech-backlog.ts`
-
-Generates the initial `tech-backlog.md` stub. The file is maintained by the Bosun agent as it discovers and fixes tech debt across sessions.
-
-### Tech Debt State Generator
-
-**Path:** `src/scaffold/tech-debt-state.ts`
-
-Generates `.claude/.tiller-tech-debt.json` — a small JSON file tracking how many features have landed since the last tech debt pass, used by `/sail` to auto-trigger the Bosun every three features.
-
-### Gitignore Generator
-
-**Path:** `src/scaffold/gitignore.ts`
-
-Generates a default `.gitignore` and exports `TILLER_GITIGNORE_ENTRIES` (currently just `.tiller.local.json`). The scaffold orchestrator appends only missing entries when an existing `.gitignore` is present.
-
-### Filesystem Utilities
-
-**Path:** `src/utils/fs.ts`
-
-Thin wrapper around Node `fs/promises` — provides `writeFile` (creates parent directories automatically) and `ensureDir`.
-
-### Git Utilities
-
-**Path:** `src/utils/git.ts`
-
-Thin wrapper around `execSync` for `git init`, `git add`, and `git commit`. Used by the scaffold orchestrator after writing files.
-
-### Skill Regeneration Script
-
-**Path:** `scripts/regen-skills.ts`
-
-Developer utility script that re-renders all skills and the cartographer agent from source generators into the live `.claude/` directory of this repo. Reads config from `.claude/.tiller.json` and `.tiller.local.json`.
-
-### Tests
+### Test Suite
 
 **Path:** `test/`
 
-Vitest test suite with unit tests for each generator category (skills, agents, claude-md, settings-json) and an integration test that runs the full scaffold into a temporary directory and validates the output files.
+Vitest unit and integration tests. Unit tests cover individual generators; integration tests scaffold into a temp directory and assert the resulting file tree and content. Run with `npm test`. The `scripts/regen-skills.ts` helper regenerates skill fixtures used in tests.
+
+### Promotional Website
+
+**Path:** `website/`
+
+Static Astro site deployed to GitHub Pages. Nautical theme with navy/teal/gold palette. Not part of the npm package — exists purely for project marketing. Edit `website/src/` for content changes; the GitHub Actions pipeline handles deployment.
+
+## Shipped Features
+
+- `feature/fix-sail-execution-rules` — Quartermaster added to embedded sail execution rules; tech debt counter fixed to count docked entries
+- `feature/remove-compass` — remove compass.md — redundant local state file replaced by git branch + git log
+- `feature/upgrade-remove-stale-managed-files` — upgrade removes stale managed files from disk when tiller drops them between versions
+- `feature/update-readme-to-match-current-feature-set` — update README to match current feature set — agents section, file tree, vibe loop step 4, CLI flags
+- `feature/add-repository-homepage-bugs-to-package-json` — add repository, homepage, bugs fields to package.json for npm listing
+- `feature/bump-version-to-0-2-0` — bump version to 0.2.0
+- `feature/ships-crew-agents` — add quartermaster, bosun, captain, and cartographer agents + tech-backlog.md
+- `feature/upgrade-without-interactive-prompt` — add --yes/-y non-interactive flag to init and upgrade commands
+- `feature/bump-version-to-0-1-4` — bump version to 0.1.4
+- `feature/remove-config-from-root-claude-md` — slim root CLAUDE.md to name+desc only; config reads from .tiller.json
+- `feature/rename-skill-land-to-dock` — rename /land → /dock across source, skills, README, website
+- `feature/fix-land-team-workflow-double-ci-push` — commit changelog before push in team workflow to prevent double CI run
+- `feature/update-readme-sync-feature-set` — add agent team support to README intro, skills table, and Features card
+- `feature/rename-vibe-to-sail-save-to-anchor` — rename /vibe → /sail and /save → /anchor across all source, generators, and tests
+- `feature/can-tiller-spawn-agent-teams` — team-aware sail skill with dependency tags, TeamCreate/TaskCreate/SendMessage, and sequential fallback
+- `feature/bump-version-to-0-1-3` — bump version to 0.1.3
+- `feature/fix-gitignore-preservation` — preserve existing .gitignore on init; append tiller entries only if missing
+- `feature/bump-version-to-0-1-2` — bump version to 0.1.2
+- `feature/bump-version-to-0-1-1` — import TILLER_VERSION from single source; update package.json, index.ts, and tests
+- `feature/command-config-interactive-select` — replace mode/workflow commands with unified tiller config interactive select UI
+- `feature/fix-nodejs-version-requirement` — fix website Node.js version requirement: 18+ → 22+
+- `feature/evaluate-if-snapshot-and-recap-are-good-names` — rename /snapshot → /save
+- `feature/create-static-promotional-website-for-github-pages` — static Astro promotional website with GitHub Actions deploy pipeline
+- `feature/rename-package-to-tiller-ai` — rename package from tiller-code to tiller-ai
+- `feature/vibe-resume-existing-branch` — vibe skill resumes existing feature branches instead of recreating them
+- `feature/vibe-resume-ask-user` — ask user to continue or revisit plan when resuming an existing branch
+- `feature/state-current-mode-before-vibe` — state current mode before vibing a new feature
+- `feature/multi-dev-support` — multi-dev support: workflow config, changelog split, unified skills, team PR flow, per-dev mode
+- `feature/add-workflow-command` — add tiller workflow command (solo/team, local + --project scope)
+- `feature/tech-debt-skill` — tech debt skill: background agent every 3 features, guardrails, stash/restore, mode-aware reporting
+- `feature/sync-readme` — rewrite README to reflect actual feature set
+- `feature/add-npm-keywords` — expand npm keywords for better discoverability
