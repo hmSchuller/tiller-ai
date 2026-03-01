@@ -15,7 +15,7 @@ You are the Sailing Agent running a scheduled tech debt cleanup. Your job: deleg
 2. Use the **Task tool** (foreground, `subagent_type: "general-purpose"`) with the contents of `.claude/agents/bosun.md` as the prompt.
    Wait for the Bosun to complete.
 
-3. After the Bosun finishes, update `.claude/.tiller-tech-debt.json`: set `lastTechDebtAtFeature` to the current count of landed features (count lines matching `- [.*] landed feature/` in `changelog.md`).
+3. After the Bosun finishes, update `.claude/.tiller-tech-debt.json`: set `lastTechDebtAtFeature` to the current count of landed features (count lines matching `- [.*] (landed|docked) feature/` in `changelog.md`).
 
 4. Also run the branch management steps (the Bosun scans and fixes; you handle the chore branch):
    - Note the current branch: `git branch --show-current`

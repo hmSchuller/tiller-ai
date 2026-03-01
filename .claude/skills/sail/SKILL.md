@@ -35,7 +35,7 @@ State the current mode from `.claude/.tiller.json` (or `.tiller.local.json` if i
 
 Before planning, check if a tech debt cleanup is due:
 
-1. Count lines in `changelog.md` matching the pattern `- [[^]]*] landed feature/` — this is `landedCount`
+1. Count lines in `changelog.md` matching the pattern `- [[^]]*] (landed|docked) feature/` — this is `landedCount`
 2. Read `.claude/.tiller-tech-debt.json` — get `lastTechDebtAtFeature` and `threshold` (default threshold: 3)
 3. If `(landedCount - lastTechDebtAtFeature) >= threshold`:
    - Use the **Task tool** (foreground, `subagent_type: "general-purpose"`) with the contents of `.claude/skills/tech-debt/SKILL.md` as the prompt
@@ -54,7 +54,7 @@ Before planning, check if a tech debt cleanup is due:
 - 2–5 numbered milestones, each with: what gets built + what gets tested + a dependency tag: `[independent]` if it can run in parallel with other independent milestones, or `[depends-on: N]` if it requires milestone N to complete first
 - Files to create or modify
 - Any trade-offs worth noting
-- **Execution rules** (embed verbatim): After plan approval, execute the milestone loop: for each remaining milestone, announce "Milestone X/N: <description>", build functionality, add or update tests, run `npm test` and fix failures, run `git add -A && git commit -m "<milestone>"`, add entry to `changelog.md` Done section then amend commit, report "Saved: <description> (X/N)". When all milestones are done, summarize what was built and suggest `/dock`.
+- **Execution rules** (embed verbatim): After plan approval, execute the milestone loop: for each remaining milestone, announce "Milestone X/N: <description>", build functionality, add or update tests, run `npm test` and fix failures, run `git add -A && git commit -m "<milestone>"`, add entry to `changelog.md` Done section then amend commit, report "Saved: <description> (X/N)". When all milestones are done, run Step 4.5 Code Review: spawn the Quartermaster agent by reading `.claude/agents/quartermaster.md` and using the Task tool (foreground, `subagent_type: "general-purpose"`, `model: "opus"`). Handle PASS/FAIL/ESCALATE per the sail skill Step 4.5 protocol. Then summarize what was built and suggest `/dock`.
 
 ## Step 4: Build milestone by milestone
 
