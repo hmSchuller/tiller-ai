@@ -4,6 +4,8 @@
 
 ## Done
 
+- [2026-03-01] remove compass.md — redundant local state file replaced by git branch + git log
+- [2026-03-01] docked feature/upgrade-remove-stale-managed-files
 - [2026-03-01] upgrade removes stale managed files from disk when tiller drops them between versions
 - [2026-02-28] docked feature/update-readme-to-match-current-feature-set
 - [2026-02-28] docs: update README to match current feature set — agents section, file tree, vibe loop step 4, CLI flags

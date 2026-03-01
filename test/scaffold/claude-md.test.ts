@@ -30,9 +30,8 @@ describe('generateDotClaudeMd', () => {
     expect(result).toContain('### team');
   });
 
-  it('explains compass.md vs changelog.md split', () => {
+  it('documents changelog.md tracking', () => {
     const result = generateDotClaudeMd(simpleConfig);
-    expect(result).toContain('compass.md');
     expect(result).toContain('changelog.md');
   });
 
