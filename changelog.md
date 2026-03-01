@@ -4,6 +4,7 @@
 
 ## Done
 
+- [2026-03-01] sail orient step reads codebase-map.md for structural overview before planning
 - [2026-03-01] docked feature/cartographer-coarser-map
 - [2026-03-01] docked feature/fix-sail-execution-rules
 - [2026-03-01] feature/fix-sail-execution-rules — Quartermaster added to embedded execution rules; tech debt counter fixed to count docked entries

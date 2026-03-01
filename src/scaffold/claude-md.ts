@@ -44,7 +44,7 @@ Multiple developers. /dock pushes the feature branch and opens a PR. Merging hap
 
 Every piece of work follows this loop:
 
-1. **Orient** — read \`.claude/.tiller.json\` (and \`.tiller.local.json\` if present) and changelog.md (shared)
+1. **Orient** — read \`.claude/.tiller.json\` (and \`.tiller.local.json\` if present) and changelog.md (shared); if \`codebase-map.md\` exists, read it for a structural overview
 2. **Confirm** — in detailed mode, enter plan mode with milestones and wait for approval
 3. **Build** — implement milestone by milestone; milestones tagged \`[independent]\` may be parallelized using agent teams (TeamCreate + Task tool); each milestone includes tests, verify, and auto-commit
 4. **Complete** — announce feature done, suggest /dock

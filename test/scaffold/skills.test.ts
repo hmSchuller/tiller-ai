@@ -161,6 +161,11 @@ describe('generateSailSkill', () => {
     const result = generateSailSkill(simpleConfig);
     expect(result).toContain('(landed|docked) feature/');
   });
+
+  it('reads codebase-map.md in Step 1 if it exists', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('codebase-map.md');
+  });
 });
 
 describe('generateAnchorSkill', () => {

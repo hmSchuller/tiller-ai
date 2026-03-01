@@ -71,6 +71,11 @@ describe('generateDotClaudeMd', () => {
     expect(skillsIdx).toBeGreaterThan(-1);
     expect(agentsIdx).toBeGreaterThan(skillsIdx);
   });
+
+  it('mentions codebase-map.md in the vibe loop orient step', () => {
+    const result = generateDotClaudeMd(simpleConfig);
+    expect(result).toContain('codebase-map.md');
+  });
 });
 
 describe('generateDotClaudeMd — config source', () => {

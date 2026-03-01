@@ -11,6 +11,7 @@ description: Start or continue working on an idea. Usage: /sail [idea descriptio
 ## Step 1: Orient
 
 Read \`.claude/.tiller.json\` (and \`.tiller.local.json\` if it exists) and \`changelog.md\` to understand current state.
+If \`codebase-map.md\` exists, read it to get a structural overview of the codebase.
 Run \`git branch\` and \`git status\`.
 
 State the current mode from \`.claude/.tiller.json\` (or \`.tiller.local.json\` if it overrides): "Mode: <mode>".
