@@ -68,6 +68,7 @@ Skills read \`.tiller.local.json\` first, then fall back to \`.claude/.tiller.js
 
 - **/setup** — first-run: understand the project and configure CLAUDE.md
 - **/sail** [idea] — milestone-driven development: plan, build, test, auto-commit. Independent milestones are parallelized using agent teams. Every 3 landed features, automatically runs a tech debt cleanup before planning.
+- **/scout** [topic] — pre-work investigation: explore the codebase, ask clarifying questions, produce a structured ticket (GitHub Issue or terminal output).
 - **/anchor** — commit current progress on the feature branch
 - **/dock** — merge or PR depending on workflow
 - **/recap** — read-only status of all work
