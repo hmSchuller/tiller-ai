@@ -109,26 +109,14 @@ describe('generateSailSkill', () => {
     const result = generateSailSkill(simpleConfig);
     expect(result).toContain('Step 4.5');
     expect(result).toContain('Quartermaster');
-    expect(result).toContain('quartermaster.md');
-  });
-
-  it('spawns Quartermaster with opus model', () => {
-    const result = generateSailSkill(simpleConfig);
-    expect(result).toContain('model: "opus"');
+    expect(result).toContain('subagent_type: "quartermaster"');
   });
 
   it('escalates to Captain on unresolved disputes', () => {
     const result = generateSailSkill(simpleConfig);
     expect(result).toContain('Captain');
-    expect(result).toContain('captain.md');
+    expect(result).toContain('subagent_type: "captain"');
     expect(result).toContain('ESCALATE TO CAPTAIN');
-  });
-
-  it('spawns Captain with opus model', () => {
-    const result = generateSailSkill(simpleConfig);
-    // Should appear twice: once for Quartermaster, once for Captain
-    const matches = (result.match(/model: "opus"/g) || []).length;
-    expect(matches).toBeGreaterThanOrEqual(2);
   });
 
   it('handles PASS, FAIL, and Captain ruling outcomes', () => {
@@ -149,10 +137,9 @@ describe('generateSailSkill', () => {
 
   it('embedded execution rules include Quartermaster review (Step 4.5)', () => {
     const result = generateSailSkill(simpleConfig);
-    // quartermaster.md must appear at least twice: once in the Step 3 embedded
-    // execution rules, and once in the standalone Step 4.5 section.
-    // A single occurrence would mean the embedded rules still skip QM review.
-    const matches = (result.match(/quartermaster\.md/g) || []).length;
+    // subagent_type: "quartermaster" must appear at least twice: once in the Step 3
+    // embedded execution rules, and once in the standalone Step 4.5 section.
+    const matches = (result.match(/subagent_type: "quartermaster"/g) || []).length;
     expect(matches).toBeGreaterThanOrEqual(2);
     expect(result).toContain('Step 4.5');
     expect(result).toContain('Code Review');
@@ -285,7 +272,7 @@ describe('generateTechDebtSkill', () => {
 
   it('delegates to Bosun via Task tool', () => {
     const result = generateTechDebtSkill(simpleConfig);
-    expect(result).toContain('bosun.md');
+    expect(result).toContain('subagent_type: "bosun"');
     expect(result).toContain('Task tool');
   });
 
@@ -435,12 +422,20 @@ describe('generateDockSkill', () => {
   it('includes cartographer step after committing uncommitted changes', () => {
     const result = generateDockSkill(simpleConfig);
     expect(result).toContain('cartographer');
-    expect(result).toContain('cartographer.md');
+    expect(result).toContain('subagent_type: "cartographer"');
     expect(result).toContain('codebase-map.md');
   });
 
   it('cartographer step commits map changes', () => {
     const result = generateDockSkill(simpleConfig);
     expect(result).toContain('map: update codebase map');
+  });
+
+  it('handles structural concerns escalation after cartographer runs', () => {
+    const result = generateDockSkill(simpleConfig);
+    expect(result).toContain('Structural Concerns');
+    expect(result).toContain('escalate to captain');
+    expect(result).toContain('subagent_type: "captain"');
+    expect(result).toContain('log to tech-backlog.md');
   });
 });
