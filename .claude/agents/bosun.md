@@ -1,6 +1,7 @@
 ---
 name: bosun
 description: Tech debt maintenance agent. Maintains tech-backlog.md and fixes one small item per run.
+tools: Read, Grep, Glob, Edit, Write, Bash, LS
 ---
 
 # Bosun — Tech Debt Maintenance Agent

@@ -4,6 +4,7 @@ import { generateAnchorSkill } from '../../src/scaffold/skills/anchor.js';
 import { generateRecapSkill } from '../../src/scaffold/skills/recap.js';
 import { generateDockSkill } from '../../src/scaffold/skills/dock.js';
 import { generateTechDebtSkill } from '../../src/scaffold/skills/tech-debt.js';
+import { generateScoutSkill } from '../../src/scaffold/skills/scout.js';
 import { simpleConfig, detailedConfig, teamSimpleConfig } from '../helpers/fixtures.js';
 
 describe('generateSailSkill', () => {
@@ -108,26 +109,14 @@ describe('generateSailSkill', () => {
     const result = generateSailSkill(simpleConfig);
     expect(result).toContain('Step 4.5');
     expect(result).toContain('Quartermaster');
-    expect(result).toContain('quartermaster.md');
-  });
-
-  it('spawns Quartermaster with opus model', () => {
-    const result = generateSailSkill(simpleConfig);
-    expect(result).toContain('model: "opus"');
+    expect(result).toContain('subagent_type: "quartermaster"');
   });
 
   it('escalates to Captain on unresolved disputes', () => {
     const result = generateSailSkill(simpleConfig);
     expect(result).toContain('Captain');
-    expect(result).toContain('captain.md');
+    expect(result).toContain('subagent_type: "captain"');
     expect(result).toContain('ESCALATE TO CAPTAIN');
-  });
-
-  it('spawns Captain with opus model', () => {
-    const result = generateSailSkill(simpleConfig);
-    // Should appear twice: once for Quartermaster, once for Captain
-    const matches = (result.match(/model: "opus"/g) || []).length;
-    expect(matches).toBeGreaterThanOrEqual(2);
   });
 
   it('handles PASS, FAIL, and Captain ruling outcomes', () => {
@@ -148,10 +137,9 @@ describe('generateSailSkill', () => {
 
   it('embedded execution rules include Quartermaster review (Step 4.5)', () => {
     const result = generateSailSkill(simpleConfig);
-    // quartermaster.md must appear at least twice: once in the Step 3 embedded
-    // execution rules, and once in the standalone Step 4.5 section.
-    // A single occurrence would mean the embedded rules still skip QM review.
-    const matches = (result.match(/quartermaster\.md/g) || []).length;
+    // subagent_type: "quartermaster" must appear at least twice: once in the Step 3
+    // embedded execution rules, and once in the standalone Step 4.5 section.
+    const matches = (result.match(/subagent_type: "quartermaster"/g) || []).length;
     expect(matches).toBeGreaterThanOrEqual(2);
     expect(result).toContain('Step 4.5');
     expect(result).toContain('Code Review');
@@ -284,7 +272,7 @@ describe('generateTechDebtSkill', () => {
 
   it('delegates to Bosun via Task tool', () => {
     const result = generateTechDebtSkill(simpleConfig);
-    expect(result).toContain('bosun.md');
+    expect(result).toContain('subagent_type: "bosun"');
     expect(result).toContain('Task tool');
   });
 
@@ -303,6 +291,85 @@ describe('generateTechDebtSkill', () => {
   it('tech debt counter pattern counts docked entries', () => {
     const result = generateTechDebtSkill(simpleConfig);
     expect(result).toContain('(landed|docked) feature/');
+  });
+});
+
+describe('generateScoutSkill', () => {
+  it('has correct frontmatter name', () => {
+    expect(generateScoutSkill(simpleConfig)).toContain('name: scout');
+  });
+
+  it('produces the same template structure regardless of mode', () => {
+    const simple = generateScoutSkill(simpleConfig);
+    const detailed = generateScoutSkill(detailedConfig);
+    expect(simple).toContain('simple');
+    expect(simple).toContain('detailed');
+    expect(detailed).toContain('simple');
+    expect(detailed).toContain('detailed');
+  });
+
+  it('includes $ARGUMENTS usage', () => {
+    expect(generateScoutSkill(simpleConfig)).toContain('$ARGUMENTS');
+  });
+
+  it('includes Step 1 orient with codebase-map.md', () => {
+    const result = generateScoutSkill(simpleConfig);
+    expect(result).toContain('codebase-map.md');
+    expect(result).toContain('changelog.md');
+    expect(result).toContain('Mode: <mode>');
+  });
+
+  it('uses Explore agent with very thorough setting', () => {
+    const result = generateScoutSkill(simpleConfig);
+    expect(result).toContain('Explore agent');
+    expect(result).toContain('"very thorough"');
+  });
+
+  it('asks clarifying questions using AskUserQuestion', () => {
+    expect(generateScoutSkill(simpleConfig)).toContain('AskUserQuestion');
+  });
+
+  it('detailed mode asks both product and technical questions', () => {
+    const result = generateScoutSkill(simpleConfig);
+    expect(result).toContain('product/behavior questions');
+    expect(result).toContain('technical questions');
+  });
+
+  it('ticket includes all required sections', () => {
+    const result = generateScoutSkill(simpleConfig);
+    expect(result).toContain('### Summary');
+    expect(result).toContain('### Relevant code');
+    expect(result).toContain('### Suggested approach');
+    expect(result).toContain('### Open questions');
+    expect(result).toContain('### Scope estimate');
+  });
+
+  it('scope estimate has three sizes', () => {
+    const result = generateScoutSkill(simpleConfig);
+    expect(result).toContain('small');
+    expect(result).toContain('medium');
+    expect(result).toContain('large');
+  });
+
+  it('publishes via gh issue create when gh is available', () => {
+    const result = generateScoutSkill(simpleConfig);
+    expect(result).toContain('gh issue create');
+    expect(result).toContain('which gh');
+  });
+
+  it('falls back to copy-paste output when gh is unavailable', () => {
+    const result = generateScoutSkill(simpleConfig);
+    expect(result).toContain('copy-paste');
+  });
+
+  it('asks user to review before publishing', () => {
+    expect(generateScoutSkill(simpleConfig)).toContain('adjust anything before publishing');
+  });
+
+  it('milestones tagged with dependency annotations', () => {
+    const result = generateScoutSkill(simpleConfig);
+    expect(result).toContain('[independent]');
+    expect(result).toContain('[depends-on: N]');
   });
 });
 
@@ -355,12 +422,20 @@ describe('generateDockSkill', () => {
   it('includes cartographer step after committing uncommitted changes', () => {
     const result = generateDockSkill(simpleConfig);
     expect(result).toContain('cartographer');
-    expect(result).toContain('cartographer.md');
+    expect(result).toContain('subagent_type: "cartographer"');
     expect(result).toContain('codebase-map.md');
   });
 
   it('cartographer step commits map changes', () => {
     const result = generateDockSkill(simpleConfig);
     expect(result).toContain('map: update codebase map');
+  });
+
+  it('handles structural concerns escalation after cartographer runs', () => {
+    const result = generateDockSkill(simpleConfig);
+    expect(result).toContain('Structural Concerns');
+    expect(result).toContain('escalate to captain');
+    expect(result).toContain('subagent_type: "captain"');
+    expect(result).toContain('log to tech-backlog.md');
   });
 });

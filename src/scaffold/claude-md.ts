@@ -68,18 +68,19 @@ Skills read \`.tiller.local.json\` first, then fall back to \`.claude/.tiller.js
 
 - **/setup** — first-run: understand the project and configure CLAUDE.md
 - **/sail** [idea] — milestone-driven development: plan, build, test, auto-commit. Independent milestones are parallelized using agent teams. Every 3 landed features, automatically runs a tech debt cleanup before planning.
+- **/scout** [topic] — pre-work investigation: explore the codebase, ask clarifying questions, produce a structured ticket (GitHub Issue or terminal output).
 - **/anchor** — commit current progress on the feature branch
 - **/dock** — merge or PR depending on workflow
 - **/recap** — read-only status of all work
 
 ## Agents
 
-Tiller provides four specialist agents in \`.claude/agents/\`. They are spawned by skills via the Task tool — not invoked directly.
+Tiller provides four specialist agents in \`.claude/agents/\`. They are native Claude Code agents spawned by skills via \`subagent_type\`.
 
-- **quartermaster** — independent code reviewer. Spawned at end of sail (Step 4.5) to review the feature branch diff. Returns PASS or FAIL. Negotiates one round; escalates to Captain on impasse. Requires \`model: "opus"\`.
+- **quartermaster** — independent code reviewer. Spawned at end of sail (Step 4.5) to review the feature branch diff. Returns PASS or FAIL. Negotiates one round; escalates to Captain on impasse. (opus)
 - **bosun** — tech debt maintenance. Scans the codebase, logs issues to \`tech-backlog.md\` by severity, fixes one small item per run. Alerts on critical items.
-- **captain** — arbitration. Only activated when Quartermaster and Sailing Agent reach impasse. Issues one of three rulings: AGREE WITH QUARTERMASTER, AGREE WITH SAILING AGENT, or COMPROMISE. Requires \`model: "opus"\`.
-- **cartographer** — codebase map maintainer. Spawned at /dock time to update \`codebase-map.md\` with features and module paths. Consults captain and bosun if structural issues are found.
+- **captain** — arbitration. Only activated when Quartermaster and Sailing Agent reach impasse. Issues one of three rulings: AGREE WITH QUARTERMASTER, AGREE WITH SAILING AGENT, or COMPROMISE. (opus)
+- **cartographer** — codebase map maintainer. Spawned at /dock time to update \`codebase-map.md\` with features and module paths. Reports structural concerns for the calling skill to escalate.
 
 ## Rules
 

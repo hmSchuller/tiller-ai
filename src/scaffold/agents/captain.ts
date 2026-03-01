@@ -4,13 +4,13 @@ export function generateCaptainAgent(_config: ProjectConfig): string {
   return `---
 name: captain
 description: Arbitration agent. Only activated when Quartermaster and Sailing Agent reach impasse after one negotiation round.
+model: opus
+tools: Read, Grep, Glob, Edit, LS
 ---
 
 # Captain — Arbitration Agent
 
 You are the Captain. You are only activated when the Quartermaster and the Sailing Agent have reached an impasse after one round of negotiation. You have final authority on whether the feature ships.
-
-**IMPORTANT: When spawned via the Task tool, you must be invoked with \`model: "opus"\` — arbitration requires the strongest model.**
 
 ## Before ruling
 

@@ -11,8 +11,12 @@ describe('generateQuartermasterAgent', () => {
     expect(generateQuartermasterAgent(simpleConfig)).toContain('name: quartermaster');
   });
 
-  it('specifies opus model requirement', () => {
-    expect(generateQuartermasterAgent(simpleConfig)).toContain('model: "opus"');
+  it('specifies opus model in frontmatter', () => {
+    expect(generateQuartermasterAgent(simpleConfig)).toContain('model: opus');
+  });
+
+  it('restricts tools to read-only set', () => {
+    expect(generateQuartermasterAgent(simpleConfig)).toContain('tools: Read, Grep, Glob, Bash, LS');
   });
 
   it('produces PASS or FAIL verdict instructions', () => {
@@ -86,6 +90,10 @@ describe('generateBosunAgent', () => {
     expect(result).toContain('simple mode');
     expect(result).toContain('detailed mode');
   });
+
+  it('specifies tools in frontmatter', () => {
+    expect(generateBosunAgent(simpleConfig)).toContain('tools: Read, Grep, Glob, Edit, Write, Bash, LS');
+  });
 });
 
 describe('generateCaptainAgent', () => {
@@ -93,8 +101,12 @@ describe('generateCaptainAgent', () => {
     expect(generateCaptainAgent(simpleConfig)).toContain('name: captain');
   });
 
-  it('specifies opus model requirement', () => {
-    expect(generateCaptainAgent(simpleConfig)).toContain('model: "opus"');
+  it('specifies opus model in frontmatter', () => {
+    expect(generateCaptainAgent(simpleConfig)).toContain('model: opus');
+  });
+
+  it('restricts tools to read-only set', () => {
+    expect(generateCaptainAgent(simpleConfig)).toContain('tools: Read, Grep, Glob, Edit, LS');
   });
 
   it('only activated on disputes', () => {
@@ -146,12 +158,22 @@ describe('generateCartographerAgent', () => {
     expect(result).toContain('git diff');
   });
 
-  it('includes captain and bosun escalation instructions', () => {
+  it('outputs Structural Concerns section and does not spawn agents', () => {
+    const result = generateCartographerAgent(simpleConfig);
+    expect(result).toContain('Structural Concerns');
+    expect(result).toContain('Do NOT spawn other agents yourself');
+  });
+
+  it('recommends escalation actions for structural concerns', () => {
     const result = generateCartographerAgent(simpleConfig);
     expect(result).toContain('captain');
     expect(result).toContain('bosun');
     expect(result).toContain('feature creep');
     expect(result).toContain('tech debt');
+  });
+
+  it('specifies tools in frontmatter', () => {
+    expect(generateCartographerAgent(simpleConfig)).toContain('tools: Read, Grep, Glob, Edit, Write, Bash, LS');
   });
 
   it('is mode-aware in reporting', () => {

@@ -38,7 +38,7 @@ git commit -m "wip: save before docking"
 
 ## Step 4: Run cartographer
 
-Read \`.claude/agents/cartographer.md\` and spawn the cartographer agent via the Task tool (foreground, \`subagent_type: "general-purpose"\`).
+Use the **Task tool** (foreground, \`subagent_type: "cartographer"\`).
 
 The cartographer will update \`codebase-map.md\` based on the docked feature changes.
 
@@ -47,6 +47,12 @@ After the cartographer completes, commit the updated map if it changed:
 \`\`\`
 git add codebase-map.md && git diff --staged --quiet || git commit -m "map: update codebase map"
 \`\`\`
+
+Then handle any Structural Concerns the cartographer reported:
+
+- If the output contains a \`## Structural Concerns\` section recommending \`escalate to captain\`: spawn the Captain via the **Task tool** (foreground, \`subagent_type: "captain"\`) with the concerns as context. Present the Captain's ruling to the user.
+- If recommending \`log to tech-backlog.md\`: add the items directly to \`tech-backlog.md\` (create the file if it doesn't exist).
+- If recommending \`monitor\` or no concerns: continue.
 
 ## Step 5: Check workflow
 

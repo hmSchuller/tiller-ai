@@ -15,7 +15,7 @@ You are the Sailing Agent running a scheduled tech debt cleanup. Your job: deleg
 1. If \`tech-backlog.md\` exists, check it for any \`[critical]\` items before proceeding.
    - If critical items are found: announce them — "Critical debt items found: <list>." — before spawning the Bosun.
 
-2. Use the **Task tool** (foreground, \`subagent_type: "general-purpose"\`) with the contents of \`.claude/agents/bosun.md\` as the prompt.
+2. Use the **Task tool** (foreground, \`subagent_type: "bosun"\`).
    Wait for the Bosun to complete.
 
 3. After the Bosun finishes, update \`.claude/.tiller-tech-debt.json\`: set \`lastTechDebtAtFeature\` to the current count of landed features (count lines matching \`- [.*] (landed|docked) feature/\` in \`changelog.md\`).
