@@ -20,7 +20,7 @@ Writes all files into the target directory in a single `scaffold()` call, then h
 
 **Path:** `src/scaffold/` (flat files), `src/scaffold/skills/`, `src/scaffold/hooks/`, `src/scaffold/agents/`
 
-Each generator is a pure function that returns a string — the content of a file to be written into the scaffolded project. Skills (`sail`, `anchor`, `dock`, `recap`, `setup`, `tech-debt`) produce `.claude/skills/*/SKILL.md`. Hooks (`post-write`, `secret-scan`, `session-resume`) produce `.claude/hooks/*.sh`. Agents (`quartermaster`, `bosun`, `captain`, `cartographer`) produce `.claude/agents/*.md`. The cartographer agent generator produces instructions for a concern-level map (3–7 module sections grouped by concern, not by file) with a Shipped Features list sourced from `changelog.md`. `claude-md.ts`, `changelog.ts`, `gitignore.ts`, `settings-json.ts`, and `tech-backlog.ts` cover the remaining generated files.
+Each generator is a pure function that returns a string — the content of a file to be written into the scaffolded project. Skills (`sail`, `anchor`, `dock`, `recap`, `setup`, `scout`, `tech-debt`) produce `.claude/skills/*/SKILL.md`. Hooks (`post-write`, `secret-scan`, `session-resume`) produce `.claude/hooks/*.sh`. Agents (`quartermaster`, `bosun`, `captain`, `cartographer`) produce `.claude/agents/*.md` with native Claude Code frontmatter (`name`, `description`, `model`, `tools`) and spawn via `subagent_type` rather than custom Task wiring. `claude-md.ts`, `changelog.ts`, `gitignore.ts`, `settings-json.ts`, and `tech-backlog.ts` cover the remaining generated files.
 
 ### Utilities
 
@@ -42,6 +42,7 @@ Static Astro site deployed to GitHub Pages. Nautical theme with navy/teal/gold p
 
 ## Shipped Features
 
+- `feature/create-scout-skill` — add scout skill generator, native frontmatter (model/tools) to all four agent generators, simplified skill spawns to native subagent_type, and restructured cartographer self-assessment to report-only Structural Concerns
 - `feature/cartographer-coarser-map` — cartographer produces concern-level map (3–7 module sections by concern) with a Shipped Features list from changelog
 - `feature/fix-sail-execution-rules` — Quartermaster added to embedded sail execution rules; tech debt counter fixed to count docked entries
 - `feature/remove-compass` — remove compass.md — redundant local state file replaced by git branch + git log
