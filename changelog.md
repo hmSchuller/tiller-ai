@@ -4,6 +4,7 @@
 
 ## Done
 
+- [2026-03-01] feat: update CLAUDE.md agent descriptions and regen script for all 4 agents (milestone 3/3)
 - [2026-03-01] feat: simplify skill spawns to native subagent_type — sail/dock/tech-debt (milestone 2/3)
 - [2026-03-01] feat: native frontmatter for all 4 agent generators — model, tools, report-only cartographer (milestone 1/3)
 - [2026-03-01] feat: wire scout skill into scaffold, manifest, claude-md, and regen script (milestone 2/2)

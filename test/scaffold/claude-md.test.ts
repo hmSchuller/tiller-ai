@@ -59,9 +59,10 @@ describe('generateDotClaudeMd', () => {
     expect(result).toContain('captain');
   });
 
-  it('notes which agents require opus model', () => {
+  it('notes which agents use opus model', () => {
     const result = generateDotClaudeMd(simpleConfig);
-    expect(result).toContain('model: "opus"');
+    // opus is now indicated via (opus) annotation, not model: "opus"
+    expect(result).toContain('(opus)');
   });
 
   it('Agents section appears after Skills section', () => {

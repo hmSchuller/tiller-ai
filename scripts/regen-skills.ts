@@ -8,6 +8,9 @@ import { generateDockSkill } from '../src/scaffold/skills/dock.ts';
 import { generateTechDebtSkill } from '../src/scaffold/skills/tech-debt.ts';
 import { generateScoutSkill } from '../src/scaffold/skills/scout.ts';
 import { generateCartographerAgent } from '../src/scaffold/agents/cartographer.ts';
+import { generateQuartermasterAgent } from '../src/scaffold/agents/quartermaster.ts';
+import { generateBosunAgent } from '../src/scaffold/agents/bosun.ts';
+import { generateCaptainAgent } from '../src/scaffold/agents/captain.ts';
 import type { ProjectConfig } from '../src/scaffold/types.ts';
 
 // Read config from .tiller.json + .tiller.local.json
@@ -31,5 +34,8 @@ await writeFile('.claude/skills/dock/SKILL.md', generateDockSkill(config));
 await writeFile('.claude/skills/tech-debt/SKILL.md', generateTechDebtSkill(config));
 await writeFile('.claude/skills/scout/SKILL.md', generateScoutSkill(config));
 await writeFile('.claude/agents/cartographer.md', generateCartographerAgent(config));
+await writeFile('.claude/agents/quartermaster.md', generateQuartermasterAgent(config));
+await writeFile('.claude/agents/bosun.md', generateBosunAgent(config));
+await writeFile('.claude/agents/captain.md', generateCaptainAgent(config));
 
 console.log(`Skills regenerated (mode: ${config.mode}, workflow: ${config.workflow})`);

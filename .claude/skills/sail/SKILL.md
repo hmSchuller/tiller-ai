@@ -8,6 +8,7 @@ description: Start or continue working on an idea. Usage: /sail [idea descriptio
 ## Step 1: Orient
 
 Read `.claude/.tiller.json` (and `.tiller.local.json` if it exists) and `changelog.md` to understand current state.
+If `codebase-map.md` exists, read it to get a structural overview of the codebase.
 Run `git branch` and `git status`.
 
 State the current mode from `.claude/.tiller.json` (or `.tiller.local.json` if it overrides): "Mode: <mode>".
@@ -54,7 +55,7 @@ Before planning, check if a tech debt cleanup is due:
 - 2–5 numbered milestones, each with: what gets built + what gets tested + a dependency tag: `[independent]` if it can run in parallel with other independent milestones, or `[depends-on: N]` if it requires milestone N to complete first
 - Files to create or modify
 - Any trade-offs worth noting
-- **Execution rules** (embed verbatim): After plan approval, execute the milestone loop: for each remaining milestone, announce "Milestone X/N: <description>", build functionality, add or update tests, run `npm test` and fix failures, run `git add -A && git commit -m "<milestone>"`, add entry to `changelog.md` Done section then amend commit, report "Saved: <description> (X/N)". When all milestones are done, run Step 4.5 Code Review: spawn the Quartermaster agent by reading `.claude/agents/quartermaster.md` and using the Task tool (foreground, `subagent_type: "general-purpose"`, `model: "opus"`). Handle PASS/FAIL/ESCALATE per the sail skill Step 4.5 protocol. Then summarize what was built and suggest `/dock`.
+- **Execution rules** (embed verbatim): After plan approval, execute the milestone loop: for each remaining milestone, announce "Milestone X/N: <description>", build functionality, add or update tests, run `npm test` and fix failures, run `git add -A && git commit -m "<milestone>"`, add entry to `changelog.md` Done section then amend commit, report "Saved: <description> (X/N)". When all milestones are done, run Step 4.5 Code Review: spawn the Quartermaster agent using the Task tool (foreground, `subagent_type: "quartermaster"`). Handle PASS/FAIL/ESCALATE per the sail skill Step 4.5 protocol. Then summarize what was built and suggest `/dock`.
 
 ## Step 4: Build milestone by milestone
 
@@ -100,7 +101,7 @@ Use agent teams to parallelize independent work:
 
 After all milestones are built and committed, spawn the Quartermaster to review the feature branch:
 
-1. Use the **Task tool** (foreground, `subagent_type: "general-purpose"`, **`model: "opus"`**) with the contents of `.claude/agents/quartermaster.md` as the prompt
+1. Use the **Task tool** (foreground, `subagent_type: "quartermaster"`)
 2. Wait for the Quartermaster's verdict
 
 **On PASS:**
@@ -108,10 +109,10 @@ After all milestones are built and committed, spawn the Quartermaster to review 
 
 **On FAIL:**
 - Review the issues list
-- Fix the issues, then present a rebuttal to the Quartermaster: re-spawn via Task tool with the original prompt plus the rebuttal context
+- Fix the issues, then present a rebuttal to the Quartermaster: re-spawn via Task tool (`subagent_type: "quartermaster"`) with the rebuttal context
 - If Quartermaster returns PASS (or PASS WITH NOTES): proceed to Step 5
 - If Quartermaster returns FAIL again and says "ESCALATE TO CAPTAIN":
-  - Spawn the Captain via the **Task tool** (foreground, `subagent_type: "general-purpose"`, **`model: "opus"`**) with the contents of `.claude/agents/captain.md` as the prompt, plus a summary of: the disputed issues, the Sailing Agent's rebuttal, and the Quartermaster's maintained objections
+  - Spawn the Captain via the **Task tool** (foreground, `subagent_type: "captain"`) with a summary of: the disputed issues, the Sailing Agent's rebuttal, and the Quartermaster's maintained objections
   - Wait for the Captain's ruling
   - Present the Captain's ruling to the user
   - If ruling is AGREE WITH QUARTERMASTER: fix the required items before docking
