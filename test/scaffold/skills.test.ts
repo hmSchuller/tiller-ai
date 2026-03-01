@@ -145,6 +145,22 @@ describe('generateSailSkill', () => {
     expect(result).toContain('[critical]');
     expect(result).toContain('Critical debt items');
   });
+
+  it('embedded execution rules include Quartermaster review (Step 4.5)', () => {
+    const result = generateSailSkill(simpleConfig);
+    // quartermaster.md must appear at least twice: once in the Step 3 embedded
+    // execution rules, and once in the standalone Step 4.5 section.
+    // A single occurrence would mean the embedded rules still skip QM review.
+    const matches = (result.match(/quartermaster\.md/g) || []).length;
+    expect(matches).toBeGreaterThanOrEqual(2);
+    expect(result).toContain('Step 4.5');
+    expect(result).toContain('Code Review');
+  });
+
+  it('tech debt counter pattern counts docked entries', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('(landed|docked) feature/');
+  });
 });
 
 describe('generateAnchorSkill', () => {
@@ -277,6 +293,11 @@ describe('generateTechDebtSkill', () => {
   it('reports Bosun results in detailed mode', () => {
     const result = generateTechDebtSkill(simpleConfig);
     expect(result).toContain("Bosun's results");
+  });
+
+  it('tech debt counter pattern counts docked entries', () => {
+    const result = generateTechDebtSkill(simpleConfig);
+    expect(result).toContain('(landed|docked) feature/');
   });
 });
 
