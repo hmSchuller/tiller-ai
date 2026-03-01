@@ -4,6 +4,7 @@
 
 ## Done
 
+- [2026-03-01] feat: add generateScoutSkill with tests (milestone 1/2 — scout skill generator)
 - [2026-03-01] sail orient step reads codebase-map.md for structural overview before planning
 - [2026-03-01] docked feature/cartographer-coarser-map
 - [2026-03-01] docked feature/fix-sail-execution-rules

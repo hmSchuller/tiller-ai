@@ -4,6 +4,7 @@ import { generateAnchorSkill } from '../../src/scaffold/skills/anchor.js';
 import { generateRecapSkill } from '../../src/scaffold/skills/recap.js';
 import { generateDockSkill } from '../../src/scaffold/skills/dock.js';
 import { generateTechDebtSkill } from '../../src/scaffold/skills/tech-debt.js';
+import { generateScoutSkill } from '../../src/scaffold/skills/scout.js';
 import { simpleConfig, detailedConfig, teamSimpleConfig } from '../helpers/fixtures.js';
 
 describe('generateSailSkill', () => {
@@ -303,6 +304,85 @@ describe('generateTechDebtSkill', () => {
   it('tech debt counter pattern counts docked entries', () => {
     const result = generateTechDebtSkill(simpleConfig);
     expect(result).toContain('(landed|docked) feature/');
+  });
+});
+
+describe('generateScoutSkill', () => {
+  it('has correct frontmatter name', () => {
+    expect(generateScoutSkill(simpleConfig)).toContain('name: scout');
+  });
+
+  it('produces the same template structure regardless of mode', () => {
+    const simple = generateScoutSkill(simpleConfig);
+    const detailed = generateScoutSkill(detailedConfig);
+    expect(simple).toContain('simple');
+    expect(simple).toContain('detailed');
+    expect(detailed).toContain('simple');
+    expect(detailed).toContain('detailed');
+  });
+
+  it('includes $ARGUMENTS usage', () => {
+    expect(generateScoutSkill(simpleConfig)).toContain('$ARGUMENTS');
+  });
+
+  it('includes Step 1 orient with codebase-map.md', () => {
+    const result = generateScoutSkill(simpleConfig);
+    expect(result).toContain('codebase-map.md');
+    expect(result).toContain('changelog.md');
+    expect(result).toContain('Mode: <mode>');
+  });
+
+  it('uses Explore agent with very thorough setting', () => {
+    const result = generateScoutSkill(simpleConfig);
+    expect(result).toContain('Explore agent');
+    expect(result).toContain('"very thorough"');
+  });
+
+  it('asks clarifying questions using AskUserQuestion', () => {
+    expect(generateScoutSkill(simpleConfig)).toContain('AskUserQuestion');
+  });
+
+  it('detailed mode asks both product and technical questions', () => {
+    const result = generateScoutSkill(simpleConfig);
+    expect(result).toContain('product/behavior questions');
+    expect(result).toContain('technical questions');
+  });
+
+  it('ticket includes all required sections', () => {
+    const result = generateScoutSkill(simpleConfig);
+    expect(result).toContain('### Summary');
+    expect(result).toContain('### Relevant code');
+    expect(result).toContain('### Suggested approach');
+    expect(result).toContain('### Open questions');
+    expect(result).toContain('### Scope estimate');
+  });
+
+  it('scope estimate has three sizes', () => {
+    const result = generateScoutSkill(simpleConfig);
+    expect(result).toContain('small');
+    expect(result).toContain('medium');
+    expect(result).toContain('large');
+  });
+
+  it('publishes via gh issue create when gh is available', () => {
+    const result = generateScoutSkill(simpleConfig);
+    expect(result).toContain('gh issue create');
+    expect(result).toContain('which gh');
+  });
+
+  it('falls back to copy-paste output when gh is unavailable', () => {
+    const result = generateScoutSkill(simpleConfig);
+    expect(result).toContain('copy-paste');
+  });
+
+  it('asks user to review before publishing', () => {
+    expect(generateScoutSkill(simpleConfig)).toContain('adjust anything before publishing');
+  });
+
+  it('milestones tagged with dependency annotations', () => {
+    const result = generateScoutSkill(simpleConfig);
+    expect(result).toContain('[independent]');
+    expect(result).toContain('[depends-on: N]');
   });
 });
 
