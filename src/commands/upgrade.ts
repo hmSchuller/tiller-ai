@@ -12,9 +12,12 @@ import { generateRecapSkill } from '../scaffold/skills/recap.js';
 import { generateDockSkill } from '../scaffold/skills/dock.js';
 import { generateTechDebtSkill } from '../scaffold/skills/tech-debt.js';
 import { generateDotClaudeMd } from '../scaffold/claude-md.js';
+import { generateSettingsJson } from '../scaffold/settings-json.js';
 import { generateQuartermasterAgent } from '../scaffold/agents/quartermaster.js';
 import { generateBosunAgent } from '../scaffold/agents/bosun.js';
 import { generateCaptainAgent } from '../scaffold/agents/captain.js';
+import { generateCartographerAgent } from '../scaffold/agents/cartographer.js';
+import { generateScoutSkill } from '../scaffold/skills/scout.js';
 import { generateTillerManifest, MANAGED_FILES, TILLER_VERSION, type TillerManifest } from '../scaffold/tiller-manifest.js';
 import type { ProjectConfig } from '../scaffold/types.js';
 
@@ -69,20 +72,24 @@ export async function upgradeCommand(opts: { yes?: boolean } = {}): Promise<void
   const s = spinner();
   s.start('Upgrading...');
 
+  const cwd = process.cwd();
   try {
-    await writeFile('.claude/CLAUDE.md', generateDotClaudeMd(config));
-    await writeFile('.claude/hooks/post-write.sh', generatePostWriteHook(config));
-    await writeFile('.claude/hooks/secret-scan.sh', generateSecretScanHook(config));
-    await writeFile('.claude/skills/setup/SKILL.md', generateSetupSkill(config));
-    await writeFile('.claude/skills/sail/SKILL.md', generateSailSkill(config));
-    await writeFile('.claude/skills/anchor/SKILL.md', generateAnchorSkill(config));
-    await writeFile('.claude/skills/recap/SKILL.md', generateRecapSkill(config));
-    await writeFile('.claude/skills/dock/SKILL.md', generateDockSkill(config));
-    await writeFile('.claude/skills/tech-debt/SKILL.md', generateTechDebtSkill(config));
-    await writeFile('.claude/agents/quartermaster.md', generateQuartermasterAgent(config));
-    await writeFile('.claude/agents/bosun.md', generateBosunAgent(config));
-    await writeFile('.claude/agents/captain.md', generateCaptainAgent(config));
-    await writeFile('.claude/.tiller.json', generateTillerManifest(config, TILLER_VERSION));
+    await writeFile(resolve(cwd, '.claude/CLAUDE.md'), generateDotClaudeMd(config));
+    await writeFile(resolve(cwd, '.claude/settings.json'), generateSettingsJson(config));
+    await writeFile(resolve(cwd, '.claude/hooks/post-write.sh'), generatePostWriteHook(config));
+    await writeFile(resolve(cwd, '.claude/hooks/secret-scan.sh'), generateSecretScanHook(config));
+    await writeFile(resolve(cwd, '.claude/skills/setup/SKILL.md'), generateSetupSkill(config));
+    await writeFile(resolve(cwd, '.claude/skills/sail/SKILL.md'), generateSailSkill(config));
+    await writeFile(resolve(cwd, '.claude/skills/anchor/SKILL.md'), generateAnchorSkill(config));
+    await writeFile(resolve(cwd, '.claude/skills/recap/SKILL.md'), generateRecapSkill(config));
+    await writeFile(resolve(cwd, '.claude/skills/dock/SKILL.md'), generateDockSkill(config));
+    await writeFile(resolve(cwd, '.claude/skills/tech-debt/SKILL.md'), generateTechDebtSkill(config));
+    await writeFile(resolve(cwd, '.claude/skills/scout/SKILL.md'), generateScoutSkill(config));
+    await writeFile(resolve(cwd, '.claude/agents/quartermaster.md'), generateQuartermasterAgent(config));
+    await writeFile(resolve(cwd, '.claude/agents/bosun.md'), generateBosunAgent(config));
+    await writeFile(resolve(cwd, '.claude/agents/captain.md'), generateCaptainAgent(config));
+    await writeFile(resolve(cwd, '.claude/agents/cartographer.md'), generateCartographerAgent(config));
+    await writeFile(resolve(cwd, '.claude/.tiller.json'), generateTillerManifest(config, TILLER_VERSION));
     s.stop('Done!');
   } catch (err) {
     s.stop('Failed.');
