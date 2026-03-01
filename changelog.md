@@ -4,6 +4,7 @@
 
 ## Done
 
+- [2026-03-01] docked feature/fix-sail-execution-rules
 - [2026-03-01] feature/fix-sail-execution-rules — Quartermaster added to embedded execution rules; tech debt counter fixed to count docked entries
 - [2026-03-01] docked feature/remove-compass
 - [2026-03-01] remove compass.md — redundant local state file replaced by git branch + git log
