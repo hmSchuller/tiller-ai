@@ -110,6 +110,7 @@ describe('scaffold integration', () => {
     expect(await exists('.claude/agents/quartermaster.md')).toBe(true);
     expect(await exists('.claude/agents/bosun.md')).toBe(true);
     expect(await exists('.claude/agents/captain.md')).toBe(true);
+    expect(await exists('.claude/agents/cartographer.md')).toBe(true);
   });
 
   it('creates tech-backlog.md', async () => {

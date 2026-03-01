@@ -71,11 +71,12 @@ Skills read `.tiller.local.json` first, then fall back to `.claude/.tiller.json`
 
 ## Agents
 
-Tiller provides three specialist agents in `.claude/agents/`. They are spawned by skills via the Task tool — not invoked directly.
+Tiller provides four specialist agents in `.claude/agents/`. They are spawned by skills via the Task tool — not invoked directly.
 
 - **quartermaster** — independent code reviewer. Spawned at end of sail (Step 4.5) to review the feature branch diff. Returns PASS or FAIL. Negotiates one round; escalates to Captain on impasse. Requires `model: "opus"`.
 - **bosun** — tech debt maintenance. Scans the codebase, logs issues to `tech-backlog.md` by severity, fixes one small item per run. Alerts on critical items.
 - **captain** — arbitration. Only activated when Quartermaster and Sailing Agent reach impasse. Issues one of three rulings: AGREE WITH QUARTERMASTER, AGREE WITH SAILING AGENT, or COMPROMISE. Requires `model: "opus"`.
+- **cartographer** — codebase map maintainer. Spawned at /dock time to update `codebase-map.md` with features and module paths. Consults captain and bosun if structural issues are found.
 
 ## Rules
 

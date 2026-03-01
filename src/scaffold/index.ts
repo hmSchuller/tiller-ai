@@ -21,6 +21,7 @@ import { generateTechDebtState } from './tech-debt-state.js';
 import { generateQuartermasterAgent } from './agents/quartermaster.js';
 import { generateBosunAgent } from './agents/bosun.js';
 import { generateCaptainAgent } from './agents/captain.js';
+import { generateCartographerAgent } from './agents/cartographer.js';
 import { generateTechBacklog } from './tech-backlog.js';
 
 export async function scaffold(config: ProjectConfig, targetDir: string): Promise<void> {
@@ -69,6 +70,7 @@ export async function scaffold(config: ProjectConfig, targetDir: string): Promis
   await writeFile(p('.claude/agents/quartermaster.md'), generateQuartermasterAgent(config));
   await writeFile(p('.claude/agents/bosun.md'), generateBosunAgent(config));
   await writeFile(p('.claude/agents/captain.md'), generateCaptainAgent(config));
+  await writeFile(p('.claude/agents/cartographer.md'), generateCartographerAgent(config));
 
   // Shared tracking files
   await writeFile(p('tech-backlog.md'), generateTechBacklog(config));

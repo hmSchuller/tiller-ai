@@ -325,4 +325,16 @@ describe('generateDockSkill', () => {
   it('updates changelog.md when docking', () => {
     expect(generateDockSkill(simpleConfig)).toContain('changelog.md');
   });
+
+  it('includes cartographer step after committing uncommitted changes', () => {
+    const result = generateDockSkill(simpleConfig);
+    expect(result).toContain('cartographer');
+    expect(result).toContain('cartographer.md');
+    expect(result).toContain('codebase-map.md');
+  });
+
+  it('cartographer step commits map changes', () => {
+    const result = generateDockSkill(simpleConfig);
+    expect(result).toContain('map: update codebase map');
+  });
 });

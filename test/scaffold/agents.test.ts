@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { generateQuartermasterAgent } from '../../src/scaffold/agents/quartermaster.js';
 import { generateBosunAgent } from '../../src/scaffold/agents/bosun.js';
 import { generateCaptainAgent } from '../../src/scaffold/agents/captain.js';
+import { generateCartographerAgent } from '../../src/scaffold/agents/cartographer.js';
 import { generateTechBacklog } from '../../src/scaffold/tech-backlog.js';
 import { simpleConfig, detailedConfig } from '../helpers/fixtures.js';
 
@@ -120,6 +121,48 @@ describe('generateCaptainAgent', () => {
   it('produces the same structure regardless of config', () => {
     const s = generateCaptainAgent(simpleConfig);
     const d = generateCaptainAgent(detailedConfig);
+    expect(s).toBe(d);
+  });
+});
+
+describe('generateCartographerAgent', () => {
+  it('has correct frontmatter name', () => {
+    expect(generateCartographerAgent(simpleConfig)).toContain('name: cartographer');
+  });
+
+  it('references codebase-map.md', () => {
+    expect(generateCartographerAgent(simpleConfig)).toContain('codebase-map.md');
+  });
+
+  it('includes full scan instructions for missing/empty map', () => {
+    const result = generateCartographerAgent(simpleConfig);
+    expect(result).toContain('full scan');
+    expect(result).toContain('missing or empty');
+  });
+
+  it('includes incremental update instructions for existing map', () => {
+    const result = generateCartographerAgent(simpleConfig);
+    expect(result).toContain('incremental update');
+    expect(result).toContain('git diff');
+  });
+
+  it('includes captain and bosun escalation instructions', () => {
+    const result = generateCartographerAgent(simpleConfig);
+    expect(result).toContain('captain');
+    expect(result).toContain('bosun');
+    expect(result).toContain('feature creep');
+    expect(result).toContain('tech debt');
+  });
+
+  it('is mode-aware in reporting', () => {
+    const result = generateCartographerAgent(simpleConfig);
+    expect(result).toContain('simple mode');
+    expect(result).toContain('detailed mode');
+  });
+
+  it('produces the same structure regardless of config', () => {
+    const s = generateCartographerAgent(simpleConfig);
+    const d = generateCartographerAgent(detailedConfig);
     expect(s).toBe(d);
   });
 });

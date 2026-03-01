@@ -33,14 +33,26 @@ git add -A
 git commit -m "wip: save before docking"
 ```
 
-## Step 4: Check workflow
+## Step 4: Run cartographer
+
+Read `.claude/agents/cartographer.md` and spawn the cartographer agent via the Task tool (foreground, `subagent_type: "general-purpose"`).
+
+The cartographer will update `codebase-map.md` based on the docked feature changes.
+
+After the cartographer completes, commit the updated map if it changed:
+
+```
+git add codebase-map.md && git diff --staged --quiet || git commit -m "map: update codebase map"
+```
+
+## Step 5: Check workflow
 
 Read workflow from `.tiller.local.json` if it exists, otherwise from `.claude/.tiller.json`. Default: solo.
 
-**If workflow is solo** → go to Step 5a (local merge).
-**If workflow is team** → go to Step 5b (open PR).
+**If workflow is solo** → go to Step 6a (local merge).
+**If workflow is team** → go to Step 6b (open PR).
 
-## Step 5a: Solo — merge to main
+## Step 6a: Solo — merge to main
 
 ```
 git checkout main
@@ -48,9 +60,9 @@ git merge --no-ff <feature-branch> -m "dock: <feature-branch>"
 git branch -d <feature-branch>
 ```
 
-Then go to Step 6.
+Then go to Step 7.
 
-## Step 5b: Team — open PR
+## Step 6b: Team — open PR
 
 First, update changelog so the single push includes it:
 
@@ -77,9 +89,9 @@ Print the PR URL. Say: "PR opened. Merge happens on GitHub after review and CI."
 Run `git remote get-url origin` to get the remote URL. Convert to a browser URL if needed.
 Say: "Push done. Open a PR at: <remote-url>/compare/<feature-branch>"
 
-Then go to Step 7 (do NOT delete the branch locally — it will be deleted after the PR merges remotely).
+Then go to Step 8 (do NOT delete the branch locally — it will be deleted after the PR merges remotely).
 
-## Step 6: Update changelog.md (solo only)
+## Step 7: Update changelog.md (solo only)
 
 1. Add an entry to the Done section of `changelog.md`:
    - `- [YYYY-MM-DD] docked <feature-branch>`
@@ -88,7 +100,7 @@ Then go to Step 7 (do NOT delete the branch locally — it will be deleted after
    git add changelog.md && git commit -m "update changelog: docked <feature-branch>"
    ```
 
-## Step 7: Confirm
+## Step 8: Confirm
 
 - **simple:** Say: "Done. Run `/clear` to reset context before starting your next feature, then `/sail` to continue."
 - **detailed:** Say: "Feature docked. Run `/clear` to reset context before your next feature, then `/sail` to continue."

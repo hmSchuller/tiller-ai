@@ -26,6 +26,7 @@ export const MANAGED_FILES = [
   '.claude/agents/quartermaster.md',
   '.claude/agents/bosun.md',
   '.claude/agents/captain.md',
+  '.claude/agents/cartographer.md',
 ];
 
 export function generateTillerManifest(config: ProjectConfig, version: string): string {

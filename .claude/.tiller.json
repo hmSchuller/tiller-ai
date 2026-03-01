@@ -16,6 +16,7 @@
     ".claude/skills/tech-debt/SKILL.md",
     ".claude/agents/quartermaster.md",
     ".claude/agents/bosun.md",
-    ".claude/agents/captain.md"
+    ".claude/agents/captain.md",
+    ".claude/agents/cartographer.md"
   ]
 }
