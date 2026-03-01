@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { mkdtemp, rm, readFile, mkdir, writeFile, stat } from 'node:fs/promises';
+import { mkdtemp, rm, readFile, mkdir, writeFile, stat, access } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { generateTillerManifest, MANAGED_FILES } from '../../src/scaffold/tiller-manifest.js';
@@ -27,6 +27,8 @@ async function setupProject(tmpDir: string) {
   await mkdir(join(tmpDir, '.claude', 'skills', 'recap'), { recursive: true });
   await mkdir(join(tmpDir, '.claude', 'skills', 'dock'), { recursive: true });
   await mkdir(join(tmpDir, '.claude', 'skills', 'tech-debt'), { recursive: true });
+  await mkdir(join(tmpDir, '.claude', 'skills', 'scout'), { recursive: true });
+  await mkdir(join(tmpDir, '.claude', 'agents'), { recursive: true });
   const config = { projectName: 'test-proj', description: 'desc', runCommand: 'npm test', mode: 'detailed' as const, workflow: 'solo' as const };
   await writeFile(join(tmpDir, '.claude', '.tiller.json'), generateTillerManifest(config, TILLER_VERSION), 'utf-8');
 }
@@ -130,6 +132,17 @@ describe('upgradeCommand', () => {
     const { upgradeCommand } = await import('../../src/commands/upgrade.js');
     await expect(upgradeCommand()).rejects.toThrow('process.exit called');
     expect(exitSpy).toHaveBeenCalledWith(0);
+  });
+
+  it('writes all MANAGED_FILES during upgrade', async () => {
+    await setupProject(tmpDir);
+
+    const { upgradeCommand } = await import('../../src/commands/upgrade.js');
+    await upgradeCommand({ yes: true });
+
+    for (const file of MANAGED_FILES) {
+      await expect(access(join(tmpDir, file))).resolves.toBeUndefined();
+    }
   });
 
   describe('stale file removal', () => {

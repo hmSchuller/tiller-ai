@@ -4,6 +4,7 @@
 
 ## Done
 
+- [2026-03-01] fix: wire cartographer, scout, and settings.json into upgrade command — regression test guards all MANAGED_FILES
 - [2026-03-01] docked feature/create-scout-skill
 - [2026-03-01] feat: update CLAUDE.md agent descriptions and regen script for all 4 agents (milestone 3/3)
 - [2026-03-01] feat: simplify skill spawns to native subagent_type — sail/dock/tech-debt (milestone 2/3)
