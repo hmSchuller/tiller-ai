@@ -4,6 +4,7 @@
 
 ## Done
 
+- [2026-03-02] docked feature/add-repair-hull-skill
 - [2026-03-02] docked feature/tiller-md-instead-of-claude-md-ownership
 - [2026-03-02] feat: introduce TILLER.md — Tiller rules move to .claude/TILLER.md; users own .claude/CLAUDE.md; upgrade guards against CLAUDE.md deletion
 - [2026-03-02] docked feature/cartographer-remove-shipped-features-list
