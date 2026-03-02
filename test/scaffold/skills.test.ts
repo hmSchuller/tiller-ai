@@ -135,14 +135,18 @@ describe('generateSailSkill', () => {
     expect(result).toContain('Critical debt items');
   });
 
-  it('embedded execution rules include Quartermaster review (Step 4.5)', () => {
+  it('embedded execution rules include self-contained Quartermaster review', () => {
     const result = generateSailSkill(simpleConfig);
     // subagent_type: "quartermaster" must appear at least twice: once in the Step 3
     // embedded execution rules, and once in the standalone Step 4.5 section.
     const matches = (result.match(/subagent_type: "quartermaster"/g) || []).length;
     expect(matches).toBeGreaterThanOrEqual(2);
-    expect(result).toContain('Step 4.5');
+    // Execution rules must inline the full PASS/FAIL/ESCALATE protocol
+    expect(result).toContain('ESCALATE TO CAPTAIN');
+    expect(result).toContain('subagent_type: "captain"');
     expect(result).toContain('Code Review');
+    // Must NOT reference the dead "Step 4.5 protocol" pattern in the execution rules
+    expect(result).not.toContain('per the sail skill Step 4.5 protocol');
   });
 
   it('tech debt counter pattern counts docked entries', () => {
