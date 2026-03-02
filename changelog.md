@@ -4,6 +4,7 @@
 
 ## Done
 
+- [2026-03-02] feat: inline PASS/FAIL/ESCALATE protocol into sail plan execution rules — plan is now fully self-contained after context clear
 - [2026-03-02] docked feature/is-readme-claudemd-and-website-in-sync
 - [2026-03-02] feat: bump to 0.2.2 — TILLER_VERSION derived from package.json at build time (single source); prepublishOnly guard prevents stale dist
 - [2026-03-01] docked feature/fix-upgrade-missing-cartographer-scout

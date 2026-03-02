@@ -20,7 +20,7 @@ Writes all files into the target directory in a single `scaffold()` call, then h
 
 **Path:** `src/scaffold/` (flat files), `src/scaffold/skills/`, `src/scaffold/hooks/`, `src/scaffold/agents/`
 
-Each generator is a pure function that returns a string — the content of a file to be written into the scaffolded project. Skills (`sail`, `anchor`, `dock`, `recap`, `setup`, `scout`, `tech-debt`) produce `.claude/skills/*/SKILL.md`. Hooks (`post-write`, `secret-scan`, `session-resume`) produce `.claude/hooks/*.sh`. Agents (`quartermaster`, `bosun`, `captain`, `cartographer`) produce `.claude/agents/*.md` with native Claude Code frontmatter (`name`, `description`, `model`, `tools`) and spawn via `subagent_type` rather than custom Task wiring. `claude-md.ts`, `changelog.ts`, `gitignore.ts`, `settings-json.ts`, and `tech-backlog.ts` cover the remaining generated files.
+Each generator is a pure function that returns a string — the content of a file to be written into the scaffolded project. Skills (`sail`, `anchor`, `dock`, `recap`, `setup`, `scout`, `tech-debt`) produce `.claude/skills/*/SKILL.md`. The sail skill is the most complex: its Step 3 plan block embeds the full Quartermaster→Captain PASS/FAIL/ESCALATE review protocol inline so the plan is self-contained after a context clear. Hooks (`post-write`, `secret-scan`, `session-resume`) produce `.claude/hooks/*.sh`. Agents (`quartermaster`, `bosun`, `captain`, `cartographer`) produce `.claude/agents/*.md` with native Claude Code frontmatter (`name`, `description`, `model`, `tools`) and spawn via `subagent_type` rather than custom Task wiring. `claude-md.ts`, `changelog.ts`, `gitignore.ts`, `settings-json.ts`, and `tech-backlog.ts` cover the remaining generated files.
 
 ### Utilities
 
@@ -42,6 +42,7 @@ Static Astro site deployed to GitHub Pages. Nautical theme with navy/teal/gold p
 
 ## Shipped Features
 
+- `feature/sail-embed-post-build-steps-in-plan` — inline the full PASS/FAIL/ESCALATE Quartermaster→Captain escalation protocol into sail's Step 3 plan block, making the plan self-contained after a context clear
 - `feature/is-readme-claudemd-and-website-in-sync` — synchronize documentation across README, .claude/CLAUDE.md, and website: 5-step vibe loop, /scout skill, and Cartographer agent reflected consistently
 - `feature/fix-upgrade-missing-cartographer-scout` — fix upgrade command: add missing `generateCartographerAgent`, `generateScoutSkill`, and `generateSettingsJson` imports and `writeFile` calls; fix all write paths to use `resolve(process.cwd(), ...)` instead of bare relative strings; add regression test asserting all MANAGED_FILES are written during upgrade
 - `feature/create-scout-skill` — add scout skill generator, native frontmatter (model/tools) to all four agent generators, simplified skill spawns to native subagent_type, and restructured cartographer self-assessment to report-only Structural Concerns
