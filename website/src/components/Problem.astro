@@ -1,0 +1,110 @@
+---
+import CodeBlock from './CodeBlock.astro';
+
+const withoutCode = `$ claude
+> Add a login page to the app
+
+  (no branch created)
+  (no plan, just starts coding)
+  (no tests written)
+  (no review before merge)
+  (different approach every time)`;
+
+const withCode = `$ /sail add a login page to the app
+
+  ✓ Branch created: feature/add-login-page
+  ✓ Plan: 3 milestones, approved
+  ✓ Built + tested milestone by milestone
+  ✓ Quartermaster review: PASS
+  ✓ Merged, changelog updated, branch cleaned`;
+---
+
+<section class="problem" id="problem" aria-labelledby="problem-heading">
+  <div class="container">
+    <div class="problem-header">
+      <h2 id="problem-heading" class="problem-title">
+        Claude Code is powerful.<br/>
+        <span class="problem-accent">But it has no default workflow.</span>
+      </h2>
+      <p class="problem-subtitle">
+        Every session starts from scratch — you re-explain the process each time.
+        Tiller gives Claude a repeatable development cycle.
+      </p>
+    </div>
+
+    <div class="comparison">
+      <div class="comparison-col">
+        <h3 class="comparison-label comparison-label--muted">Without Tiller</h3>
+        <CodeBlock code={withoutCode} variant="muted" />
+      </div>
+      <div class="comparison-col">
+        <h3 class="comparison-label comparison-label--success">With Tiller</h3>
+        <CodeBlock code={withCode} variant="success" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .problem {
+    padding: var(--space-20) 0;
+    background-color: var(--cream-100);
+  }
+
+  .problem-header {
+    text-align: center;
+    margin-bottom: var(--space-12);
+  }
+
+  .problem-title {
+    font-family: var(--font-serif);
+    font-size: clamp(var(--text-2xl), 4vw, var(--text-4xl));
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--navy-900);
+    margin-bottom: var(--space-4);
+  }
+
+  .problem-accent {
+    color: var(--text-secondary);
+    font-weight: 400;
+  }
+
+  .problem-subtitle {
+    font-size: var(--text-lg);
+    color: var(--text-secondary);
+    max-width: 520px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  .comparison {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  @media (min-width: 768px) {
+    .comparison {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .comparison-label {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: var(--space-3);
+  }
+
+  .comparison-label--muted {
+    color: var(--text-muted);
+  }
+
+  .comparison-label--success {
+    color: var(--teal-600);
+  }
+</style>
