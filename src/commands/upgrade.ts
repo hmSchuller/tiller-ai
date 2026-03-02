@@ -1,5 +1,5 @@
 import { intro, outro, confirm, spinner, isCancel, cancel } from '@clack/prompts';
-import { readFile, unlink, writeFile as fsWriteFile } from 'node:fs/promises';
+import { readFile, unlink } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { writeFile } from '../utils/fs.js';
@@ -89,7 +89,7 @@ export async function upgradeCommand(opts: { yes?: boolean } = {}): Promise<void
       // file doesn't exist
     }
     if (existingClaudeMd !== null && !existingClaudeMd.includes('@.claude/TILLER.md')) {
-      await fsWriteFile(claudeMdPath, '@.claude/TILLER.md\n\n' + existingClaudeMd, 'utf-8');
+      await writeFile(claudeMdPath, '@.claude/TILLER.md\n\n' + existingClaudeMd);
     }
     await writeFile(resolve(cwd, '.claude/settings.json'), generateSettingsJson(config));
     await writeFile(resolve(cwd, '.claude/hooks/post-write.sh'), generatePostWriteHook(config));
