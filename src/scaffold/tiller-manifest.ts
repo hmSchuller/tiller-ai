@@ -1,7 +1,13 @@
+import { createRequire } from 'node:module';
 import type { ProjectConfig } from './types.js';
 
 declare const __PKG_VERSION__: string;
-export const TILLER_VERSION: string = __PKG_VERSION__;
+// __PKG_VERSION__ is injected by tsup/vitest define at build/test time.
+// When running via tsx (scripts), fall back to reading package.json directly.
+export const TILLER_VERSION: string =
+  typeof __PKG_VERSION__ !== 'undefined'
+    ? __PKG_VERSION__
+    : createRequire(import.meta.url)('../../package.json').version;
 
 export type TillerManifest = {
   version: string;

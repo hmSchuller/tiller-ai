@@ -4,6 +4,7 @@
 
 ## Done
 
+- [2026-03-02] feat: bump to 0.2.2 — TILLER_VERSION derived from package.json at build time (single source); prepublishOnly guard prevents stale dist
 - [2026-03-01] docked feature/fix-upgrade-missing-cartographer-scout
 - [2026-03-01] fix: wire cartographer, scout, and settings.json into upgrade command — regression test guards all MANAGED_FILES
 - [2026-03-01] docked feature/create-scout-skill
