@@ -4,6 +4,7 @@
 
 ## Done
 
+- [2026-03-02] feat: introduce TILLER.md — Tiller rules move to .claude/TILLER.md; users own .claude/CLAUDE.md; upgrade guards against CLAUDE.md deletion
 - [2026-03-02] docked feature/cartographer-remove-shipped-features-list
 - [2026-03-02] docked feature/sail-embed-post-build-steps-in-plan
 - [2026-03-02] feat: inline PASS/FAIL/ESCALATE protocol into sail plan execution rules — plan is now fully self-contained after context clear
