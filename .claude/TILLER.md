@@ -1,11 +1,8 @@
-import type { ProjectConfig } from './types.js';
-
-export function generateTillerMd(_config: ProjectConfig): string {
-  return `# Tiller — How to work
+# Tiller — How to work
 
 ## Modes
 
-The mode is set in \`.claude/.tiller.json\` (or overridden locally in \`.tiller.local.json\`). Read it at the start of every session.
+The mode is set in `.claude/.tiller.json` (or overridden locally in `.tiller.local.json`). Read it at the start of every session.
 
 ### simple
 
@@ -28,7 +25,7 @@ The user is technical and wants to stay in control.
 
 ## Workflows
 
-The workflow is set in \`.claude/.tiller.json\` (or overridden locally in \`.tiller.local.json\`).
+The workflow is set in `.claude/.tiller.json` (or overridden locally in `.tiller.local.json`).
 
 ### solo
 
@@ -42,9 +39,9 @@ Multiple developers. /dock pushes the feature branch and opens a PR. Merging hap
 
 Every piece of work follows this loop:
 
-1. **Orient** — read \`.claude/.tiller.json\` (and \`.tiller.local.json\` if present) and changelog.md (shared); if \`codebase-map.md\` exists, read it for a structural overview
+1. **Orient** — read `.claude/.tiller.json` (and `.tiller.local.json` if present) and changelog.md (shared); if `codebase-map.md` exists, read it for a structural overview
 2. **Plan** — in detailed mode, enter plan mode with milestones and wait for approval
-3. **Build** — implement milestone by milestone; milestones tagged \`[independent]\` may be parallelized using agent teams (TeamCreate + Task tool); each milestone includes tests, verify, and auto-commit
+3. **Build** — implement milestone by milestone; milestones tagged `[independent]` may be parallelized using agent teams (TeamCreate + Task tool); each milestone includes tests, verify, and auto-commit
 4. **Review** — Quartermaster inspects the feature branch diff and issues PASS or FAIL; one round of negotiation allowed; unresolved disagreements escalate to Captain
 5. **Dock** — announce feature done, suggest /dock to merge and clean up
 
@@ -53,15 +50,15 @@ Every piece of work follows this loop:
 - Never commit directly to main
 - Always work on a feature branch (feature/<name>)
 - Run the verify command before every anchor and dock
-- \`changelog.md\` is committed and shared — it tracks the project's done log
+- `changelog.md` is committed and shared — it tracks the project's done log
 
 ## Per-dev overrides
 
-Create \`.tiller.local.json\` (gitignored) to override mode or workflow personally:
-\`\`\`json
+Create `.tiller.local.json` (gitignored) to override mode or workflow personally:
+```json
 { "mode": "simple", "workflow": "solo" }
-\`\`\`
-Skills read \`.tiller.local.json\` first, then fall back to \`.claude/.tiller.json\`.
+```
+Skills read `.tiller.local.json` first, then fall back to `.claude/.tiller.json`.
 
 ## Skills
 
@@ -74,12 +71,12 @@ Skills read \`.tiller.local.json\` first, then fall back to \`.claude/.tiller.js
 
 ## Agents
 
-Tiller provides four specialist agents in \`.claude/agents/\`. They are native Claude Code agents spawned by skills via \`subagent_type\`.
+Tiller provides four specialist agents in `.claude/agents/`. They are native Claude Code agents spawned by skills via `subagent_type`.
 
 - **quartermaster** — independent code reviewer. Spawned at end of sail (Step 4.5) to review the feature branch diff. Returns PASS or FAIL. Negotiates one round; escalates to Captain on impasse. (opus)
-- **bosun** — tech debt maintenance. Scans the codebase, logs issues to \`tech-backlog.md\` by severity, fixes one small item per run. Alerts on critical items.
+- **bosun** — tech debt maintenance. Scans the codebase, logs issues to `tech-backlog.md` by severity, fixes one small item per run. Alerts on critical items.
 - **captain** — arbitration. Only activated when Quartermaster and Sailing Agent reach impasse. Issues one of three rulings: AGREE WITH QUARTERMASTER, AGREE WITH SAILING AGENT, or COMPROMISE. (opus)
-- **cartographer** — codebase map maintainer. Spawned at /dock time to update \`codebase-map.md\` with features and module paths. Reports structural concerns for the calling skill to escalate.
+- **cartographer** — codebase map maintainer. Spawned at /dock time to update `codebase-map.md` with features and module paths. Reports structural concerns for the calling skill to escalate.
 
 ## Rules
 
@@ -87,9 +84,3 @@ Tiller provides four specialist agents in \`.claude/agents/\`. They are native C
 - Do not touch unrelated files
 - Do not make architectural changes without explicit confirmation in detailed mode
 - Keep commits atomic and descriptive
-`;
-}
-
-export function generateUserClaudeMd(): string {
-  return `@.claude/TILLER.md\n`;
-}

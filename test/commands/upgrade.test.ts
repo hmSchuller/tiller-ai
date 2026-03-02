@@ -194,7 +194,57 @@ describe('upgradeCommand', () => {
 
       // Current managed files should still be listed in the updated manifest
       const manifest = JSON.parse(await readFile(join(tmpDir, '.claude', '.tiller.json'), 'utf-8'));
-      expect(manifest.managedFiles).toContain('.claude/CLAUDE.md');
+      expect(manifest.managedFiles).toContain('.claude/TILLER.md');
+    });
+
+    it('does not delete .claude/CLAUDE.md even when listed as stale in old manifest', async () => {
+      await setupProject(tmpDir);
+
+      // Write a user CLAUDE.md
+      await writeFile(join(tmpDir, '.claude', 'CLAUDE.md'), 'my custom instructions', 'utf-8');
+
+      // Simulate old manifest that listed CLAUDE.md as managed
+      const oldManifest = {
+        version: '0.2.0',
+        mode: 'detailed',
+        workflow: 'solo',
+        runCommand: 'npm test',
+        managedFiles: [...MANAGED_FILES, '.claude/CLAUDE.md'],
+      };
+      await writeFile(join(tmpDir, '.claude', '.tiller.json'), JSON.stringify(oldManifest, null, 2), 'utf-8');
+
+      const { upgradeCommand } = await import('../../src/commands/upgrade.js');
+      await upgradeCommand({ yes: true });
+
+      // CLAUDE.md must still exist with user content intact
+      const content = await readFile(join(tmpDir, '.claude', 'CLAUDE.md'), 'utf-8');
+      expect(content).toContain('my custom instructions');
+    });
+
+    it('adds @.claude/TILLER.md import to existing CLAUDE.md that lacks it', async () => {
+      await setupProject(tmpDir);
+
+      await writeFile(join(tmpDir, '.claude', 'CLAUDE.md'), 'my custom instructions', 'utf-8');
+
+      const { upgradeCommand } = await import('../../src/commands/upgrade.js');
+      await upgradeCommand({ yes: true });
+
+      const content = await readFile(join(tmpDir, '.claude', 'CLAUDE.md'), 'utf-8');
+      expect(content).toContain('@.claude/TILLER.md');
+      expect(content).toContain('my custom instructions');
+    });
+
+    it('does not duplicate @.claude/TILLER.md import if already present', async () => {
+      await setupProject(tmpDir);
+
+      await writeFile(join(tmpDir, '.claude', 'CLAUDE.md'), '@.claude/TILLER.md\n\nmy custom instructions', 'utf-8');
+
+      const { upgradeCommand } = await import('../../src/commands/upgrade.js');
+      await upgradeCommand({ yes: true });
+
+      const content = await readFile(join(tmpDir, '.claude', 'CLAUDE.md'), 'utf-8');
+      const matches = content.match(/@\.claude\/TILLER\.md/g);
+      expect(matches).toHaveLength(1);
     });
   });
 });

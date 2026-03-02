@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { writeFile } from '../utils/fs.js';
 import { isGitRepo, gitInit, gitAdd, gitCommit } from '../utils/git.js';
 import type { ProjectConfig } from './types.js';
-import { generateDotClaudeMd } from './claude-md.js';
+import { generateTillerMd, generateUserClaudeMd } from './claude-md.js';
 import { generateChangelog } from './changelog.js';
 import { generateSettingsJson } from './settings-json.js';
 import { generateGitignore, TILLER_GITIGNORE_ENTRIES } from './gitignore.js';
@@ -49,7 +49,21 @@ export async function scaffold(config: ProjectConfig, targetDir: string): Promis
   await writeFile(p('changelog.md'), generateChangelog(config));
 
   // .claude/ files
-  await writeFile(p('.claude/CLAUDE.md'), generateDotClaudeMd(config));
+  await writeFile(p('.claude/TILLER.md'), generateTillerMd(config));
+  // .claude/CLAUDE.md: create on first init only; if it exists, add import line if missing
+  const claudeMdPath = p('.claude/CLAUDE.md');
+  let existingClaudeMd: string | null = null;
+  try {
+    existingClaudeMd = await readFile(claudeMdPath, 'utf-8');
+  } catch {
+    // file doesn't exist — write fresh
+  }
+  if (existingClaudeMd === null) {
+    await writeFile(claudeMdPath, generateUserClaudeMd());
+  } else if (!existingClaudeMd.includes('@.claude/TILLER.md')) {
+    await writeFile(claudeMdPath, '@.claude/TILLER.md\n\n' + existingClaudeMd);
+  }
+  // else: already has the import — leave unchanged
   await writeFile(p('.claude/settings.json'), generateSettingsJson(config));
   await writeFile(p('.claude/.tiller.json'), generateTillerManifest(config, TILLER_VERSION));
   await writeFile(p('.claude/.tiller-tech-debt.json'), generateTechDebtState());
