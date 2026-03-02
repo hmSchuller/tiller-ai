@@ -21,6 +21,17 @@
           }
         ]
       }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "clear",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/session-resume.sh"
+          }
+        ]
+      }
     ]
   },
   "permissions": {
@@ -28,7 +39,8 @@
       "Bash(git:*)",
       "Bash(npm:*)",
       "Bash(npx:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(echo:*)"
     ]
   }
 }
