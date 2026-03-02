@@ -103,7 +103,7 @@ describe('scaffold integration', () => {
     expect(content.threshold).toBe(3);
   });
 
-  it('creates all skills including tech-debt and scout', async () => {
+  it('creates all skills including tech-debt, scout, and repair-hull', async () => {
     expect(await exists('.claude/skills/setup/SKILL.md')).toBe(true);
     expect(await exists('.claude/skills/sail/SKILL.md')).toBe(true);
     expect(await exists('.claude/skills/anchor/SKILL.md')).toBe(true);
@@ -111,6 +111,8 @@ describe('scaffold integration', () => {
     expect(await exists('.claude/skills/dock/SKILL.md')).toBe(true);
     expect(await exists('.claude/skills/tech-debt/SKILL.md')).toBe(true);
     expect(await exists('.claude/skills/scout/SKILL.md')).toBe(true);
+    expect(await exists('.claude/skills/repair-hull/SKILL.md')).toBe(true);
+    expect(await read('.claude/skills/repair-hull/SKILL.md')).toContain('repair-hull');
   });
 
   it('creates all agent files', async () => {

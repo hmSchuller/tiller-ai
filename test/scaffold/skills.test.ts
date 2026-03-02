@@ -5,6 +5,7 @@ import { generateRecapSkill } from '../../src/scaffold/skills/recap.js';
 import { generateDockSkill } from '../../src/scaffold/skills/dock.js';
 import { generateTechDebtSkill } from '../../src/scaffold/skills/tech-debt.js';
 import { generateScoutSkill } from '../../src/scaffold/skills/scout.js';
+import { generateRepairHullSkill } from '../../src/scaffold/skills/repair-hull.js';
 import { simpleConfig, detailedConfig, teamSimpleConfig } from '../helpers/fixtures.js';
 
 describe('generateSailSkill', () => {
@@ -441,5 +442,79 @@ describe('generateDockSkill', () => {
     expect(result).toContain('escalate to captain');
     expect(result).toContain('subagent_type: "captain"');
     expect(result).toContain('log to tech-backlog.md');
+  });
+});
+
+describe('generateRepairHullSkill', () => {
+  it('has correct frontmatter name', () => {
+    expect(generateRepairHullSkill(simpleConfig)).toContain('name: repair-hull');
+  });
+
+  it('is user-invocable (description does not say "Not user-invocable")', () => {
+    expect(generateRepairHullSkill(simpleConfig)).not.toContain('Not user-invocable');
+  });
+
+  it('contains AskUserQuestion for item selection', () => {
+    expect(generateRepairHullSkill(simpleConfig)).toContain('AskUserQuestion');
+  });
+
+  it('delegates to Bosun via Task tool', () => {
+    const result = generateRepairHullSkill(simpleConfig);
+    expect(result).toContain('subagent_type: "bosun"');
+    expect(result).toContain('Task tool');
+  });
+
+  it('uses verify command from config', () => {
+    expect(generateRepairHullSkill(simpleConfig)).toContain('npm test');
+  });
+
+  it('uses verify command from config (detailed)', () => {
+    expect(generateRepairHullSkill(detailedConfig)).toContain('npm run verify');
+  });
+
+  it('contains chore branch pattern', () => {
+    expect(generateRepairHullSkill(simpleConfig)).toContain('chore/repair-hull-');
+  });
+
+  it('simple mode reports "Fixed: <desc>"', () => {
+    expect(generateRepairHullSkill(simpleConfig)).toContain('Fixed: <desc>');
+  });
+
+  it('detailed mode reports full summary', () => {
+    const result = generateRepairHullSkill(simpleConfig);
+    expect(result).toContain('detailed mode');
+    expect(result).toContain('Full summary');
+  });
+
+  it('reads tech-backlog.md for open items', () => {
+    expect(generateRepairHullSkill(simpleConfig)).toContain('tech-backlog.md');
+  });
+
+  it('handles empty backlog gracefully', () => {
+    expect(generateRepairHullSkill(simpleConfig)).toContain('No open items in tech-backlog.md');
+  });
+
+  it('merges with --no-ff', () => {
+    expect(generateRepairHullSkill(simpleConfig)).toContain('--no-ff');
+  });
+
+  it('includes stash and restore steps', () => {
+    const result = generateRepairHullSkill(simpleConfig);
+    expect(result).toContain('git stash');
+    expect(result).toContain('stash pop');
+  });
+
+  it('marks item done in tech-backlog.md after fix', () => {
+    expect(generateRepairHullSkill(simpleConfig)).toContain('Mark the item as done in');
+  });
+
+  it('supports $ARGUMENTS for direct item selection', () => {
+    expect(generateRepairHullSkill(simpleConfig)).toContain('$ARGUMENTS');
+  });
+
+  it('includes guardrails section', () => {
+    const result = generateRepairHullSkill(simpleConfig);
+    expect(result).toContain('Guardrails');
+    expect(result).toContain('MUST NOT');
   });
 });

@@ -18,6 +18,7 @@ import { generateDockSkill } from './skills/dock.js';
 import { generateSetupSkill } from './skills/setup.js';
 import { generateTechDebtSkill } from './skills/tech-debt.js';
 import { generateScoutSkill } from './skills/scout.js';
+import { generateRepairHullSkill } from './skills/repair-hull.js';
 import { generateTechDebtState } from './tech-debt-state.js';
 import { generateQuartermasterAgent } from './agents/quartermaster.js';
 import { generateBosunAgent } from './agents/bosun.js';
@@ -81,6 +82,7 @@ export async function scaffold(config: ProjectConfig, targetDir: string): Promis
   await writeFile(p('.claude/skills/dock/SKILL.md'), generateDockSkill(config));
   await writeFile(p('.claude/skills/tech-debt/SKILL.md'), generateTechDebtSkill(config));
   await writeFile(p('.claude/skills/scout/SKILL.md'), generateScoutSkill(config));
+  await writeFile(p('.claude/skills/repair-hull/SKILL.md'), generateRepairHullSkill(config));
 
   // Agents
   await writeFile(p('.claude/agents/quartermaster.md'), generateQuartermasterAgent(config));

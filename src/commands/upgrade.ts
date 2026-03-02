@@ -19,6 +19,7 @@ import { generateBosunAgent } from '../scaffold/agents/bosun.js';
 import { generateCaptainAgent } from '../scaffold/agents/captain.js';
 import { generateCartographerAgent } from '../scaffold/agents/cartographer.js';
 import { generateScoutSkill } from '../scaffold/skills/scout.js';
+import { generateRepairHullSkill } from '../scaffold/skills/repair-hull.js';
 import { generateTillerManifest, MANAGED_FILES, TILLER_VERSION, type TillerManifest } from '../scaffold/tiller-manifest.js';
 import type { ProjectConfig } from '../scaffold/types.js';
 
@@ -101,6 +102,7 @@ export async function upgradeCommand(opts: { yes?: boolean } = {}): Promise<void
     await writeFile(resolve(cwd, '.claude/skills/dock/SKILL.md'), generateDockSkill(config));
     await writeFile(resolve(cwd, '.claude/skills/tech-debt/SKILL.md'), generateTechDebtSkill(config));
     await writeFile(resolve(cwd, '.claude/skills/scout/SKILL.md'), generateScoutSkill(config));
+    await writeFile(resolve(cwd, '.claude/skills/repair-hull/SKILL.md'), generateRepairHullSkill(config));
     await writeFile(resolve(cwd, '.claude/agents/quartermaster.md'), generateQuartermasterAgent(config));
     await writeFile(resolve(cwd, '.claude/agents/bosun.md'), generateBosunAgent(config));
     await writeFile(resolve(cwd, '.claude/agents/captain.md'), generateCaptainAgent(config));
