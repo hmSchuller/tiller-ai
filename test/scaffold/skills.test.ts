@@ -13,6 +13,10 @@ describe('generateSailSkill', () => {
     expect(generateSailSkill(simpleConfig)).toContain('name: sail');
   });
 
+  it('has updated frontmatter description covering features, fixes, and tasks', () => {
+    expect(generateSailSkill(simpleConfig)).toContain('features, fixes, and tasks');
+  });
+
   it('produces the same template structure regardless of mode', () => {
     // Both configs have same mode-agnostic structure; only runCommand differs
     const simple = generateSailSkill(simpleConfig);
@@ -56,6 +60,34 @@ describe('generateSailSkill', () => {
 
   it('announces the current mode', () => {
     expect(generateSailSkill(simpleConfig)).toContain('Mode: <mode>');
+  });
+
+  it('supports fix/ branch prefix for bug-related arguments', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('fix/');
+    expect(result).toContain('broken');
+    expect(result).toContain('repair');
+  });
+
+  it('includes branch chaining logic when already on a feature branch', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('Clearly related');
+    expect(result).toContain('Clearly unrelated');
+    expect(result).toContain('Uncertain');
+  });
+
+  it('asks user when continuation vs new branch is uncertain', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('Should I continue on');
+    expect(result).toContain('start a new branch');
+  });
+
+  it('covers all four branch routing cases', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('$ARGUMENTS provided + already on a feature or fix branch');
+    expect(result).toContain('$ARGUMENTS provided + on main');
+    expect(result).toContain('No arguments + already on a feature or fix branch');
+    expect(result).toContain('No arguments + on main');
   });
 
   it('includes tech debt check step between branch routing and planning', () => {
