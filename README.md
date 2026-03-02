@@ -1,120 +1,83 @@
 # tiller-ai
 
-Scaffold Claude Code projects with a structured vibe loop — branch, build, commit, dock.
+[![npm](https://img.shields.io/npm/v/tiller-ai)](https://www.npmjs.com/package/tiller-ai)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Node ≥22](https://img.shields.io/badge/node-%3E%3D22-brightgreen)](https://nodejs.org)
 
-## What is this?
+**Give Claude Code a workflow it follows by default.**
 
-Tiller is a thin scaffold for Claude Code that turns a blank repo into a project Claude knows how to navigate. It installs a set of slash commands (skills), two `CLAUDE.md` files (one user-facing, one Tiller-managed), hooks for formatting and secret scanning, and shared tracking files. Once scaffolded, you describe work with `/sail`, anchor checkpoints with `/anchor`, and ship with `/dock` — and Claude follows the loop without you having to re-explain your workflow every session.
-
-When milestones are independent, `/sail` spawns parallel agent workers to build them simultaneously. Every three features, a tech debt cleanup runs automatically. Before any `/dock`, a code review agent (Quartermaster) inspects the diff and must pass before merging — with a Captain agent available to arbitrate disagreements.
+Tiller scaffolds a set of slash commands, agents, and shared tracking files into any repo. Once installed, Claude knows how to branch, build, review, and ship — without you explaining the loop every session.
 
 ## Quick start
 
 ```bash
-# 1. Scaffold a new project
+# 1. Scaffold into a new (or existing) repo
 npx tiller-ai init
 
-# 2. Open in Claude Code and run setup
+# 2. Open in Claude Code and run first-time setup
 /setup
 
-# 3. Start working
+# 3. Describe work and let Claude plan and build it
 /sail add a login page
 ```
+
+## How it works
+
+```
+/sail  →  Orient  →  Plan (detailed mode)  →  Build  →  Quartermaster review  →  /dock
+                                                 ↑
+                              independent milestones run in parallel via agent teams
+```
+
+Every `/sail`:
+- Claude reads `.claude/.tiller.json` and `changelog.md` to pick up where you left off
+- In `detailed` mode, Claude proposes a plan and waits for your go-ahead before touching files
+- Independent milestones are built in parallel using agent teams
+- Every 3 features, Bosun auto-runs a tech debt cleanup before planning starts
+- Quartermaster reviews the full diff; one round of negotiation; Captain arbitrates any impasse
+
+`/dock` merges to main (solo) or opens a PR (team), updates the changelog, and cleans up the branch.
 
 ## Skills
 
 | Command | What it does |
 |---|---|
-| `/setup` | First-run: understand the project and fill in `CLAUDE.md` |
-| `/sail [idea]` | Start or continue work; parallelizes independent milestones using agent teams; auto-runs tech debt cleanup every 3 features |
-| `/scout [topic]` | Pre-work investigation: explore the codebase, ask clarifying questions, produce a structured ticket |
-| `/anchor` | Anchor current progress on the feature branch |
-| `/dock` | Merge completed feature to main (solo) or open a PR (team) |
+| `/setup` | First-run: understand the project, fill in `CLAUDE.md` |
+| `/sail [idea]` | Plan and build; parallelizes independent milestones; auto-runs debt cleanup every 3 features |
+| `/scout [topic]` | Investigate a codebase area and produce a structured ticket |
+| `/anchor` | Commit current progress on the feature branch |
+| `/dock` | Merge to main (solo) or open a PR (team); update changelog; clean up branch |
 | `/recap` | Read-only status — active feature, notes |
+| `/repair-hull` | Pick a tech debt item from `tech-backlog.md` and fix it on demand |
 
-## Modes
+## Agents
 
-Tiller has two modes that control how Claude communicates:
+Four specialist agents run automatically — you never invoke them directly.
 
-**`simple`** — for non-technical users. Claude builds without narrating steps, surfaces only blockers, and keeps responses short and outcome-focused.
+| Agent | Role |
+|---|---|
+| **Quartermaster** | Reviews the feature diff before every `/dock`. Issues PASS or FAIL. Negotiates one round; escalates to Captain on impasse. |
+| **Bosun** | Scans for tech debt, logs to `tech-backlog.md`, fixes one small item per run. Auto-triggered every 3 features. |
+| **Captain** | Arbitrates Quartermaster/sailing-agent impasses. Final ruling — no further escalation. |
+| **Cartographer** | Updates `codebase-map.md` at `/dock` time so Claude has a structural overview at session start. |
 
-**`detailed`** — for technical users. Claude proposes an approach and waits for confirmation before touching files, narrates decisions, and surfaces trade-offs.
+## Modes & Workflows
 
-Switch modes at any time with the interactive config command:
+**Modes** control how Claude communicates:
+- `simple` — builds without narrating, surfaces only blockers, short outcome-focused responses
+- `detailed` — proposes approach and waits for confirmation before touching files, narrates decisions
+
+**Workflows** control how `/dock` behaves:
+- `solo` — merges feature branch to main locally, deletes branch
+- `team` — pushes branch, opens a PR via `gh` CLI (or prints URL), branch kept locally
+
+Switch at any time:
 
 ```bash
 npx tiller-ai config
 ```
 
-
-## Workflows
-
-Tiller supports two workflows that affect how `/dock` behaves:
-
-**`solo`** — single developer. `/dock` merges the feature branch into main locally and deletes the branch.
-
-**`team`** — multiple developers. `/dock` pushes the branch and opens a PR (via `gh` CLI if available, otherwise prints the URL). The branch is not deleted locally.
-
-The workflow is set during `init` and stored in `.claude/.tiller.json`. Each developer can override it locally in `.tiller.local.json` (gitignored).
-
-## What gets scaffolded
-
-```
-your-project/
-├── CLAUDE.md                              # User-facing: project name and description
-├── .gitignore                             # Ignores .tiller.local.json, common build artifacts
-├── changelog.md                           # Shared done log — updated by /dock on each merge
-├── tech-backlog.md                        # Persistent tech debt register — managed by Bosun
-├── codebase-map.md                        # Structural overview — generated by Cartographer at /dock time
-├── .claude/
-│   ├── CLAUDE.md                          # Tiller-managed: vibe loop rules, skill docs
-│   ├── settings.json                      # Hook registrations (PostToolUse, PreToolUse, UserPromptSubmit)
-│   ├── .tiller.json                       # Manifest: version, mode, workflow, runCommand, managedFiles
-│   ├── .tiller-tech-debt.json             # Tech debt state tracker (feature counter, last-run date)
-│   ├── agents/
-│   │   ├── quartermaster.md               # Code review agent — reviews diff before /dock
-│   │   ├── bosun.md                       # Tech debt agent — scans and fixes one item per run
-│   │   ├── captain.md                     # Arbitration agent — resolves dev/quartermaster impasse
-│   │   └── cartographer.md               # Codebase map agent — updates codebase-map.md at /dock time
-│   ├── hooks/
-│   │   ├── post-write.sh                  # PostToolUse: run formatter after file writes
-│   │   ├── secret-scan.sh                 # PreToolUse: block writes containing secrets
-│   │   └── session-resume.sh              # UserPromptSubmit: orient Claude at session start
-│   └── skills/
-│       ├── setup/SKILL.md                 # /setup skill
-│       ├── sail/SKILL.md                  # /sail skill
-│       ├── scout/SKILL.md                 # /scout skill
-│       ├── anchor/SKILL.md                # /anchor skill
-│       ├── dock/SKILL.md                  # /dock skill
-│       ├── recap/SKILL.md                 # /recap skill
-│       └── tech-debt/SKILL.md             # internal: auto-run by /sail every 3 features
-```
-
-**Per-dev local overrides** — `.tiller.local.json` (gitignored, not scaffolded) lets individual developers override `mode` and `workflow` without touching shared files.
-
-## The vibe loop
-
-Every piece of work follows this loop:
-
-1. **Orient** — Claude reads `.claude/.tiller.json` and `changelog.md` to understand project state and pick up any in-progress work
-2. **Plan** — in `detailed` mode, Claude writes out the proposed approach and waits for a go-ahead before touching files
-3. **Build** — Claude implements milestone by milestone, running the verify command after each. Independent milestones are parallelized using agent teams.
-4. **Review** — Quartermaster inspects the feature branch diff and issues PASS or FAIL before merging. One round of negotiation is allowed; unresolved disagreements go to the Captain.
-5. **Dock** — Claude reminds you to `/dock` when the feature is done; `/dock` merges to main (or opens a PR in team mode), updates the changelog, and cleans up the branch
-
-`changelog.md` is the shared done log — updated by `/dock` whenever a feature merges, so team members can see what's been shipped.
-
-## Agents
-
-Tiller ships four specialist agents that run automatically — you don't invoke them directly.
-
-**Quartermaster** — code reviewer. Spawned by `/sail` at the end of every feature. Reads the full diff against main and issues a PASS or FAIL verdict with specific comments. The sailing agent negotiates once; if they can't agree, the Captain arbitrates.
-
-**Bosun** — tech debt maintenance. Scans the codebase and logs issues to `tech-backlog.md` by severity. Fixes one small item per run. Auto-triggered by `/sail` every three features, so the backlog stays manageable without manual intervention.
-
-**Captain** — arbitrator. Only activated when the sailing agent and Quartermaster reach an impasse after one round of negotiation. Issues one of three rulings: agree with Quartermaster, agree with the sailing agent, or propose a compromise. Final word — no further escalation.
-
-**Cartographer** — codebase map maintainer. Spawned at `/dock` time to update `codebase-map.md` with current features and module paths. Gives Claude a structural overview at the start of every session, reducing orient time on large codebases.
+Per-dev override (gitignored, not scaffolded): create `.tiller.local.json` with `{ "mode": "simple", "workflow": "solo" }` to override shared settings locally.
 
 ## CLI reference
 
@@ -134,13 +97,13 @@ npx tiller-ai init --mode detailed --workflow team
 
 | Flag | Description |
 |---|---|
-| `-y, --yes` | Skip all prompts and use defaults |
+| `-y, --yes` | Skip all prompts, use defaults |
 | `--mode <mode>` | `simple` or `detailed` (default: `simple`) |
 | `--workflow <workflow>` | `solo` or `team` (default: `solo`) |
 
 ### `npx tiller-ai upgrade`
 
-Update Tiller-managed files (`.claude/CLAUDE.md`, `settings.json`, hooks, skills, agents) to the latest version without touching your `CLAUDE.md` or `changelog.md`.
+Update Tiller-managed files (`.claude/TILLER.md`, `settings.json`, hooks, skills, agents) to the latest version without touching your `changelog.md` or project-specific content.
 
 ```bash
 npx tiller-ai upgrade
@@ -155,11 +118,53 @@ npx tiller-ai upgrade --yes
 
 ### `npx tiller-ai config`
 
-Interactively update mode and workflow. Prompts for mode (`simple`/`detailed`), workflow (`solo`/`team`), and scope (`local` writes to `.tiller.local.json`, `project` updates the shared `.tiller.json`).
+Interactively update mode and workflow. Scope `local` writes to `.tiller.local.json`; scope `project` updates the shared `.tiller.json`.
 
 ```bash
 npx tiller-ai config
 ```
+
+## Scaffolded files
+
+<details>
+<summary>View full file tree</summary>
+
+```
+your-project/
+├── .gitignore                             # Tiller entries added (or appended if existing)
+├── changelog.md                           # Done log — updated by /dock on each merge
+├── tech-backlog.md                        # Tech debt register — managed by Bosun
+└── .claude/
+    ├── CLAUDE.md                          # Imports TILLER.md (one line: @.claude/TILLER.md)
+    ├── TILLER.md                          # Tiller-managed rules: vibe loop, skill docs, agents
+    ├── settings.json                      # Hook registrations (PostToolUse, PreToolUse, UserPromptSubmit)
+    ├── .tiller.json                       # Manifest: version, mode, workflow, runCommand, managedFiles
+    ├── .tiller-tech-debt.json             # Tech debt state tracker (feature counter, last-run date)
+    ├── agents/
+    │   ├── quartermaster.md               # Code review agent
+    │   ├── bosun.md                       # Tech debt agent
+    │   ├── captain.md                     # Arbitration agent
+    │   └── cartographer.md               # Codebase map agent
+    ├── hooks/
+    │   ├── post-write.sh                  # PostToolUse: run formatter after file writes
+    │   ├── secret-scan.sh                 # PreToolUse: block writes containing secrets
+    │   └── session-resume.sh              # UserPromptSubmit: orient Claude at session start
+    └── skills/
+        ├── setup/SKILL.md
+        ├── sail/SKILL.md
+        ├── scout/SKILL.md
+        ├── anchor/SKILL.md
+        ├── dock/SKILL.md
+        ├── recap/SKILL.md
+        ├── repair-hull/SKILL.md
+        └── tech-debt/SKILL.md             # Internal — auto-run by /sail every 3 features
+```
+
+Not scaffolded by `init`:
+- Root `CLAUDE.md` — created by `/setup` with project name and description
+- `codebase-map.md` — generated by Cartographer at first `/dock`
+
+</details>
 
 ## Requirements
 
