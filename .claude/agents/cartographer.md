@@ -27,6 +27,7 @@ Explore the codebase to understand its structure at a conceptual level:
    - A short noun-phrase name
    - The folder path(s) it spans
    - 2–3 sentences: what it does, why it exists, and which files are most important to read first
+
 Write the full `codebase-map.md` using the output format below.
 
 ### Phase 2b: Incremental update
