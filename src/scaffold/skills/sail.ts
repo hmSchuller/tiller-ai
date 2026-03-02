@@ -3,10 +3,12 @@ import type { ProjectConfig } from '../types.js';
 export function generateSailSkill(config: ProjectConfig): string {
   return `---
 name: sail
-description: Start or continue working on an idea. Usage: /sail [idea description]
+description: Start or continue work — features, fixes, and tasks. Usage: /sail [description]
 ---
 
 # /sail — Start or continue work
+
+Use this skill to contribute anything: new features, bug fixes, or incremental tasks on an existing branch. It handles branch routing automatically so you can focus on the work.
 
 ## Step 1: Orient
 
@@ -21,19 +23,39 @@ State the current mode from \`.claude/.tiller.json\` (or \`.tiller.local.json\` 
 
 ## Step 2: Branch routing
 
-**$ARGUMENTS provided** → check if a branch named \`feature/<kebab-case-of-arguments>\` already exists locally or remotely.
-  - If it exists: switch to it. Ask: "Found existing branch feature/<name>. Continue where we left off, or do you want to revisit the plan first?"
+### Branch prefix selection
+
+Before routing, determine the right branch prefix for $ARGUMENTS (if provided):
+- If the arguments clearly describe a bug fix (contains words like "fix", "bug", "broken", "repair", "crash", "error", "wrong", "incorrect") → use prefix \`fix/\`
+- Otherwise → use prefix \`feature/\`
+
+Convert $ARGUMENTS to kebab-case for the branch name (e.g. "fix broken auth redirect" → \`fix/broken-auth-redirect\`).
+
+### Routing cases
+
+**$ARGUMENTS provided + already on a feature or fix branch:**
+  Assess whether the arguments describe work that belongs on the current branch:
+  - **Clearly related** (same feature area, natural next step, continuation of current work) → stay on the current branch. Treat $ARGUMENTS as the next task description. Skip to Step 2.5.
+    - **simple:** Say: "Continuing on <branch-name>."
+    - **detailed:** State: "Continuing work on: <branch-name> — <task description>"
+  - **Clearly unrelated** (different domain, new feature, unrelated fix) → create a new \`<prefix>/<kebab>\` branch from main (same as the "on main" case below).
+  - **Uncertain** → ask the user: "Should I continue on \`<current-branch>\` (treating this as the next task), or start a new branch \`<prefix>/<kebab>\`?"
+    - Wait for the user's choice before continuing.
+
+**$ARGUMENTS provided + on main:**
+  Check if a branch named \`<prefix>/<kebab-case-of-arguments>\` already exists locally or remotely.
+  - If it exists: switch to it. Ask: "Found existing branch <prefix>/<name>. Continue where we left off, or do you want to revisit the plan first?"
     - Continue → pick up from the next unchecked milestone
     - Revisit → summarize what's done so far, discuss before building
   - If it doesn't exist: create it from main.
     - **simple:** Say: "On it."
-    - **detailed:** State: "Starting work on: <idea>"
+    - **detailed:** State: "Starting work on: <description>"
 
-**Already on a feature branch** → continue.
+**No arguments + already on a feature or fix branch** → continue.
   - **simple:** Say nothing unless asked.
   - **detailed:** State: "Continuing work on: <branch-name>"
 
-**Neither** → list open feature branches briefly, ask what to work on.
+**No arguments + on main** → list open feature and fix branches briefly, ask what to work on.
 
 ## Step 2.5: Tech debt check
 
