@@ -4,6 +4,7 @@ export function generateCartographerAgent(_config: ProjectConfig): string {
   return `---
 name: cartographer
 description: Codebase map maintainer. Runs at /dock time to keep codebase-map.md current.
+model: haiku
 tools: Read, Grep, Glob, Edit, Write, Bash, LS
 ---
 

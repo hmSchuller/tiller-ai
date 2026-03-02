@@ -4,6 +4,7 @@
 
 ## Done
 
+- [2026-03-02] feat: specify haiku model for cartographer agent — reduces cost and latency for map updates
 - [2026-03-02] chore: bump version to 0.3.0
 - [2026-03-02] docked feature/interactive-sail-interview
 - [2026-03-02] feat(sail): passive escape hatch for Step 2.7 interview — users can say "just build it" to skip; fixed stale test assertions
