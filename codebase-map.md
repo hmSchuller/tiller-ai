@@ -42,6 +42,7 @@ Static Astro site deployed to GitHub Pages. Nautical theme with navy/teal/gold p
 
 ## Shipped Features
 
+- `feature/is-readme-claudemd-and-website-in-sync` — synchronize documentation across README, .claude/CLAUDE.md, and website: 5-step vibe loop, /scout skill, and Cartographer agent reflected consistently
 - `feature/fix-upgrade-missing-cartographer-scout` — fix upgrade command: add missing `generateCartographerAgent`, `generateScoutSkill`, and `generateSettingsJson` imports and `writeFile` calls; fix all write paths to use `resolve(process.cwd(), ...)` instead of bare relative strings; add regression test asserting all MANAGED_FILES are written during upgrade
 - `feature/create-scout-skill` — add scout skill generator, native frontmatter (model/tools) to all four agent generators, simplified skill spawns to native subagent_type, and restructured cartographer self-assessment to report-only Structural Concerns
 - `feature/cartographer-coarser-map` — cartographer produces concern-level map (3–7 module sections by concern) with a Shipped Features list from changelog

@@ -6,9 +6,10 @@ describe('generateDotClaudeMd', () => {
   it('contains vibe loop instructions', () => {
     const result = generateDotClaudeMd(simpleConfig);
     expect(result).toContain('Orient');
-    expect(result).toContain('Confirm');
+    expect(result).toContain('Plan');
     expect(result).toContain('Build');
-    expect(result).toContain('Complete');
+    expect(result).toContain('Review');
+    expect(result).toContain('Dock');
   });
 
   it('lists all four skills', () => {
@@ -51,12 +52,13 @@ describe('generateDotClaudeMd', () => {
     expect(result).toContain('parallelized');
   });
 
-  it('has an Agents section listing all three agents', () => {
+  it('has an Agents section listing all four agents', () => {
     const result = generateDotClaudeMd(simpleConfig);
     expect(result).toContain('## Agents');
     expect(result).toContain('quartermaster');
     expect(result).toContain('bosun');
     expect(result).toContain('captain');
+    expect(result).toContain('cartographer');
   });
 
   it('notes which agents use opus model', () => {
