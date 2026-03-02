@@ -24,6 +24,7 @@ export const MANAGED_FILES = [
   '.claude/settings.json',
   '.claude/hooks/post-write.sh',
   '.claude/hooks/secret-scan.sh',
+  '.claude/hooks/session-resume.sh',
   '.claude/skills/setup/SKILL.md',
   '.claude/skills/sail/SKILL.md',
   '.claude/skills/anchor/SKILL.md',

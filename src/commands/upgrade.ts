@@ -5,6 +5,7 @@ import { resolve } from 'node:path';
 import { writeFile } from '../utils/fs.js';
 import { generatePostWriteHook } from '../scaffold/hooks/post-write.js';
 import { generateSecretScanHook } from '../scaffold/hooks/secret-scan.js';
+import { generateSessionResumeHook } from '../scaffold/hooks/session-resume.js';
 import { generateSetupSkill } from '../scaffold/skills/setup.js';
 import { generateSailSkill } from '../scaffold/skills/sail.js';
 import { generateAnchorSkill } from '../scaffold/skills/anchor.js';
@@ -92,6 +93,7 @@ export async function upgradeCommand(opts: { yes?: boolean } = {}): Promise<void
     await writeFile(resolve(cwd, '.claude/settings.json'), generateSettingsJson(config));
     await writeFile(resolve(cwd, '.claude/hooks/post-write.sh'), generatePostWriteHook(config));
     await writeFile(resolve(cwd, '.claude/hooks/secret-scan.sh'), generateSecretScanHook(config));
+    await writeFile(resolve(cwd, '.claude/hooks/session-resume.sh'), generateSessionResumeHook(config));
     await writeFile(resolve(cwd, '.claude/skills/setup/SKILL.md'), generateSetupSkill(config));
     await writeFile(resolve(cwd, '.claude/skills/sail/SKILL.md'), generateSailSkill(config));
     await writeFile(resolve(cwd, '.claude/skills/anchor/SKILL.md'), generateAnchorSkill(config));
