@@ -2,13 +2,14 @@ import { Command } from 'commander';
 import { initCommand } from './commands/init.js';
 import { upgradeCommand } from './commands/upgrade.js';
 import { configCommand } from './commands/config.js';
+import { TILLER_VERSION } from './scaffold/tiller-manifest.js';
 
 const program = new Command();
 
 program
   .name('tiller')
   .description('Scaffold Claude Code projects with a structured vibe loop')
-  .version('0.2.0');
+  .version(TILLER_VERSION);
 
 program
   .command('init')

@@ -10,6 +10,7 @@
 
 ## Done
 
+- [done 2026-03-02] src/index.ts: hardcoded version string '0.2.0' in program.version() — duplicated TILLER_VERSION from tiller-manifest.ts; now imports and uses TILLER_VERSION directly
 - [done 2026-02-28] src/scaffold/skills/setup.ts: stale /vibe reference in setup skill outro — should say /sail
 - [done 2026-02-28] src/scaffold/skills/tech-debt.ts: stale /vibe reference in skill frontmatter description — should say /sail
 - [done 2026-02-28] src/scaffold/hooks/session-resume.ts: stale /vibe reference in session-resume hook output — should say /sail
