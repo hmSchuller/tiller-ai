@@ -191,6 +191,58 @@ describe('generateSailSkill', () => {
     const result = generateSailSkill(simpleConfig);
     expect(result).toContain('codebase-map.md');
   });
+
+  it('includes Step 2.7 requirements interview', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('Step 2.7');
+    expect(result).toContain('Requirements Interview');
+  });
+
+  it('interview uses AskUserQuestion for structured questions', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('AskUserQuestion');
+    expect(result).toContain('Scope & goals');
+    expect(result).toContain('User-facing behavior');
+    expect(result).toContain('Edge cases & constraints');
+    expect(result).toContain('Acceptance criteria');
+  });
+
+  it('interview produces a Requirements Summary', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('Requirements Summary');
+    expect(result).toContain('anything to correct or add');
+  });
+
+  it('interview has skip condition for branch continuation', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('Skip condition');
+    expect(result).toContain('no new `$ARGUMENTS`');
+  });
+
+  it('detailed mode includes technical specification questions', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('detailed mode only');
+    expect(result).toContain('Technical specification');
+    expect(result).toContain('Architecture');
+    expect(result).toContain('Data flow & error handling');
+    expect(result).toContain('Testing strategy');
+    expect(result).toContain('API contracts & backwards compatibility');
+    expect(result).toContain('Performance');
+  });
+
+  it('simple mode includes core interview but not tech spec (runtime behavior)', () => {
+    // The template is mode-agnostic — both modes are in the same template.
+    // Phase 3 is gated by "detailed mode only" at runtime.
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('Phase 1: Core requirements');
+    expect(result).toContain('Phase 2: Freeform clarification');
+    expect(result).toContain('Phase 3 (detailed mode only)');
+  });
+
+  it('Step 3 references requirements summary from Step 2.7', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('requirements summary from Step 2.7');
+  });
 });
 
 describe('generateAnchorSkill', () => {
