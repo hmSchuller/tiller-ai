@@ -66,9 +66,54 @@ Before planning, check if a tech debt cleanup is due:
 4. If `tech-backlog.md` exists, check it for any `[critical]` items:
    - If critical items are found: **alert the user** before planning: "Critical debt items exist: <list them>. Proceed with the feature, or address critical debt first?"
    - Wait for user response before continuing to Step 3
-5. Continue to Step 3 regardless of whether the tech debt agent ran or critical items were found (unless user chooses to address debt first)
+5. Continue to Step 2.7 regardless of whether the tech debt agent ran or critical items were found (unless user chooses to address debt first)
+
+## Step 2.7: Requirements Interview
+
+Gather requirements from the user before planning. This eliminates ambiguity and reduces rework.
+
+### Skip condition
+
+Skip this step and go directly to Step 3 if:
+- Continuing on an existing branch with no new `$ARGUMENTS`
+- `$ARGUMENTS` clearly describes work related to the current branch (e.g. "fix the tests" on a feature branch you're already building)
+- The user explicitly asks to skip the interview (e.g. "just build it") — respect that and proceed to Step 3
+
+### How to interview
+
+Use any mix of `AskUserQuestion` (structured) and freeform conversational questions. There is no fixed phase ordering — cycle between structured and freeform as the conversation demands. Start wherever makes sense for the task, and keep going until no ambiguity remains.
+
+Tailor every question to the specific `$ARGUMENTS` and codebase context — do not ask generic questions.
+
+### Core topics (all modes)
+
+Cover these before moving on:
+- **Scope & goals**: What exactly should this feature/fix do? What's the expected outcome? What's explicitly out of scope?
+- **User-facing behavior**: Who/what triggers this? What does the user see or experience? What are the success and failure states?
+- **Edge cases & constraints**: Any known edge cases? Platform/environment constraints? Dependencies on external systems?
+- **Acceptance criteria**: How will we know this is done? Are there specific test scenarios?
+
+Also watch for and address:
+- Contradictions or ambiguities in answers
+- Interactions with existing features discovered during codebase exploration
+- Priority trade-offs (speed vs thoroughness, etc.)
+
+### Technical topics (detailed mode only)
+
+In detailed mode, also cover:
+- **Architecture**: Which existing patterns/modules to follow? Where should new code live?
+- **Data flow & error handling**: Input validation, error states, recovery behavior
+- **Testing strategy**: Unit vs integration, specific scenarios, mocking needs
+- **API contracts & backwards compatibility**: Breaking changes, migration path, versioning
+- **Performance**: Any latency/memory/scaling considerations?
+
+### Output
+
+Compile all answers into a **Requirements Summary** (bulleted list). Present it to the user: "Here's what I understand — anything to correct or add?" Wait for confirmation before proceeding to Step 3.
 
 ## Step 3: Plan milestones
+
+Use the requirements summary from Step 2.7 to inform milestone breakdown.
 
 **If mode is simple:** Explore the codebase and break the work into 2–5 milestones internally. Do not show this plan to the user. Tag each milestone as `[independent]` or `[depends-on: N]` based on whether it can run in parallel with others.
 
