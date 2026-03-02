@@ -42,9 +42,15 @@ describe('scaffold integration', () => {
     expect(await exists('CLAUDE.md')).toBe(false);
   });
 
-  it('creates .claude/CLAUDE.md', async () => {
+  it('creates .claude/CLAUDE.md with TILLER.md import', async () => {
     expect(await exists('.claude/CLAUDE.md')).toBe(true);
     const content = await read('.claude/CLAUDE.md');
+    expect(content).toContain('@.claude/TILLER.md');
+  });
+
+  it('creates .claude/TILLER.md with Tiller rules', async () => {
+    expect(await exists('.claude/TILLER.md')).toBe(true);
+    const content = await read('.claude/TILLER.md');
     expect(content).toContain('Vibe loop');
   });
 

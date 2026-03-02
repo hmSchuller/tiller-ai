@@ -1,5 +1,5 @@
 import { intro, outro, confirm, spinner, isCancel, cancel } from '@clack/prompts';
-import { readFile, unlink } from 'node:fs/promises';
+import { readFile, unlink, writeFile as fsWriteFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { writeFile } from '../utils/fs.js';
@@ -11,7 +11,7 @@ import { generateAnchorSkill } from '../scaffold/skills/anchor.js';
 import { generateRecapSkill } from '../scaffold/skills/recap.js';
 import { generateDockSkill } from '../scaffold/skills/dock.js';
 import { generateTechDebtSkill } from '../scaffold/skills/tech-debt.js';
-import { generateDotClaudeMd } from '../scaffold/claude-md.js';
+import { generateTillerMd } from '../scaffold/claude-md.js';
 import { generateSettingsJson } from '../scaffold/settings-json.js';
 import { generateQuartermasterAgent } from '../scaffold/agents/quartermaster.js';
 import { generateBosunAgent } from '../scaffold/agents/bosun.js';
@@ -59,8 +59,11 @@ export async function upgradeCommand(opts: { yes?: boolean } = {}): Promise<void
     workflow: manifest.workflow ?? 'solo',
   };
 
-  // Remove files that were managed by the old version but are no longer managed
-  const staleFiles = (manifest.managedFiles ?? []).filter((f) => !MANAGED_FILES.includes(f));
+  // Remove files that were managed by the old version but are no longer managed.
+  // Never delete .claude/CLAUDE.md — it is user-owned content.
+  const staleFiles = (manifest.managedFiles ?? []).filter(
+    (f) => !MANAGED_FILES.includes(f) && f !== '.claude/CLAUDE.md'
+  );
   for (const f of staleFiles) {
     try {
       await unlink(resolve(process.cwd(), f));
@@ -74,7 +77,18 @@ export async function upgradeCommand(opts: { yes?: boolean } = {}): Promise<void
 
   const cwd = process.cwd();
   try {
-    await writeFile(resolve(cwd, '.claude/CLAUDE.md'), generateDotClaudeMd(config));
+    await writeFile(resolve(cwd, '.claude/TILLER.md'), generateTillerMd(config));
+    // Ensure .claude/CLAUDE.md has the import line; never overwrite user content
+    const claudeMdPath = resolve(cwd, '.claude/CLAUDE.md');
+    let existingClaudeMd: string | null = null;
+    try {
+      existingClaudeMd = await readFile(claudeMdPath, 'utf-8');
+    } catch {
+      // file doesn't exist
+    }
+    if (existingClaudeMd !== null && !existingClaudeMd.includes('@.claude/TILLER.md')) {
+      await fsWriteFile(claudeMdPath, '@.claude/TILLER.md\n\n' + existingClaudeMd, 'utf-8');
+    }
     await writeFile(resolve(cwd, '.claude/settings.json'), generateSettingsJson(config));
     await writeFile(resolve(cwd, '.claude/hooks/post-write.sh'), generatePostWriteHook(config));
     await writeFile(resolve(cwd, '.claude/hooks/secret-scan.sh'), generateSecretScanHook(config));

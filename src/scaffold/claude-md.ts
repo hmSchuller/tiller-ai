@@ -1,9 +1,7 @@
 import type { ProjectConfig } from './types.js';
 
-export function generateDotClaudeMd(_config: ProjectConfig): string {
+export function generateTillerMd(_config: ProjectConfig): string {
   return `# Tiller — How to work
-
-> These rules are managed by Tiller. Do not edit manually.
 
 ## Modes
 
@@ -90,4 +88,8 @@ Tiller provides four specialist agents in \`.claude/agents/\`. They are native C
 - Do not make architectural changes without explicit confirmation in detailed mode
 - Keep commits atomic and descriptive
 `;
+}
+
+export function generateUserClaudeMd(): string {
+  return `@.claude/TILLER.md\n`;
 }
