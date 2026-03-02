@@ -4,6 +4,7 @@
 
 ## Done
 
+- [2026-03-02] docked feature/bump-version-to-0-3-1
 - [2026-03-02] chore: bump version to 0.3.1
 - [2026-03-02] feat: specify haiku model for cartographer agent — reduces cost and latency for map updates
 - [2026-03-02] chore: bump version to 0.3.0
