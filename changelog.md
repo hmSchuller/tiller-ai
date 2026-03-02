@@ -4,6 +4,7 @@
 
 ## Done
 
+- [2026-03-02] docked feature/bump-version-to-0-2-3
 - [2026-03-02] docked feature/overhaul-website
 - [2026-03-02] overhaul website — clear value prop, problem section, restructured features and workflow
 - [2026-03-02] docked feature/polish-readme
