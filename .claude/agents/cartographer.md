@@ -27,8 +27,6 @@ Explore the codebase to understand its structure at a conceptual level:
    - A short noun-phrase name
    - The folder path(s) it spans
    - 2–3 sentences: what it does, why it exists, and which files are most important to read first
-4. Read `changelog.md` and collect all shipped features (lines matching `- [.*] docked feature/` or `- [.*] landed feature/`). List them in the Features section of the map.
-
 Write the full `codebase-map.md` using the output format below.
 
 ### Phase 2b: Incremental update
@@ -49,8 +47,6 @@ For each changed path:
 - If it belongs to an existing module section: update the description only if the change meaningfully alters what that area does
 - If it introduces a genuinely new concern not covered by any existing section: add a new module section
 - If a concern was removed entirely: remove its section
-
-Also prepend the newly docked feature to the **Shipped Features** list (read its description from the changelog entry).
 
 Do not rewrite module sections that were not meaningfully touched by the docked feature.
 
@@ -77,15 +73,10 @@ Do not rewrite module sections that were not meaningfully touched by the docked 
 
 <Description.>
 
-## Shipped Features
-
-- `feature/<name>` — <one-line description of what it added or changed>
-- `feature/<name>` — <one-line description>
 ```
 
 Rules:
 - **Modules**: 3–7 sections max. Group by concern, not by file. A folder with 10 generators is one section, not 10.
-- **Shipped Features**: one line per docked/landed feature from `changelog.md`, newest first. Include the feature branch name so agents can correlate with git log.
 - Keep everything concise — this map is scanned in seconds at the start of a session, not read in full.
 
 ## Self-assessment
@@ -110,4 +101,4 @@ Do NOT spawn other agents yourself. The calling skill will decide whether to esc
 After updating `codebase-map.md`:
 
 **simple mode:** Say nothing unless there are Structural Concerns. If concerns exist: "Note: [module] looks tangled — flagged for review."
-**detailed mode:** "Codebase map updated. <N> features mapped. <Added/updated/removed: X sections.>" If concerns exist, add: "Flagged [module] as potentially tangled — see Structural Concerns section."
+**detailed mode:** "Codebase map updated. <Added/updated/removed: X sections.>" If concerns exist, add: "Flagged [module] as potentially tangled — see Structural Concerns section."
