@@ -4,6 +4,7 @@
 
 ## Done
 
+- [2026-03-02] chore: bump version to 0.3.0
 - [2026-03-02] docked feature/interactive-sail-interview
 - [2026-03-02] feat(sail): passive escape hatch for Step 2.7 interview — users can say "just build it" to skip; fixed stale test assertions
 - [2026-03-02] feat(sail): add Step 2.7 requirements interview — structured AskUserQuestion phases, freeform clarification, detailed-mode tech spec, skip condition for branch continuation
