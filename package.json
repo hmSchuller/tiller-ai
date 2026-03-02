@@ -15,7 +15,8 @@
     "dev": "tsup --watch",
     "test": "vitest run",
     "test:watch": "vitest",
-    "regen": "tsx scripts/regen-skills.ts"
+    "regen": "tsx scripts/regen-skills.ts",
+    "prepublishOnly": "npm run build && npm test && tsx scripts/prepublish-check.ts"
   },
   "dependencies": {
     "@clack/prompts": "^0.9.1",
