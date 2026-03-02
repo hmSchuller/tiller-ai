@@ -4,6 +4,7 @@
 
 ## Done
 
+- [2026-03-02] docked feature/improve-sail-skill
 - [2026-03-02] feat(sail): smarter branch routing — chaining intelligence (related/unrelated/uncertain), fix/ prefix for bug fixes, updated description
 - [2026-03-02] docked feature/bump-version-to-0-2-3
 - [2026-03-02] docked feature/overhaul-website
