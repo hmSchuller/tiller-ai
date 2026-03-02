@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { mkdtemp, rm, readFile, writeFile, mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { generateTillerManifest } from '../../src/scaffold/tiller-manifest.js';
+import { generateTillerManifest, TILLER_VERSION } from '../../src/scaffold/tiller-manifest.js';
 
 vi.mock('@clack/prompts', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@clack/prompts')>();
@@ -16,8 +16,6 @@ vi.mock('@clack/prompts', async (importOriginal) => {
     isCancel: vi.fn((val) => val === Symbol.for('clack/cancel')),
   };
 });
-
-const TILLER_VERSION = '0.2.1';
 
 async function setupProject(
   tmpDir: string,

@@ -1,6 +1,7 @@
 import type { ProjectConfig } from './types.js';
 
-export const TILLER_VERSION = '0.2.1';
+declare const __PKG_VERSION__: string;
+export const TILLER_VERSION: string = __PKG_VERSION__;
 
 export type TillerManifest = {
   version: string;
