@@ -4,7 +4,7 @@
 
 ## Done
 
-- [2026-03-02] in progress feature/cartographer-remove-shipped-features-list — remove Shipped Features section from cartographer agent and codebase-map.md; changelog.md is the canonical source
+- [2026-03-02] docked feature/cartographer-remove-shipped-features-list
 - [2026-03-02] docked feature/sail-embed-post-build-steps-in-plan
 - [2026-03-02] feat: inline PASS/FAIL/ESCALATE protocol into sail plan execution rules — plan is now fully self-contained after context clear
 - [2026-03-02] docked feature/is-readme-claudemd-and-website-in-sync
