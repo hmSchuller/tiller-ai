@@ -41,16 +41,15 @@ const base = import.meta.env.BASE_URL;
 
     <!-- Heading -->
     <h1 id="hero-heading" class="hero-heading">
-      Steer your<br/>
-      <em>AI coding</em><br/>
-      sessions
+      Give Claude Code<br/>
+      a <em>workflow</em>
     </h1>
 
     <!-- Subtitle -->
     <p class="hero-subtitle">
-      Tiller scaffolds Claude Code projects with a structured vibe loop —
-      orient, plan, build, review, dock — so every AI coding session stays
-      focused and ships clean code.
+      One command scaffolds slash commands, review agents, and tracking files
+      into your repo — so Claude knows how to branch, plan, build, review,
+      and ship by default.
     </p>
 
     <!-- CTA code block -->
@@ -70,16 +69,13 @@ const base = import.meta.env.BASE_URL;
           <span class="copy-text">Copy</span>
         </button>
       </div>
-      <p class="cta-note">Works with Claude Code. Node.js 22+ required.</p>
+      <p class="cta-note">Works with Claude Code · 30 seconds to install, zero config after</p>
     </div>
 
     <!-- Supporting links -->
     <div class="hero-links">
-      <a href="#how-it-works" class="hero-link-primary">
-        See how it works
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" aria-hidden="true">
-          <path d="M8 2l6 6-6 6M2 8h12"/>
-        </svg>
+      <a href="#how-it-works" class="hero-btn-primary">
+        See the workflow &rarr;
       </a>
       <a href="https://github.com/hmschuller/tiller-ai" class="hero-link-secondary" target="_blank" rel="noopener noreferrer">
         View on GitHub
@@ -102,7 +98,7 @@ const base = import.meta.env.BASE_URL;
     color: var(--text-inverse);
     padding: var(--space-32) 0 0;
     overflow: hidden;
-    min-height: 92vh;
+    min-height: auto;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
@@ -126,6 +122,7 @@ const base = import.meta.env.BASE_URL;
   }
 
   .hero-compass {
+    display: none;
     position: absolute;
     right: -8%;
     top: 50%;
@@ -135,8 +132,9 @@ const base = import.meta.env.BASE_URL;
     color: var(--cream-100);
   }
 
-  @media (min-width: 768px) {
+  @media (min-width: 1024px) {
     .hero-compass {
+      display: block;
       right: -5%;
       width: min(55vw, 520px);
     }
@@ -270,20 +268,22 @@ const base = import.meta.env.BASE_URL;
     flex-wrap: wrap;
   }
 
-  .hero-link-primary {
+  .hero-btn-primary {
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
     font-size: var(--text-base);
     font-weight: 600;
-    color: var(--teal-300);
+    color: var(--white);
+    background-color: var(--teal-500);
+    padding: var(--space-3) var(--space-6);
+    border-radius: var(--radius-md);
     text-decoration: none;
-    transition: gap var(--transition-fast), color var(--transition-fast);
+    transition: background-color var(--transition-fast);
   }
 
-  .hero-link-primary:hover {
-    color: var(--teal-100);
-    gap: var(--space-3);
+  .hero-btn-primary:hover {
+    background-color: var(--teal-400);
   }
 
   .hero-link-secondary {

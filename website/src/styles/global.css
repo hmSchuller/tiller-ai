@@ -220,6 +220,14 @@ ul, ol {
   }
 }
 
+/* --- Text gradient utility --- */
+.text-gradient {
+  background: linear-gradient(135deg, var(--gold-400), var(--gold-300), var(--gold-500));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 /* --- Print --- */
 @media print {
   .header,

@@ -4,6 +4,7 @@
 
 ## Done
 
+- [2026-03-02] overhaul website — clear value prop, problem section, restructured features and workflow
 - [2026-03-02] docked feature/polish-readme
 - [2026-03-02] docked feature/add-repair-hull-skill
 - [2026-03-02] docked feature/tiller-md-instead-of-claude-md-ownership

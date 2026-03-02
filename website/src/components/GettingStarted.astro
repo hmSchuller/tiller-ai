@@ -1,37 +1,49 @@
 ---
 import CodeBlock from './CodeBlock.astro';
 
-const initCode = `# Install Tiller into your project
-npx tiller-ai init
+const initCode = `$ npx tiller-ai init
 
-# Answer a few questions:
-#   Project name?  my-app
-#   Run command?   npm test
-#   Mode?          detailed
+  ✓ Project name: my-app
+  ✓ Run command: npm test
+  ✓ Mode: detailed
 
-# Change settings any time:
-npx tiller-ai config`;
+  Writing files:
+    CLAUDE.md
+    .claude/CLAUDE.md
+    .claude/skills/sail.md
+    .claude/skills/dock.md
+    .claude/hooks/secret-scan.sh
+    ... 12 files total
 
-const setupCode = `# Inside Claude Code, run:
-/setup
+  ✓ All files written
+  ✓ Git commit: "chore: scaffold Tiller workflow"
 
-# Tiller reads your project and configures:
-#  - CLAUDE.md with project context
-#  - .claude/CLAUDE.md with workflow rules
-#  - Verify command, mode, workflow`;
+  Done. Open Claude Code and run /setup to finish.`;
 
-const vibeCode = `# Start a feature with a plain-English description:
-/sail add a search bar to the dashboard
+const setupCode = `$ claude
+> /setup
 
-# Claude will:
-#  1. Orient — read context files
-#  2. Plan — show a milestone plan
-#  3. Build — implement milestone by milestone
-#  4. Review — Quartermaster inspects the diff
-#  5. Dock — merge, update changelog, clean up
+  Reading project structure...
+  ✓ Detected: TypeScript + React + Vitest
+  ✓ Updated CLAUDE.md with project context
+  ✓ Verify command set: npm test
+  ✓ Mode: detailed
 
-# When done, land the feature:
-/dock`;
+  Ready to sail.`;
+
+const sailCode = `$ claude
+> /sail add search to the dashboard
+
+  ✓ Branch: feature/add-search
+  ✓ Plan: 3 milestones — approved
+  ✓ Milestone 1: search API endpoint — done
+  ✓ Milestone 2: search UI component — done
+  ✓ Milestone 3: integration tests — done
+  ✓ Quartermaster review: PASS
+
+> /dock
+  ✓ Merged feature/add-search → main
+  ✓ Changelog updated`;
 ---
 
 <section class="getting-started" id="getting-started" aria-labelledby="gs-heading">
@@ -57,8 +69,6 @@ const vibeCode = `# Start a feature with a plain-English description:
             Run <code>npx tiller-ai init</code> in your project root.
             Tiller scaffolds all the config files, slash commands, and
             git hooks you need — committed straight to your repo.
-            Run <code>npx tiller-ai config</code> any time to switch
-            mode or workflow.
           </p>
         </div>
         <div class="step-code">
@@ -74,7 +84,7 @@ const vibeCode = `# Start a feature with a plain-English description:
       </div>
 
       <!-- Step 2 -->
-      <div class="step-row step-row--reverse">
+      <div class="step-row">
         <div class="step-meta">
           <div class="step-badge">Step 2</div>
           <h3 class="step-title">Run /setup</h3>
@@ -100,15 +110,15 @@ const vibeCode = `# Start a feature with a plain-English description:
       <div class="step-row">
         <div class="step-meta">
           <div class="step-badge">Step 3</div>
-          <h3 class="step-title">Start sailing</h3>
+          <h3 class="step-title">Start building</h3>
           <p class="step-description">
             Describe what you want to build. Claude plans it in milestones,
-            builds it cleanly, and commits each step. When you're happy,
-            <code>/dock</code> ships it.
+            builds it cleanly, reviews the diff, and commits each step. When
+            you're happy, <code>/dock</code> ships it.
           </p>
         </div>
         <div class="step-code">
-          <CodeBlock code={vibeCode} language="bash" label="Claude Code" />
+          <CodeBlock code={sailCode} language="bash" label="Claude Code" />
         </div>
       </div>
     </div>
@@ -177,14 +187,6 @@ const vibeCode = `# Start a feature with a plain-English description:
       grid-template-columns: 1fr 1fr;
       gap: var(--space-12);
       align-items: center;
-    }
-
-    .step-row--reverse .step-meta {
-      order: 2;
-    }
-
-    .step-row--reverse .step-code {
-      order: 1;
     }
   }
 

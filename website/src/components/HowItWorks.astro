@@ -2,37 +2,50 @@
 const steps = [
   {
     number: '01',
-    label: 'Orient',
-    title: 'Read the context',
-    body: 'Claude reads .tiller.json and changelog.md to understand the project config and history, then checks git branch to pick up any in-progress work.',
-    color: 'navy',
+    label: 'Plan',
+    title: 'Read context, then plan',
+    body: 'Claude reads the codebase map, project config, and changelog — then creates a feature branch and writes milestones before touching code. The map is a self-managed asset that stays current as the project grows.',
+    code: `$ /sail add search to the dashboard
+
+  ✓ Read codebase-map.md
+  ✓ Read .tiller.json + changelog
+  ✓ Branch: feature/add-search
+  ✓ Plan: 3 milestones — waiting for approval`,
+    color: 'teal',
   },
   {
     number: '02',
-    label: 'Plan',
-    title: 'Milestones before code',
-    body: 'In detailed mode, Claude writes out milestones and waits for your go-ahead. Checks the tech backlog for critical debt before planning begins.',
-    color: 'teal',
-  },
-  {
-    number: '03',
     label: 'Build',
     title: 'Milestone by milestone',
-    body: 'Each milestone includes implementation, tests, and a commit. Independent milestones run in parallel via agent teams.',
+    body: 'Each milestone includes implementation, tests, and a commit. Independent milestones run in parallel.',
+    code: `  ✓ Milestone 1: search API endpoint
+  ✓ Milestone 2: search UI component
+  ⠋ Milestone 3: integration tests`,
     color: 'gold',
   },
   {
-    number: '04',
+    number: '03',
     label: 'Review',
-    title: 'Quartermaster inspects',
-    body: 'An independent review agent checks the diff for test gaps, correctness risks, and code quality. No feature ships without a PASS verdict.',
+    title: 'Independent code review',
+    body: 'The Quartermaster agent inspects every diff for test gaps, correctness risks, and code quality.',
+    code: `  Quartermaster Review
+  Files changed: 6  (+142 / -38)
+  ✓ Tests: all paths covered
+  ✓ Security: clean
+  Verdict: PASS`,
     color: 'teal',
   },
   {
-    number: '05',
-    label: 'Dock',
+    number: '04',
+    label: 'Ship',
     title: 'Merge and clean up',
-    body: 'When review passes, /dock merges to main (or opens a PR in team mode). Changelog updated, branch cleaned up, everything tidy.',
+    body: 'When review passes, /dock merges to main, updates the changelog, refreshes the codebase map, and cleans up the branch.',
+    code: `$ /dock
+
+  ✓ Merged feature/add-search → main
+  ✓ Changelog updated
+  ✓ Codebase map refreshed
+  ✓ Branch cleaned up`,
     color: 'cream',
   },
 ];
@@ -49,12 +62,12 @@ const steps = [
   <div class="hiw-body">
     <div class="container">
       <div class="section-header">
-        <p class="section-eyebrow">The vibe loop</p>
+        <p class="section-eyebrow">The development cycle</p>
         <h2 id="hiw-heading" class="section-heading">
           How it works
         </h2>
         <p class="section-subtitle">
-          Every feature follows the same five-step loop — keeping AI sessions
+          Every feature follows the same four-step cycle — keeping AI sessions
           predictable and your codebase clean.
         </p>
       </div>
@@ -62,21 +75,6 @@ const steps = [
       <div class="steps">
         {steps.map((step, i) => (
           <div class={`step step--${step.color}`}>
-            <!-- Connector rope line (not last) -->
-            {i < steps.length - 1 && (
-              <div class="step-connector" aria-hidden="true">
-                <svg viewBox="0 0 40 80" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-                  <path
-                    d="M20 0 C20 0, 28 20, 20 40 C12 60, 20 80, 20 80"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-dasharray="4 4"
-                    opacity="0.3"
-                  />
-                </svg>
-              </div>
-            )}
-
             <div class="step-inner">
               <div class="step-number-wrap">
                 <span class="step-number">{step.number}</span>
@@ -85,6 +83,9 @@ const steps = [
               <div class="step-content">
                 <h3 class="step-title">{step.title}</h3>
                 <p class="step-body">{step.body}</p>
+              </div>
+              <div class="step-code">
+                <pre><code>{step.code}</code></pre>
               </div>
             </div>
           </div>
@@ -159,43 +160,23 @@ const steps = [
 
   /* Steps */
   .steps {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
     max-width: 760px;
     margin: 0 auto;
   }
 
   @media (min-width: 768px) {
     .steps {
-      flex-direction: row;
-      align-items: stretch;
-      gap: var(--space-4);
+      grid-template-columns: 1fr 1fr;
       max-width: 100%;
     }
   }
 
   .step {
     position: relative;
-    flex: 1;
-  }
-
-  .step-connector {
-    display: flex;
-    justify-content: center;
-    height: 40px;
-    color: var(--navy-200);
-  }
-
-  .step-connector svg {
-    height: 40px;
-    width: 30px;
-  }
-
-  @media (min-width: 768px) {
-    .step-connector {
-      display: none;
-    }
+    min-width: 0;
   }
 
   .step-inner {
@@ -208,6 +189,8 @@ const steps = [
     flex-direction: column;
     gap: var(--space-4);
     transition: background-color var(--transition-base);
+    min-width: 0;
+    overflow: hidden;
   }
 
   .step-inner:hover {
@@ -227,7 +210,6 @@ const steps = [
     line-height: 1;
   }
 
-  .step--navy .step-number { color: var(--navy-200); }
   .step--teal .step-number { color: var(--teal-300); }
   .step--gold .step-number { color: var(--gold-300); }
   .step--cream .step-number { color: var(--cream-200); }
@@ -254,5 +236,25 @@ const steps = [
     color: var(--text-inverse-muted);
     line-height: 1.65;
     margin: 0;
+  }
+
+  .step-code {
+    margin-top: auto;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .step-code pre {
+    margin: 0;
+    padding: var(--space-4);
+  }
+
+  .step-code code {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    line-height: 1.6;
+    color: var(--cream-200);
+    white-space: pre;
   }
 </style>
