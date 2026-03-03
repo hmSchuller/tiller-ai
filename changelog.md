@@ -3,6 +3,7 @@
 > Shared project history. Updated by /sail, /anchor, and /dock. Committed and shared.
 
 ## Done
+- [2026-03-03] docked feature/upgrade-instructions-in-tiller-md
 
 - [2026-03-02] docked feature/bump-version-to-0-3-1
 - [2026-03-02] chore: bump version to 0.3.1
