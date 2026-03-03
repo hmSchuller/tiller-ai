@@ -80,6 +80,22 @@ describe('generateTillerMd', () => {
     expect(result).toContain('codebase-map.md');
   });
 
+  it('has an Upgrading section with key commands', () => {
+    const result = generateTillerMd(simpleConfig);
+    expect(result).toContain('## Upgrading');
+    expect(result).toContain('npx tiller-ai --version');
+    expect(result).toContain('npm view tiller-ai version');
+    expect(result).toContain('npx tiller-ai upgrade --yes');
+  });
+
+  it('Upgrading section appears before Skills section', () => {
+    const result = generateTillerMd(simpleConfig);
+    const upgradingIdx = result.indexOf('## Upgrading');
+    const skillsIdx = result.indexOf('## Skills');
+    expect(upgradingIdx).toBeGreaterThan(-1);
+    expect(skillsIdx).toBeGreaterThan(upgradingIdx);
+  });
+
   it('does not contain "Do not edit manually" header', () => {
     const result = generateTillerMd(simpleConfig);
     expect(result).not.toContain('Do not edit manually');
