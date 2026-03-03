@@ -96,6 +96,10 @@ describe('scaffold integration', () => {
     expect(await exists('.claude/hooks/session-resume.sh')).toBe(true);
   });
 
+  it('creates plan-context.sh hook', async () => {
+    expect(await exists('.claude/hooks/plan-context.sh')).toBe(true);
+  });
+
   it('creates .tiller/tech-debt.json with correct defaults', async () => {
     expect(await exists('.tiller/tech-debt.json')).toBe(true);
     const content = JSON.parse(await read('.tiller/tech-debt.json'));

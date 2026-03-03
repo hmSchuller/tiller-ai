@@ -23,6 +23,7 @@ export const MANAGED_FILES = [
   '.claude/hooks/post-write.sh',
   '.claude/hooks/secret-scan.sh',
   '.claude/hooks/session-resume.sh',
+  '.claude/hooks/plan-context.sh',
   '.claude/skills/setup/SKILL.md',
   '.claude/skills/sail/SKILL.md',
   '.claude/skills/anchor/SKILL.md',

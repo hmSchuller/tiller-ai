@@ -11,6 +11,7 @@ import { generateTillerManifest, TILLER_VERSION } from './tiller-manifest.js';
 import { generatePostWriteHook } from './hooks/post-write.js';
 import { generateSecretScanHook } from './hooks/secret-scan.js';
 import { generateSessionResumeHook } from './hooks/session-resume.js';
+import { generatePlanContextHook } from './hooks/plan-context.js';
 import { generateSailSkill } from './skills/sail.js';
 import { generateAnchorSkill } from './skills/anchor.js';
 import { generateRecapSkill } from './skills/recap.js';
@@ -76,6 +77,7 @@ export async function scaffold(config: ProjectConfig, targetDir: string): Promis
   await writeFile(p('.claude/hooks/post-write.sh'), generatePostWriteHook(config));
   await writeFile(p('.claude/hooks/secret-scan.sh'), generateSecretScanHook(config));
   await writeFile(p('.claude/hooks/session-resume.sh'), generateSessionResumeHook(config));
+  await writeFile(p('.claude/hooks/plan-context.sh'), generatePlanContextHook(config));
 
   // Skills
   await writeFile(p('.claude/skills/setup/SKILL.md'), generateSetupSkill(config));

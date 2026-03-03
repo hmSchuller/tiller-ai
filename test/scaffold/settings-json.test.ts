@@ -53,4 +53,16 @@ describe('generateSettingsJson', () => {
     const result = generateSettingsJson(simpleConfig);
     expect(result).toContain('session-resume.sh');
   });
+
+  it('includes SubagentStart hook with Plan matcher', () => {
+    const result = JSON.parse(generateSettingsJson(simpleConfig));
+    const subagentHooks = result.hooks.SubagentStart;
+    expect(subagentHooks).toBeDefined();
+    expect(subagentHooks[0].matcher).toBe('Plan');
+  });
+
+  it('references plan-context.sh', () => {
+    const result = generateSettingsJson(simpleConfig);
+    expect(result).toContain('plan-context.sh');
+  });
 });
