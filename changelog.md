@@ -3,6 +3,7 @@
 > Shared project history. Updated by /sail, /anchor, and /dock. Committed and shared.
 
 ## Done
+- [2026-03-03] feat: add Ways to Work persona section to website — three persona cards (Solo Creator, Solo Developer, Engineering Team) replacing generic "Two Modes" card; responsive layout 1→2→3 columns; updated all Claude→Claude Code references for clarity
 - [2026-03-03] docked feature/compass-md-detailed-mode
 - [2026-03-03] fix: create compass.md during sail if missing (upgraded projects without init don't get left without a compass)
 - [2026-03-03] feat: restore compass.md as local sail waypoint for detailed mode — gitignored checklist persists branch/milestones/stages across context clears; wired into orient, plan, build, review, and session-resume hook; upgrade command now syncs gitignore entries
