@@ -63,6 +63,19 @@ Create \`.tiller.local.json\` (gitignored) to override mode or workflow personal
 \`\`\`
 Skills read \`.tiller.local.json\` first, then fall back to \`.claude/.tiller.json\`.
 
+## Upgrading
+
+To check if a newer version of Tiller is available:
+\`\`\`
+npx tiller-ai --version      # current version installed in this project
+npm view tiller-ai version   # latest published version
+\`\`\`
+
+To upgrade (non-interactive, safe for agents to run):
+\`\`\`
+npx tiller-ai upgrade --yes
+\`\`\`
+
 ## Skills
 
 - **/setup** — first-run: understand the project and configure CLAUDE.md
