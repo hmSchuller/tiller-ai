@@ -234,7 +234,7 @@ describe('upgradeCommand', () => {
       expect(content).toContain('my custom instructions');
     });
 
-    it('adds @.tiller/TILLER.md import to existing CLAUDE.md that lacks it', async () => {
+    it('adds @../.tiller/TILLER.md import to existing CLAUDE.md that lacks it', async () => {
       await setupProject(tmpDir);
 
       await writeFile(join(tmpDir, '.claude', 'CLAUDE.md'), 'my custom instructions', 'utf-8');
@@ -243,11 +243,11 @@ describe('upgradeCommand', () => {
       await upgradeCommand({ yes: true });
 
       const content = await readFile(join(tmpDir, '.claude', 'CLAUDE.md'), 'utf-8');
-      expect(content).toContain('@.tiller/TILLER.md');
+      expect(content).toContain('@../.tiller/TILLER.md');
       expect(content).toContain('my custom instructions');
     });
 
-    it('migrates @.claude/TILLER.md import to @.tiller/TILLER.md', async () => {
+    it('migrates @.claude/TILLER.md import to @../.tiller/TILLER.md', async () => {
       await setupProject(tmpDir);
 
       await writeFile(join(tmpDir, '.claude', 'CLAUDE.md'), '@.claude/TILLER.md\n\nmy custom instructions', 'utf-8');
@@ -256,20 +256,20 @@ describe('upgradeCommand', () => {
       await upgradeCommand({ yes: true });
 
       const content = await readFile(join(tmpDir, '.claude', 'CLAUDE.md'), 'utf-8');
-      expect(content).toContain('@.tiller/TILLER.md');
+      expect(content).toContain('@../.tiller/TILLER.md');
       expect(content).not.toContain('@.claude/TILLER.md');
     });
 
-    it('does not duplicate @.tiller/TILLER.md import if already present', async () => {
+    it('does not duplicate @../.tiller/TILLER.md import if already present', async () => {
       await setupProject(tmpDir);
 
-      await writeFile(join(tmpDir, '.claude', 'CLAUDE.md'), '@.tiller/TILLER.md\n\nmy custom instructions', 'utf-8');
+      await writeFile(join(tmpDir, '.claude', 'CLAUDE.md'), '@../.tiller/TILLER.md\n\nmy custom instructions', 'utf-8');
 
       const { upgradeCommand } = await import('../../src/commands/upgrade.js');
       await upgradeCommand({ yes: true });
 
       const content = await readFile(join(tmpDir, '.claude', 'CLAUDE.md'), 'utf-8');
-      const matches = content.match(/@\.tiller\/TILLER\.md/g);
+      const matches = content.match(/@\.\.\/\.tiller\/TILLER\.md/g);
       expect(matches).toHaveLength(1);
     });
   });
@@ -354,7 +354,7 @@ describe('upgradeCommand', () => {
       await expect(access(join(tmpDir, '.tiller', 'local.json'))).resolves.toBeUndefined();
     });
 
-    it('updates @.claude/TILLER.md import to @.tiller/TILLER.md in CLAUDE.md', async () => {
+    it('updates @.claude/TILLER.md import to @../.tiller/TILLER.md in CLAUDE.md', async () => {
       await setupLegacyProject(tmpDir);
       await writeFile(join(tmpDir, '.claude', 'CLAUDE.md'), '@.claude/TILLER.md\n\nmy notes', 'utf-8');
 
@@ -362,7 +362,7 @@ describe('upgradeCommand', () => {
       await upgradeCommand({ yes: true });
 
       const content = await readFile(join(tmpDir, '.claude', 'CLAUDE.md'), 'utf-8');
-      expect(content).toContain('@.tiller/TILLER.md');
+      expect(content).toContain('@../.tiller/TILLER.md');
       expect(content).not.toContain('@.claude/TILLER.md');
     });
 

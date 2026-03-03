@@ -45,7 +45,7 @@ describe('scaffold integration', () => {
   it('creates .claude/CLAUDE.md with TILLER.md import', async () => {
     expect(await exists('.claude/CLAUDE.md')).toBe(true);
     const content = await read('.claude/CLAUDE.md');
-    expect(content).toContain('@.tiller/TILLER.md');
+    expect(content).toContain('@../.tiller/TILLER.md');
   });
 
   it('creates .tiller/TILLER.md with Tiller rules', async () => {
