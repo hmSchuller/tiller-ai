@@ -254,7 +254,7 @@ describe('generateSailSkill', () => {
     expect(result).toContain('**Medium**');
     expect(result).toContain('**Large**');
     expect(result).toContain('< 3 milestones');
-    expect(result).toContain('>= 3 milestones');
+    expect(result).toContain('>= 6 milestones');
   });
 
   it('Step 3.5 evaluates silently in simple mode', () => {

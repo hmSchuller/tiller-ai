@@ -145,7 +145,7 @@ Will run after all milestones are complete (Step 4.5).
 Before building, classify the task into a tier using these heuristics on the milestones from Step 3:
 
 - **Small**: < 3 milestones AND < 5 files AND single subsystem
-- **Large**: >= 3 milestones OR >= 5 files OR multiple independent subsystems
+- **Large**: >= 6 milestones OR >= 10 files OR >= 3 independent subsystems
 - **Medium**: everything else
 
 **If mode is simple:** Evaluate silently, pick the tier, proceed to Step 4.
