@@ -14,8 +14,6 @@ export type TillerManifest = {
   mode: 'simple' | 'detailed';
   workflow?: 'solo' | 'team';
   runCommand: string;
-  projectName?: string;
-  description?: string;
   managedFiles?: string[];
 };
 
