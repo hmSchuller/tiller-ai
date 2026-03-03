@@ -100,8 +100,8 @@ export async function configCommand(): Promise<void> {
     s.start('Updating project settings...');
 
     const config: ProjectConfig = {
-      projectName: manifest.projectName ?? '',
-      description: manifest.description ?? '',
+      projectName: '',
+      description: '',
       runCommand: manifest.runCommand,
       mode: newMode,
       workflow: newWorkflow,
