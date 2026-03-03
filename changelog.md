@@ -3,6 +3,7 @@
 > Shared project history. Updated by /sail, /anchor, and /dock. Committed and shared.
 
 ## Done
+- [2026-03-03] docked feature/subagent-start-plan-hook
 - [2026-03-03] feat: add SubagentStart hook for Plan agents — injects /sail Step 3 plan template + compass.md state via additionalContext so Plan agents follow the rigid template after context clears
 - [2026-03-03] docked feature/sail-orchestrator-eval-step
 - [2026-03-03] docked fix/tiller-md-import-path
