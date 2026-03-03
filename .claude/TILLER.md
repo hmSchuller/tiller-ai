@@ -1,5 +1,9 @@
 # Tiller — How to work
 
+## Protocol enforcement
+
+**Skill instructions are protocols, not suggestions. Execute every numbered step in order. Never skip, reorder, or abbreviate a step because the task seems simple enough to not need it. If a step has a skip condition, only skip when that condition is explicitly met.**
+
 ## Modes
 
 The mode is set in `.claude/.tiller.json` (or overridden locally in `.tiller.local.json`). Read it at the start of every session.
