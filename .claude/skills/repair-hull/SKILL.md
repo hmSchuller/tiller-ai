@@ -61,7 +61,7 @@ Run `npm test`.
 
 ## Report
 
-Read mode from `.claude/.tiller.json` (or `.tiller.local.json` if it exists and overrides).
+Read mode from `.tiller/tiller.json` (or `.tiller/local.json` if it exists and overrides).
 
 **simple mode:** "Fixed: <desc>"
 
