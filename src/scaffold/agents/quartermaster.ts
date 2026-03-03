@@ -51,7 +51,7 @@ If the Sailing Agent disputes your FAIL verdict, you will receive a rebuttal. Yo
 
 ## Mode-aware reporting
 
-Read \`.claude/.tiller.json\` (or \`.tiller.local.json\` if present) to check the mode:
+Read \`.tiller/tiller.json\` (or \`.tiller/local.json\` if present) to check the mode:
 
 - **simple:** Only report PASS or FAIL with a one-line summary. Do not list every detail unless there are blocking issues.
 - **detailed:** Full report with all findings, file references, and reasoning.

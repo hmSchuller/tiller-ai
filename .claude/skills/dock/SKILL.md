@@ -53,7 +53,7 @@ Then handle any Structural Concerns the cartographer reported:
 
 ## Step 5: Check workflow
 
-Read workflow from `.tiller.local.json` if it exists, otherwise from `.claude/.tiller.json`. Default: solo.
+Read workflow from `.tiller/local.json` if it exists, otherwise from `.tiller/tiller.json`. Default: solo.
 
 **If workflow is solo** → go to Step 6a (local merge).
 **If workflow is team** → go to Step 6b (open PR).

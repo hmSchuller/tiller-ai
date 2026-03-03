@@ -9,10 +9,10 @@ import type { ProjectConfig } from '../scaffold/types.js';
 export async function configCommand(): Promise<void> {
   intro('tiller-ai config — update mode and workflow');
 
-  const manifestPath = resolve(process.cwd(), '.claude/.tiller.json');
+  const manifestPath = resolve(process.cwd(), '.tiller/tiller.json');
 
   if (!existsSync(manifestPath)) {
-    cancel('No .claude/.tiller.json found. Is this a Tiller project?');
+    cancel('No .tiller/tiller.json found. Is this a Tiller project?');
     process.exit(1);
   }
 
@@ -21,11 +21,11 @@ export async function configCommand(): Promise<void> {
     const raw = await readFile(manifestPath, 'utf-8');
     manifest = JSON.parse(raw);
   } catch {
-    cancel('Failed to read .claude/.tiller.json.');
+    cancel('Failed to read .tiller/tiller.json.');
     process.exit(1);
   }
 
-  const localPath = resolve(process.cwd(), '.tiller.local.json');
+  const localPath = resolve(process.cwd(), '.tiller/local.json');
   let local: Record<string, unknown> = {};
   if (existsSync(localPath)) {
     try {
@@ -69,8 +69,8 @@ export async function configCommand(): Promise<void> {
   const scopeAnswer = await select({
     message: 'Who should this apply to?',
     options: [
-      { value: 'local', label: 'just me', hint: 'Saves to .tiller.local.json (gitignored). Only affects your machine.' },
-      { value: 'project', label: 'whole project', hint: 'Updates .tiller.json and CLAUDE.md (committed). Shared with the team.' },
+      { value: 'local', label: 'just me', hint: 'Saves to .tiller/local.json (gitignored). Only affects your machine.' },
+      { value: 'project', label: 'whole project', hint: 'Updates .tiller/tiller.json (committed). Shared with the team.' },
     ],
   });
 
@@ -116,7 +116,7 @@ export async function configCommand(): Promise<void> {
       throw err;
     }
 
-    outro('Project settings updated. Commit .claude/.tiller.json to share with the team.');
+    outro('Project settings updated. Commit .tiller/tiller.json to share with the team.');
   } else {
     s.start('Saving personal settings...');
 
@@ -129,6 +129,6 @@ export async function configCommand(): Promise<void> {
       throw err;
     }
 
-    outro('Personal settings saved to .tiller.local.json (gitignored).');
+    outro('Personal settings saved to .tiller/local.json (gitignored).');
   }
 }

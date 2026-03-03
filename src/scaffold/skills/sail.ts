@@ -12,11 +12,11 @@ Use this skill to contribute anything: new features, bug fixes, or incremental t
 
 ## Step 1: Orient
 
-Read \`.claude/.tiller.json\` (and \`.tiller.local.json\` if it exists), \`changelog.md\`, and \`compass.md\` (if it exists) to understand current state.
+Read \`.tiller/tiller.json\` (and \`.tiller/local.json\` if it exists), \`changelog.md\`, and \`.tiller/compass.md\` (if it exists) to understand current state.
 If \`codebase-map.md\` exists, read it to get a structural overview of the codebase.
 Run \`git branch\` and \`git status\`.
 
-State the current mode from \`.claude/.tiller.json\` (or \`.tiller.local.json\` if it overrides): "Mode: <mode>".
+State the current mode from \`.tiller/tiller.json\` (or \`.tiller/local.json\` if it overrides): "Mode: <mode>".
 
 **If mode is simple:** Do not narrate the orient step.
 **If mode is detailed:** Summarize the current state in 2-3 sentences.
@@ -62,7 +62,7 @@ Convert $ARGUMENTS to kebab-case for the branch name (e.g. "fix broken auth redi
 Before planning, check if a tech debt cleanup is due:
 
 1. Count lines in \`changelog.md\` matching the pattern \`- [` + `[^]]*] (landed|docked) feature/\` — this is \`landedCount\`
-2. Read \`.claude/.tiller-tech-debt.json\` — get \`lastTechDebtAtFeature\` and \`threshold\` (default threshold: 3)
+2. Read \`.tiller/tech-debt.json\` — get \`lastTechDebtAtFeature\` and \`threshold\` (default threshold: 3)
 3. If \`(landedCount - lastTechDebtAtFeature) >= threshold\`:
    - Use the **Task tool** (foreground, \`subagent_type: "general-purpose"\`) with the contents of \`.claude/skills/tech-debt/SKILL.md\` as the prompt
    - Wait for the agent to complete before continuing
@@ -137,7 +137,7 @@ Use the requirements summary from Step 2.7 to inform milestone breakdown.
 (any relevant trade-offs, or "None" if not applicable)
 
 ## Execution rules
-After plan approval, create \`compass.md\` if it doesn't exist (using the standard template: Branch / Stages checklist / Milestones / Notes sections). Then update \`compass.md\`: set Branch to the current branch, check off Orientation and Planning stages, and list the numbered milestones under the Milestones section. Then execute the milestone loop: for each remaining milestone, announce "Milestone X/N: <description>", build functionality, add or update tests, run \`${config.runCommand}\` and fix failures, run \`git add -A && git commit -m "<milestone>"\`, add entry to \`changelog.md\` Done section then amend commit, update \`compass.md\` to check off that milestone then amend commit, report "Saved: <description> (X/N)". When all milestones are done, check off the Testing stage in \`compass.md\`, run Code Review: spawn the Quartermaster agent using the Task tool (foreground, \`subagent_type: "quartermaster"\`) to review the feature branch diff against main. On PASS: check off the Quartermaster review stage in \`compass.md\`, summarize what was built and suggest \`/dock\`. On FAIL: fix the issues, re-spawn the Quartermaster with rebuttal context. If the Quartermaster FAILs again with "ESCALATE TO CAPTAIN": spawn the Captain via Task tool (foreground, \`subagent_type: "captain"\`) with the disputed issues, your rebuttal, and the Quartermaster's objections; follow the Captain's ruling (AGREE WITH QUARTERMASTER → fix before docking; AGREE WITH SAILING AGENT → proceed; COMPROMISE → fix blocking items, log rest to \`tech-backlog.md\`). After review passes, summarize what was built and suggest \`/dock\`.
+After plan approval, create \`.tiller/compass.md\` if it doesn't exist (using the standard template: Branch / Stages checklist / Milestones / Notes sections). Then update \`.tiller/compass.md\`: set Branch to the current branch, check off Orientation and Planning stages, and list the numbered milestones under the Milestones section. Then execute the milestone loop: for each remaining milestone, announce "Milestone X/N: <description>", build functionality, add or update tests, run \`${config.runCommand}\` and fix failures, run \`git add -A && git commit -m "<milestone>"\`, add entry to \`changelog.md\` Done section then amend commit, update \`.tiller/compass.md\` to check off that milestone then amend commit, report "Saved: <description> (X/N)". When all milestones are done, check off the Testing stage in \`.tiller/compass.md\`, run Code Review: spawn the Quartermaster agent using the Task tool (foreground, \`subagent_type: "quartermaster"\`) to review the feature branch diff against main. On PASS: check off the Quartermaster review stage in \`.tiller/compass.md\`, summarize what was built and suggest \`/dock\`. On FAIL: fix the issues, re-spawn the Quartermaster with rebuttal context. If the Quartermaster FAILs again with "ESCALATE TO CAPTAIN": spawn the Captain via Task tool (foreground, \`subagent_type: "captain"\`) with the disputed issues, your rebuttal, and the Quartermaster's objections; follow the Captain's ruling (AGREE WITH QUARTERMASTER → fix before docking; AGREE WITH SAILING AGENT → proceed; COMPROMISE → fix blocking items, log rest to \`tech-backlog.md\`). After review passes, summarize what was built and suggest \`/dock\`.
 
 ## Quartermaster review
 Will run after all milestones are complete (Step 4.5).
@@ -145,7 +145,7 @@ Will run after all milestones are complete (Step 4.5).
 
 ## Step 4: Build milestone by milestone
 
-After planning, look at the dependency tags on your milestones. **detailed only:** Read \`compass.md\` to find the milestone checklist and resume from the first unchecked milestone.
+After planning, look at the dependency tags on your milestones. **detailed only:** Read \`.tiller/compass.md\` to find the milestone checklist and resume from the first unchecked milestone.
 
 ### If all milestones are sequential (all tagged \`[depends-on: N]\`)
 
@@ -156,7 +156,7 @@ Execute them one by one:
 4. Run \`${config.runCommand}\` — **simple:** fix failures silently. **detailed:** fix before continuing.
 5. \`git add -A && git commit -m "<milestone description>"\`
 6. Add entry to \`changelog.md\` Done section. Amend: \`git commit --amend --no-edit\`
-7. **detailed only:** Update \`compass.md\` to check off this milestone. Amend: \`git commit --amend --no-edit\`
+7. **detailed only:** Update \`.tiller/compass.md\` to check off this milestone. Amend: \`git commit --amend --no-edit\`
 8. **simple:** Say: "Saved: <what changed>". **detailed:** Report: "Saved: <description> (X/N)"
 
 ### If independent milestones exist
@@ -186,13 +186,13 @@ Use agent teams to parallelize independent work:
 
 ## Step 4.5: Code Review ⚠️ REQUIRED — do not skip
 
-After all milestones are built and committed, **detailed only:** check off the Testing stage in \`compass.md\`. Then spawn the Quartermaster to review the feature branch:
+After all milestones are built and committed, **detailed only:** check off the Testing stage in \`.tiller/compass.md\`. Then spawn the Quartermaster to review the feature branch:
 
 1. Use the **Task tool** (foreground, \`subagent_type: "quartermaster"\`)
 2. Wait for the Quartermaster's verdict
 
 **On PASS:**
-- **detailed only:** Check off the Quartermaster review stage in \`compass.md\`
+- **detailed only:** Check off the Quartermaster review stage in \`.tiller/compass.md\`
 - Proceed to Step 5
 
 **On FAIL:**
@@ -218,7 +218,7 @@ For a large milestone where implementation and tests are clearly separable, the 
 ## Step 5: Complete
 
 **simple:** Say: "Feature complete. Type /dock when ready to merge."
-**detailed:** Add a note to \`compass.md\` under Notes: "Sail complete — ready to /dock." Summarize everything that was built across all milestones. Suggest \`/dock\` to merge.
+**detailed:** Add a note to \`.tiller/compass.md\` under Notes: "Sail complete — ready to /dock." Summarize everything that was built across all milestones. Suggest \`/dock\` to merge.
 
 ## If something goes wrong
 

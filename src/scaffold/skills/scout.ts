@@ -10,11 +10,11 @@ description: Investigate a feature or area and produce a structured ticket. Usag
 
 ## Step 1: Orient
 
-Read \`.claude/.tiller.json\` (and \`.tiller.local.json\` if it exists) and \`changelog.md\` to understand current state.
+Read \`.tiller/tiller.json\` (and \`.tiller/local.json\` if it exists) and \`changelog.md\` to understand current state.
 If \`codebase-map.md\` exists, read it to get a structural overview of the codebase.
 Run \`git branch\` and \`git status\`.
 
-State the current mode from \`.claude/.tiller.json\` (or \`.tiller.local.json\` if it overrides): "Mode: <mode>".
+State the current mode from \`.tiller/tiller.json\` (or \`.tiller/local.json\` if it overrides): "Mode: <mode>".
 
 **If mode is simple:** Do not narrate the orient step.
 **If mode is detailed:** Summarize the current state in 2-3 sentences.

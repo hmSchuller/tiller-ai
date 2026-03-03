@@ -18,7 +18,7 @@ export type TillerManifest = {
 };
 
 export const MANAGED_FILES = [
-  '.claude/TILLER.md',
+  '.tiller/TILLER.md',
   '.claude/settings.json',
   '.claude/hooks/post-write.sh',
   '.claude/hooks/secret-scan.sh',

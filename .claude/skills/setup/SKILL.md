@@ -43,10 +43,10 @@ Look at the project files silently. Do not ask the user about this.
 
 **Step 4: Update .tiller.json and commit**
 
-Update `runCommand` and `mode` in `.claude/.tiller.json`.
+Update `runCommand` and `mode` in `.tiller/tiller.json`.
 
 ```
-git add .claude/.tiller.json
+git add .tiller/tiller.json
 git commit -m "chore: configure project via /setup"
 ```
 
@@ -72,10 +72,10 @@ Give suggestions based on what you see in the project. If they don't know yet, s
 
 **Step 4: Update .tiller.json and commit**
 
-Update `runCommand` and `mode` in `.claude/.tiller.json`.
+Update `runCommand` and `mode` in `.tiller/tiller.json`.
 
 ```
-git add .claude/.tiller.json
+git add .tiller/tiller.json
 git commit -m "chore: configure project via /setup"
 ```
 

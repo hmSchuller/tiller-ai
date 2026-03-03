@@ -13,9 +13,9 @@ describe('generateSessionResumeHook', () => {
     expect(result).toContain('fix/*');
   });
 
-  it('references compass.md', () => {
+  it('references .tiller/compass.md', () => {
     const result = generateSessionResumeHook(simpleConfig);
-    expect(result).toContain('compass.md');
+    expect(result).toContain('.tiller/compass.md');
   });
 
   it('tells Claude to read compass.md for full context', () => {
