@@ -1,1 +1,1 @@
-@.tiller/TILLER.md
+@../.tiller/TILLER.md

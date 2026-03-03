@@ -137,19 +137,30 @@ Use the requirements summary from Step 2.7 to inform milestone breakdown.
 (any relevant trade-offs, or "None" if not applicable)
 
 ## Execution rules
-After plan approval, create \`.tiller/compass.md\` if it doesn't exist (using the standard template: Branch / Stages checklist / Milestones / Notes sections). Then update \`.tiller/compass.md\`: set Branch to the current branch, check off Orientation and Planning stages, and list the numbered milestones under the Milestones section. Then execute the milestone loop: for each remaining milestone, announce "Milestone X/N: <description>", build functionality, add or update tests, run \`${config.runCommand}\` and fix failures, run \`git add -A && git commit -m "<milestone>"\`, add entry to \`changelog.md\` Done section then amend commit, update \`.tiller/compass.md\` to check off that milestone then amend commit, report "Saved: <description> (X/N)". When all milestones are done, check off the Testing stage in \`.tiller/compass.md\`, run Code Review: spawn the Quartermaster agent using the Task tool (foreground, \`subagent_type: "quartermaster"\`) to review the feature branch diff against main. On PASS: check off the Quartermaster review stage in \`.tiller/compass.md\`, summarize what was built and suggest \`/dock\`. On FAIL: fix the issues, re-spawn the Quartermaster with rebuttal context. If the Quartermaster FAILs again with "ESCALATE TO CAPTAIN": spawn the Captain via Task tool (foreground, \`subagent_type: "captain"\`) with the disputed issues, your rebuttal, and the Quartermaster's objections; follow the Captain's ruling (AGREE WITH QUARTERMASTER → fix before docking; AGREE WITH SAILING AGENT → proceed; COMPROMISE → fix blocking items, log rest to \`tech-backlog.md\`). After review passes, summarize what was built and suggest \`/dock\`.
+After plan approval, evaluate scope per Step 3.5 (count milestones, files, subsystems → Small/Medium/Large tier). In detailed mode, announce the tier and wait for user confirmation or override. Then create \`.tiller/compass.md\` if it doesn't exist (using the standard template: Branch / Stages checklist / Milestones / Notes sections). Then update \`.tiller/compass.md\`: set Branch to the current branch, check off Orientation and Planning stages, and list the numbered milestones under the Milestones section. Then proceed with the selected tier's execution path in Step 4: for each remaining milestone, announce "Milestone X/N: <description>", build functionality, add or update tests, run \`${config.runCommand}\` and fix failures, run \`git add -A && git commit -m "<milestone>"\`, add entry to \`changelog.md\` Done section then amend commit, update \`.tiller/compass.md\` to check off that milestone then amend commit, report "Saved: <description> (X/N)". When all milestones are done, check off the Testing stage in \`.tiller/compass.md\`, run Code Review: spawn the Quartermaster agent using the Task tool (foreground, \`subagent_type: "quartermaster"\`) to review the feature branch diff against main. On PASS: check off the Quartermaster review stage in \`.tiller/compass.md\`, summarize what was built and suggest \`/dock\`. On FAIL: fix the issues, re-spawn the Quartermaster with rebuttal context. If the Quartermaster FAILs again with "ESCALATE TO CAPTAIN": spawn the Captain via Task tool (foreground, \`subagent_type: "captain"\`) with the disputed issues, your rebuttal, and the Quartermaster's objections; follow the Captain's ruling (AGREE WITH QUARTERMASTER → fix before docking; AGREE WITH SAILING AGENT → proceed; COMPROMISE → fix blocking items, log rest to \`tech-backlog.md\`). After review passes, summarize what was built and suggest \`/dock\`.
 
 ## Quartermaster review
 Will run after all milestones are complete (Step 4.5).
 \`\`\`
 
+## Step 3.5: Evaluate scope
+
+Before building, classify the task into a tier using these heuristics on the milestones from Step 3:
+
+- **Small**: < 3 milestones AND < 5 files AND single subsystem
+- **Large**: >= 3 milestones OR >= 5 files OR multiple independent subsystems
+- **Medium**: everything else
+
+**If mode is simple:** Evaluate silently, pick the tier, proceed to Step 4.
+**If mode is detailed:** Announce: "Scope assessment: **<tier>** — <rationale>" and ask the user to confirm or override the tier. Wait for confirmation before proceeding.
+
 ## Step 4: Build milestone by milestone
 
-After planning, look at the dependency tags on your milestones. **detailed only:** Read \`.tiller/compass.md\` to find the milestone checklist and resume from the first unchecked milestone.
+After planning, look at the dependency tags on your milestones. **detailed only:** Read \`.tiller/compass.md\` to find the milestone checklist and resume from the first unchecked milestone. Use the tier from Step 3.5 to select the execution path.
 
-### If all milestones are sequential (all tagged \`[depends-on: N]\`)
+### Small tier — solo sequential
 
-Execute them one by one:
+All milestones run one by one, no agent spawning:
 1. **detailed only:** Announce: "Milestone X/N: <description>"
 2. Build the functionality
 3. Add or update tests for what was built
@@ -159,9 +170,9 @@ Execute them one by one:
 7. **detailed only:** Update \`.tiller/compass.md\` to check off this milestone. Amend: \`git commit --amend --no-edit\`
 8. **simple:** Say: "Saved: <what changed>". **detailed:** Report: "Saved: <description> (X/N)"
 
-### If independent milestones exist
+### Medium tier — parallel with lead participation
 
-Use agent teams to parallelize independent work:
+Use agent teams to parallelize independent work while the lead also implements:
 
 **Setup:**
 1. Use \`TeamCreate\` to create a team named after the feature branch (e.g. \`feature-x\`)
@@ -182,7 +193,34 @@ Use agent teams to parallelize independent work:
 9. \`git add -A && git commit -m "<feature>: parallel milestones <list>"\`
 10. Update \`changelog.md\`. Amend: \`git commit --amend --no-edit\`
 
-**Then continue** with any remaining sequential milestones using the sequential loop above.
+**Then continue** with any remaining sequential milestones using the Small tier loop above.
+
+### Large tier — orchestrator mode
+
+The main agent becomes a pure orchestrator. It does NOT implement any code itself — all implementation is delegated to spawned agents.
+
+**Setup:**
+1. Use \`TeamCreate\` to create a team named after the feature branch
+2. Use \`TaskCreate\` for ALL milestones, setting \`addBlockedBy\` to establish dependency chains matching the \`[depends-on: N]\` tags
+3. For each currently unblocked milestone, spawn a worker agent via the \`Task\` tool with \`team_name\` set, selecting the model based on milestone complexity:
+   - **haiku**: simple, mechanical milestones (rename, move files, update imports, boilerplate)
+   - **sonnet**: moderate implementation (new functions, test writing, standard feature work)
+   - **opus**: complex or architectural work (design decisions, cross-cutting changes, tricky logic)
+4. Provide each worker: milestone description, full context, branch name, files in scope, verify command (\`${config.runCommand}\`), and these instructions:
+   - Implement only the files in your milestone scope
+   - Run \`${config.runCommand}\` before reporting done — fix any failures
+   - Do NOT commit — the orchestrator commits
+   - Report done via \`SendMessage\` to the lead with a summary of changes
+
+**Coordination:**
+5. Monitor progress via \`TaskList\` — do NOT implement any code yourself
+6. When a worker completes: review the changes, run \`${config.runCommand}\`, fix integration issues if needed
+7. Commit incrementally: \`git add -A && git commit -m "<milestone description>"\`
+8. Add entry to \`changelog.md\` Done section. Amend: \`git commit --amend --no-edit\`
+9. **detailed only:** Update \`.tiller/compass.md\` to check off the milestone. Amend: \`git commit --amend --no-edit\`
+10. Mark the task completed via \`TaskUpdate\`, then spawn workers for any newly unblocked milestones (using the same model selection rules)
+11. Repeat until all milestones are done
+12. Shut down the team via \`SendMessage\` with \`type: "shutdown_request"\`
 
 ## Step 4.5: Code Review ⚠️ REQUIRED — do not skip
 
