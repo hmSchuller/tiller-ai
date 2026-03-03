@@ -123,9 +123,10 @@ describe('generateSailSkill', () => {
     expect(generateSailSkill(simpleConfig)).toContain('SendMessage');
   });
 
-  it('includes sequential fallback when all milestones depend on each other', () => {
+  it('includes Small tier for solo sequential execution', () => {
     const result = generateSailSkill(simpleConfig);
-    expect(result).toContain('all milestones are sequential');
+    expect(result).toContain('Small tier');
+    expect(result).toContain('solo sequential');
   });
 
   it('includes within-milestone split option', () => {
@@ -239,6 +240,73 @@ describe('generateSailSkill', () => {
     const result = generateSailSkill(simpleConfig);
     expect(result).toContain('Core topics (all modes)');
     expect(result).toContain('Technical topics (detailed mode only)');
+  });
+
+  it('includes Step 3.5 evaluate scope section', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('Step 3.5');
+    expect(result).toContain('Evaluate scope');
+  });
+
+  it('Step 3.5 defines three tier heuristics (Small, Medium, Large)', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('**Small**');
+    expect(result).toContain('**Medium**');
+    expect(result).toContain('**Large**');
+    expect(result).toContain('< 3 milestones');
+    expect(result).toContain('>= 6 milestones');
+  });
+
+  it('Step 3.5 evaluates silently in simple mode', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('Evaluate silently');
+  });
+
+  it('Step 3.5 announces and allows override in detailed mode', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('Scope assessment:');
+    expect(result).toContain('confirm or override');
+  });
+
+  it('Step 4 has three tier subsections', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('### Small tier');
+    expect(result).toContain('### Medium tier');
+    expect(result).toContain('### Large tier');
+  });
+
+  it('Medium tier includes parallel with lead participation', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('Medium tier — parallel with lead participation');
+  });
+
+  it('Large tier delegates all work — orchestrator does not implement', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('orchestrator mode');
+    expect(result).toContain('does NOT implement any code itself');
+  });
+
+  it('Large tier selects model per milestone complexity (haiku/sonnet/opus)', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('**haiku**');
+    expect(result).toContain('**sonnet**');
+    expect(result).toContain('**opus**');
+  });
+
+  it('Large tier commits incrementally after each milestone', () => {
+    const result = generateSailSkill(simpleConfig);
+    // "Commit incrementally" appears in the Large tier section
+    expect(result).toContain('Commit incrementally');
+  });
+
+  it('Large tier uses addBlockedBy for dependency chains', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('addBlockedBy');
+  });
+
+  it('execution rules reference Step 3.5 evaluation', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('evaluate scope per Step 3.5');
   });
 
   it('Step 3 references requirements summary from Step 2.7', () => {
