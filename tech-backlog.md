@@ -5,10 +5,9 @@
 
 ## Backlog
 
-- [minor] src/commands/config.ts: uses `fsWriteFile` from `node:fs/promises` directly (bypassing the shared `writeFile` utility from `utils/fs.ts`) — inconsistent with the rest of the codebase; the utility wrapper also ensures parent directories exist via `ensureDir`
-
 ## Done
 
+- [done 2026-03-03] src/commands/config.ts: switched two `fsWriteFile` calls to use the shared `writeFile` utility from `utils/fs.ts`; removed the redundant `writeFile as fsWriteFile` import from `node:fs/promises`
 - [done 2026-03-03] src/scaffold/tiller-manifest.ts + src/commands/config.ts: `projectName` and `description` were optional fields on `TillerManifest` but never written by `generateTillerManifest`; `config.ts` read them back as `manifest.projectName ?? ''` making them permanently empty — removed dead fields from the type and replaced the two `?? ''` references with literal `''`
 - [done 2026-03-02] src/commands/upgrade.ts: redundant `writeFile as fsWriteFile` import — one call used raw `fsWriteFile` while all other writes in the same file used the shared `writeFile` utility from `utils/fs.ts`; replaced with the utility wrapper for consistency
 - [done 2026-03-02] src/commands/upgrade.ts + src/scaffold/tiller-manifest.ts: session-resume.sh was missing from MANAGED_FILES and not written during upgrade; both gaps fixed together
