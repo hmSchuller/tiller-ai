@@ -3,6 +3,8 @@
 > Shared project history. Updated by /sail, /anchor, and /dock. Committed and shared.
 
 ## Done
+- [2026-03-03] fix: add do-not-skip markers + rigid plan template to sail SKILL.md — Steps 2.7, 3, and 4.5 marked ⚠️ REQUIRED; Step 3 now uses a mandatory fill-in template with Approach/Milestones/Files/Trade-offs/Execution rules/Quartermaster sections
+- [2026-03-03] fix: add protocol enforcement rule to TILLER.md — "Skill instructions are protocols, not suggestions" heading at top of file; generated from claude-md.ts
 - [2026-03-03] docked feature/website-ways-to-work-section
 - [2026-03-03] feat: add Ways to Work persona section to website — three persona cards (Solo Creator, Solo Developer, Engineering Team) replacing generic "Two Modes" card; responsive layout 1→2→3 columns; updated all Claude→Claude Code references for clarity
 - [2026-03-03] docked feature/compass-md-detailed-mode
