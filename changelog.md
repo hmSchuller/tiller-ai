@@ -3,6 +3,7 @@
 > Shared project history. Updated by /sail, /anchor, and /dock. Committed and shared.
 
 ## Done
+- [2026-03-03] chore: bump version to 0.4.0
 - [2026-03-03] docked feature/move-tiller-config-to-tiller-folder
 - [2026-03-03] regen: update deployed skills, agents, and hooks to .tiller/ paths
 - [2026-03-03] feat: move tiller config from .claude/ to .tiller/ — .tiller.json→.tiller/tiller.json, TILLER.md→.tiller/TILLER.md, tech-debt.json→.tiller/tech-debt.json, compass.md→.tiller/compass.md, local.json→.tiller/local.json; upgrade command migrates old-layout projects automatically
