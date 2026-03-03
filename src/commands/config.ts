@@ -1,7 +1,8 @@
 import { intro, outro, spinner, select, isCancel, cancel } from '@clack/prompts';
-import { readFile, writeFile as fsWriteFile } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { writeFile } from '../utils/fs.js';
 import { generateTillerManifest, TILLER_VERSION, type TillerManifest } from '../scaffold/tiller-manifest.js';
 import type { ProjectConfig } from '../scaffold/types.js';
 
@@ -108,7 +109,7 @@ export async function configCommand(): Promise<void> {
     };
 
     try {
-      await fsWriteFile(manifestPath, generateTillerManifest(config, TILLER_VERSION), 'utf-8');
+      await writeFile(manifestPath, generateTillerManifest(config, TILLER_VERSION));
       s.stop('Done!');
     } catch (err) {
       s.stop('Failed.');
@@ -121,7 +122,7 @@ export async function configCommand(): Promise<void> {
 
     const updated = { ...local, mode: newMode, workflow: newWorkflow };
     try {
-      await fsWriteFile(localPath, JSON.stringify(updated, null, 2), 'utf-8');
+      await writeFile(localPath, JSON.stringify(updated, null, 2));
       s.stop('Done!');
     } catch (err) {
       s.stop('Failed.');
