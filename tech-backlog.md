@@ -7,6 +7,8 @@
 
 ## Done
 
+- [done 2026-03-03] src/commands/upgrade.ts: `writeFile as fsWriteFile` from `node:fs/promises` was still used in `migrateLegacyFiles` for a `.gitignore` write — replaced with the shared `writeFile` utility from `utils/fs.ts` for consistency; removed the now-unused alias from the import
+
 - [done 2026-03-03] src/commands/config.ts: switched two `fsWriteFile` calls to use the shared `writeFile` utility from `utils/fs.ts`; removed the redundant `writeFile as fsWriteFile` import from `node:fs/promises`
 - [done 2026-03-03] src/scaffold/tiller-manifest.ts + src/commands/config.ts: `projectName` and `description` were optional fields on `TillerManifest` but never written by `generateTillerManifest`; `config.ts` read them back as `manifest.projectName ?? ''` making them permanently empty — removed dead fields from the type and replaced the two `?? ''` references with literal `''`
 - [done 2026-03-02] src/commands/upgrade.ts: redundant `writeFile as fsWriteFile` import — one call used raw `fsWriteFile` while all other writes in the same file used the shared `writeFile` utility from `utils/fs.ts`; replaced with the utility wrapper for consistency
