@@ -1,5 +1,5 @@
 import { intro, outro, confirm, spinner, isCancel, cancel } from '@clack/prompts';
-import { readFile, unlink, rename, mkdir, writeFile as fsWriteFile } from 'node:fs/promises';
+import { readFile, unlink, rename, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { writeFile } from '../utils/fs.js';
@@ -51,7 +51,7 @@ async function migrateLegacyFiles(cwd: string): Promise<void> {
     let content = await readFile(gitignorePath, 'utf-8');
     content = content.replace(/^\.tiller\.local\.json$/m, '.tiller/local.json');
     content = content.replace(/^compass\.md$/m, '.tiller/compass.md');
-    await fsWriteFile(gitignorePath, content, 'utf-8');
+    await writeFile(gitignorePath, content);
   }
 }
 
