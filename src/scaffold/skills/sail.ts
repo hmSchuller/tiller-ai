@@ -71,7 +71,7 @@ Before planning, check if a tech debt cleanup is due:
    - Wait for user response before continuing to Step 3
 5. Continue to Step 2.7 regardless of whether the tech debt agent ran or critical items were found (unless user chooses to address debt first)
 
-## Step 2.7: Requirements Interview
+## Step 2.7: Requirements Interview ⚠️ REQUIRED — do not skip
 
 Gather requirements from the user before planning. This eliminates ambiguity and reduces rework.
 
@@ -114,18 +114,34 @@ In detailed mode, also cover:
 
 Compile all answers into a **Requirements Summary** (bulleted list). Present it to the user: "Here's what I understand — anything to correct or add?" Wait for confirmation before proceeding to Step 3.
 
-## Step 3: Plan milestones
+## Step 3: Plan milestones ⚠️ REQUIRED — do not skip
 
 Use the requirements summary from Step 2.7 to inform milestone breakdown.
 
 **If mode is simple:** Explore the codebase and break the work into 2–5 milestones internally. Do not show this plan to the user. Tag each milestone as \`[independent]\` or \`[depends-on: N]\` based on whether it can run in parallel with others.
 
-**If mode is detailed:** Call \`EnterPlanMode\`. In the plan file, write:
-- High-level approach (2–3 sentences)
-- 2–5 numbered milestones, each with: what gets built + what gets tested + a dependency tag: \`[independent]\` if it can run in parallel with other independent milestones, or \`[depends-on: N]\` if it requires milestone N to complete first
-- Files to create or modify
-- Any trade-offs worth noting
-- **Execution rules** (embed verbatim): After plan approval, create \`compass.md\` if it doesn't exist (using the standard template: Branch / Stages checklist / Milestones / Notes sections). Then update \`compass.md\`: set Branch to the current branch, check off Orientation and Planning stages, and list the numbered milestones under the Milestones section. Then execute the milestone loop: for each remaining milestone, announce "Milestone X/N: <description>", build functionality, add or update tests, run \`${config.runCommand}\` and fix failures, run \`git add -A && git commit -m "<milestone>"\`, add entry to \`changelog.md\` Done section then amend commit, update \`compass.md\` to check off that milestone then amend commit, report "Saved: <description> (X/N)". When all milestones are done, check off the Testing stage in \`compass.md\`, run Code Review: spawn the Quartermaster agent using the Task tool (foreground, \`subagent_type: "quartermaster"\`) to review the feature branch diff against main. On PASS: check off the Quartermaster review stage in \`compass.md\`, summarize what was built and suggest \`/dock\`. On FAIL: fix the issues, re-spawn the Quartermaster with rebuttal context. If the Quartermaster FAILs again with "ESCALATE TO CAPTAIN": spawn the Captain via Task tool (foreground, \`subagent_type: "captain"\`) with the disputed issues, your rebuttal, and the Quartermaster's objections; follow the Captain's ruling (AGREE WITH QUARTERMASTER → fix before docking; AGREE WITH SAILING AGENT → proceed; COMPROMISE → fix blocking items, log rest to \`tech-backlog.md\`). After review passes, summarize what was built and suggest \`/dock\`.
+**If mode is detailed:** Call \`EnterPlanMode\`. In the plan file, use this exact template — fill in every section, do not omit any:
+
+\`\`\`
+## Approach
+(2-3 sentences describing the high-level strategy)
+
+## Milestones
+1. <what gets built> + <what gets tested> [independent | depends-on: N]
+2. ...
+
+## Files to modify
+- path/to/file — reason
+
+## Trade-offs
+(any relevant trade-offs, or "None" if not applicable)
+
+## Execution rules
+After plan approval, create \`compass.md\` if it doesn't exist (using the standard template: Branch / Stages checklist / Milestones / Notes sections). Then update \`compass.md\`: set Branch to the current branch, check off Orientation and Planning stages, and list the numbered milestones under the Milestones section. Then execute the milestone loop: for each remaining milestone, announce "Milestone X/N: <description>", build functionality, add or update tests, run \`${config.runCommand}\` and fix failures, run \`git add -A && git commit -m "<milestone>"\`, add entry to \`changelog.md\` Done section then amend commit, update \`compass.md\` to check off that milestone then amend commit, report "Saved: <description> (X/N)". When all milestones are done, check off the Testing stage in \`compass.md\`, run Code Review: spawn the Quartermaster agent using the Task tool (foreground, \`subagent_type: "quartermaster"\`) to review the feature branch diff against main. On PASS: check off the Quartermaster review stage in \`compass.md\`, summarize what was built and suggest \`/dock\`. On FAIL: fix the issues, re-spawn the Quartermaster with rebuttal context. If the Quartermaster FAILs again with "ESCALATE TO CAPTAIN": spawn the Captain via Task tool (foreground, \`subagent_type: "captain"\`) with the disputed issues, your rebuttal, and the Quartermaster's objections; follow the Captain's ruling (AGREE WITH QUARTERMASTER → fix before docking; AGREE WITH SAILING AGENT → proceed; COMPROMISE → fix blocking items, log rest to \`tech-backlog.md\`). After review passes, summarize what was built and suggest \`/dock\`.
+
+## Quartermaster review
+Will run after all milestones are complete (Step 4.5).
+\`\`\`
 
 ## Step 4: Build milestone by milestone
 
@@ -168,7 +184,7 @@ Use agent teams to parallelize independent work:
 
 **Then continue** with any remaining sequential milestones using the sequential loop above.
 
-## Step 4.5: Code Review
+## Step 4.5: Code Review ⚠️ REQUIRED — do not skip
 
 After all milestones are built and committed, **detailed only:** check off the Testing stage in \`compass.md\`. Then spawn the Quartermaster to review the feature branch:
 
