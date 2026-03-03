@@ -3,6 +3,7 @@
 > Shared project history. Updated by /sail, /anchor, and /dock. Committed and shared.
 
 ## Done
+- [2026-03-03] feat: move tiller config from .claude/ to .tiller/ — .tiller.json→.tiller/tiller.json, TILLER.md→.tiller/TILLER.md, tech-debt.json→.tiller/tech-debt.json, compass.md→.tiller/compass.md, local.json→.tiller/local.json; upgrade command migrates old-layout projects automatically
 - [2026-03-03] docked fix/setup-skip-mode-question
 - [2026-03-03] fix: add do-not-skip markers + rigid plan template to sail SKILL.md — Steps 2.7, 3, and 4.5 marked ⚠️ REQUIRED; Step 3 now uses a mandatory fill-in template with Approach/Milestones/Files/Trade-offs/Execution rules/Quartermaster sections
 - [2026-03-03] fix: add protocol enforcement rule to TILLER.md — "Skill instructions are protocols, not suggestions" heading at top of file; generated from claude-md.ts

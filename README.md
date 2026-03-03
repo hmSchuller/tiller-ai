@@ -30,7 +30,7 @@ npx tiller-ai init
 ```
 
 Every `/sail`:
-- Claude reads `.claude/.tiller.json` and `changelog.md` to pick up where you left off
+- Claude reads `.tiller/tiller.json` and `changelog.md` to pick up where you left off
 - In `detailed` mode, Claude proposes a plan and waits for your go-ahead before touching files
 - Independent milestones are built in parallel using agent teams
 - Every 3 features, Bosun auto-runs a tech debt cleanup before planning starts
@@ -77,7 +77,7 @@ Switch at any time:
 npx tiller-ai config
 ```
 
-Per-dev override (gitignored, not scaffolded): create `.tiller.local.json` with `{ "mode": "simple", "workflow": "solo" }` to override shared settings locally.
+Per-dev override (gitignored, not scaffolded): create `.tiller/local.json` with `{ "mode": "simple", "workflow": "solo" }` to override shared settings locally.
 
 ## CLI reference
 
@@ -103,7 +103,7 @@ npx tiller-ai init --mode detailed --workflow team
 
 ### `npx tiller-ai upgrade`
 
-Update Tiller-managed files (`.claude/TILLER.md`, `settings.json`, hooks, skills, agents) to the latest version without touching your `changelog.md` or project-specific content.
+Update Tiller-managed files (`.tiller/TILLER.md`, `settings.json`, hooks, skills, agents) to the latest version without touching your `changelog.md` or project-specific content.
 
 ```bash
 npx tiller-ai upgrade
@@ -118,7 +118,7 @@ npx tiller-ai upgrade --yes
 
 ### `npx tiller-ai config`
 
-Interactively update mode and workflow. Scope `local` writes to `.tiller.local.json`; scope `project` updates the shared `.tiller.json`.
+Interactively update mode and workflow. Scope `local` writes to `.tiller/local.json`; scope `project` updates the shared `.tiller/tiller.json`.
 
 ```bash
 npx tiller-ai config
@@ -134,12 +134,15 @@ your-project/
 ├── .gitignore                             # Tiller entries added (or appended if existing)
 ├── changelog.md                           # Done log — updated by /dock on each merge
 ├── tech-backlog.md                        # Tech debt register — managed by Bosun
+├── .tiller/
+│   ├── TILLER.md                          # Tiller-managed rules: vibe loop, skill docs, agents
+│   ├── tiller.json                        # Manifest: version, mode, workflow, runCommand, managedFiles
+│   ├── tech-debt.json                     # Tech debt state tracker (feature counter, threshold)
+│   ├── compass.md                         # gitignored — per-dev sail waypoint
+│   └── local.json                         # gitignored — per-dev mode/workflow overrides
 └── .claude/
-    ├── CLAUDE.md                          # Imports TILLER.md (one line: @.claude/TILLER.md)
-    ├── TILLER.md                          # Tiller-managed rules: vibe loop, skill docs, agents
+    ├── CLAUDE.md                          # Imports TILLER.md (one line: @.tiller/TILLER.md)
     ├── settings.json                      # Hook registrations (PostToolUse, PreToolUse, UserPromptSubmit)
-    ├── .tiller.json                       # Manifest: version, mode, workflow, runCommand, managedFiles
-    ├── .tiller-tech-debt.json             # Tech debt state tracker (feature counter, last-run date)
     ├── agents/
     │   ├── quartermaster.md               # Code review agent
     │   ├── bosun.md                       # Tech debt agent

@@ -6,7 +6,7 @@
 
 ## Modes
 
-The mode is set in `.claude/.tiller.json` (or overridden locally in `.tiller.local.json`). Read it at the start of every session.
+The mode is set in `.tiller/tiller.json` (or overridden locally in `.tiller/local.json`). Read it at the start of every session.
 
 ### simple
 
@@ -29,7 +29,7 @@ The user is technical and wants to stay in control.
 
 ## Workflows
 
-The workflow is set in `.claude/.tiller.json` (or overridden locally in `.tiller.local.json`).
+The workflow is set in `.tiller/tiller.json` (or overridden locally in `.tiller/local.json`).
 
 ### solo
 
@@ -43,7 +43,7 @@ Multiple developers. /dock pushes the feature branch and opens a PR. Merging hap
 
 Every piece of work follows this loop:
 
-1. **Orient** — read `.claude/.tiller.json` (and `.tiller.local.json` if present) and changelog.md (shared); if `codebase-map.md` exists, read it for a structural overview
+1. **Orient** — read `.tiller/tiller.json` (and `.tiller/local.json` if present) and changelog.md (shared); if `codebase-map.md` exists, read it for a structural overview
 2. **Plan** — in detailed mode, enter plan mode with milestones and wait for approval
 3. **Build** — implement milestone by milestone; milestones tagged `[independent]` may be parallelized using agent teams (TeamCreate + Task tool); each milestone includes tests, verify, and auto-commit
 4. **Review** — Quartermaster inspects the feature branch diff and issues PASS or FAIL; one round of negotiation allowed; unresolved disagreements escalate to Captain
@@ -58,11 +58,11 @@ Every piece of work follows this loop:
 
 ## Per-dev overrides
 
-Create `.tiller.local.json` (gitignored) to override mode or workflow personally:
+Create `.tiller/local.json` (gitignored) to override mode or workflow personally:
 ```json
 { "mode": "simple", "workflow": "solo" }
 ```
-Skills read `.tiller.local.json` first, then fall back to `.claude/.tiller.json`.
+Skills read `.tiller/local.json` first, then fall back to `.tiller/tiller.json`.
 
 ## Upgrading
 

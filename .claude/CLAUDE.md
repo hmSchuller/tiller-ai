@@ -1,1 +1,1 @@
-@.claude/TILLER.md
+@.tiller/TILLER.md
