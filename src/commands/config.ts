@@ -69,8 +69,8 @@ export async function configCommand(): Promise<void> {
   const scopeAnswer = await select({
     message: 'Who should this apply to?',
     options: [
-      { value: 'local', label: 'just me', hint: 'Saves to .tiller.local.json (gitignored). Only affects your machine.' },
-      { value: 'project', label: 'whole project', hint: 'Updates .tiller.json and CLAUDE.md (committed). Shared with the team.' },
+      { value: 'local', label: 'just me', hint: 'Saves to .tiller/local.json (gitignored). Only affects your machine.' },
+      { value: 'project', label: 'whole project', hint: 'Updates .tiller/tiller.json (committed). Shared with the team.' },
     ],
   });
 

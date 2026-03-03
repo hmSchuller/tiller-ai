@@ -15,7 +15,7 @@
     "dev": "tsup --watch",
     "test": "vitest run",
     "test:watch": "vitest",
-    "regen": "tsx scripts/regen-skills.ts",
+    "regen": "npm run build && npm link && tiller-ai upgrade --yes",
     "prepublish-check": "tsx scripts/prepublish-check.ts",
     "prepublishOnly": "npm run build && npm test && npm run prepublish-check"
   },

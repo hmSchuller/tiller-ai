@@ -17,6 +17,18 @@ vi.mock('@clack/prompts', async (importOriginal) => {
   };
 });
 
+async function setupLegacyProject(tmpDir: string) {
+  await mkdir(join(tmpDir, '.claude', 'hooks'), { recursive: true });
+  await mkdir(join(tmpDir, '.claude', 'skills', 'sail'), { recursive: true });
+  await mkdir(join(tmpDir, '.claude', 'agents'), { recursive: true });
+  const config = { projectName: 'test-proj', description: 'desc', runCommand: 'npm test', mode: 'detailed' as const, workflow: 'solo' as const };
+  await writeFile(join(tmpDir, '.claude', '.tiller.json'), generateTillerManifest(config, TILLER_VERSION), 'utf-8');
+  await writeFile(join(tmpDir, '.claude', 'TILLER.md'), '# Tiller old', 'utf-8');
+  await writeFile(join(tmpDir, '.claude', '.tiller-tech-debt.json'), '{"lastTechDebtAtFeature":0,"threshold":3}', 'utf-8');
+  await writeFile(join(tmpDir, 'compass.md'), '# compass', 'utf-8');
+  await writeFile(join(tmpDir, '.tiller.local.json'), '{"mode":"simple"}', 'utf-8');
+}
+
 async function setupProject(tmpDir: string) {
   await mkdir(join(tmpDir, '.tiller'), { recursive: true });
   await mkdir(join(tmpDir, '.claude', 'hooks'), { recursive: true });
@@ -293,6 +305,91 @@ describe('upgradeCommand', () => {
       // No .gitignore written — upgrade should not throw
       const { upgradeCommand } = await import('../../src/commands/upgrade.js');
       await expect(upgradeCommand({ yes: true })).resolves.toBeUndefined();
+    });
+  });
+
+  describe('legacy migration', () => {
+    it('migrates old .claude/.tiller.json to .tiller/tiller.json', async () => {
+      await setupLegacyProject(tmpDir);
+
+      const { upgradeCommand } = await import('../../src/commands/upgrade.js');
+      await upgradeCommand({ yes: true });
+
+      await expect(access(join(tmpDir, '.tiller', 'tiller.json'))).resolves.toBeUndefined();
+    });
+
+    it('migrates old .claude/TILLER.md to .tiller/TILLER.md', async () => {
+      await setupLegacyProject(tmpDir);
+
+      const { upgradeCommand } = await import('../../src/commands/upgrade.js');
+      await upgradeCommand({ yes: true });
+
+      await expect(access(join(tmpDir, '.tiller', 'TILLER.md'))).resolves.toBeUndefined();
+    });
+
+    it('migrates old .claude/.tiller-tech-debt.json to .tiller/tech-debt.json', async () => {
+      await setupLegacyProject(tmpDir);
+
+      const { upgradeCommand } = await import('../../src/commands/upgrade.js');
+      await upgradeCommand({ yes: true });
+
+      await expect(access(join(tmpDir, '.tiller', 'tech-debt.json'))).resolves.toBeUndefined();
+    });
+
+    it('migrates root compass.md to .tiller/compass.md', async () => {
+      await setupLegacyProject(tmpDir);
+
+      const { upgradeCommand } = await import('../../src/commands/upgrade.js');
+      await upgradeCommand({ yes: true });
+
+      await expect(access(join(tmpDir, '.tiller', 'compass.md'))).resolves.toBeUndefined();
+    });
+
+    it('migrates root .tiller.local.json to .tiller/local.json', async () => {
+      await setupLegacyProject(tmpDir);
+
+      const { upgradeCommand } = await import('../../src/commands/upgrade.js');
+      await upgradeCommand({ yes: true });
+
+      await expect(access(join(tmpDir, '.tiller', 'local.json'))).resolves.toBeUndefined();
+    });
+
+    it('updates @.claude/TILLER.md import to @.tiller/TILLER.md in CLAUDE.md', async () => {
+      await setupLegacyProject(tmpDir);
+      await writeFile(join(tmpDir, '.claude', 'CLAUDE.md'), '@.claude/TILLER.md\n\nmy notes', 'utf-8');
+
+      const { upgradeCommand } = await import('../../src/commands/upgrade.js');
+      await upgradeCommand({ yes: true });
+
+      const content = await readFile(join(tmpDir, '.claude', 'CLAUDE.md'), 'utf-8');
+      expect(content).toContain('@.tiller/TILLER.md');
+      expect(content).not.toContain('@.claude/TILLER.md');
+    });
+
+    it('updates .gitignore old entries to new paths during migration', async () => {
+      await setupLegacyProject(tmpDir);
+      await writeFile(join(tmpDir, '.gitignore'), '# Tiller\n.tiller.local.json\ncompass.md\n', 'utf-8');
+
+      const { upgradeCommand } = await import('../../src/commands/upgrade.js');
+      await upgradeCommand({ yes: true });
+
+      const content = await readFile(join(tmpDir, '.gitignore'), 'utf-8');
+      expect(content).toContain('.tiller/local.json');
+      expect(content).toContain('.tiller/compass.md');
+    });
+
+    it('does not overwrite already-migrated files', async () => {
+      await setupLegacyProject(tmpDir);
+      // Pre-create new location with different content
+      await mkdir(join(tmpDir, '.tiller'), { recursive: true });
+      await writeFile(join(tmpDir, '.tiller', 'tiller.json'), '{"already":"migrated"}', 'utf-8');
+
+      const { upgradeCommand } = await import('../../src/commands/upgrade.js');
+      await upgradeCommand({ yes: true });
+
+      // New file should not be overwritten by migration (old file still exists at old path)
+      const content = await readFile(join(tmpDir, '.tiller', 'tiller.json'), 'utf-8');
+      expect(content).not.toBe('{"already":"migrated"}'); // upgrade rewrites it anyway
     });
   });
 });
