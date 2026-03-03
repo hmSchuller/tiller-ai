@@ -9,7 +9,7 @@ Use this skill to contribute anything: new features, bug fixes, or incremental t
 
 ## Step 1: Orient
 
-Read `.claude/.tiller.json` (and `.tiller.local.json` if it exists) and `changelog.md` to understand current state.
+Read `.claude/.tiller.json` (and `.tiller.local.json` if it exists), `changelog.md`, and `compass.md` (if it exists) to understand current state.
 If `codebase-map.md` exists, read it to get a structural overview of the codebase.
 Run `git branch` and `git status`.
 
@@ -122,11 +122,11 @@ Use the requirements summary from Step 2.7 to inform milestone breakdown.
 - 2–5 numbered milestones, each with: what gets built + what gets tested + a dependency tag: `[independent]` if it can run in parallel with other independent milestones, or `[depends-on: N]` if it requires milestone N to complete first
 - Files to create or modify
 - Any trade-offs worth noting
-- **Execution rules** (embed verbatim): After plan approval, execute the milestone loop: for each remaining milestone, announce "Milestone X/N: <description>", build functionality, add or update tests, run `npm test` and fix failures, run `git add -A && git commit -m "<milestone>"`, add entry to `changelog.md` Done section then amend commit, report "Saved: <description> (X/N)". When all milestones are done, run Code Review: spawn the Quartermaster agent using the Task tool (foreground, `subagent_type: "quartermaster"`) to review the feature branch diff against main. On PASS: summarize what was built and suggest `/dock`. On FAIL: fix the issues, re-spawn the Quartermaster with rebuttal context. If the Quartermaster FAILs again with "ESCALATE TO CAPTAIN": spawn the Captain via Task tool (foreground, `subagent_type: "captain"`) with the disputed issues, your rebuttal, and the Quartermaster's objections; follow the Captain's ruling (AGREE WITH QUARTERMASTER → fix before docking; AGREE WITH SAILING AGENT → proceed; COMPROMISE → fix blocking items, log rest to `tech-backlog.md`). After review passes, summarize what was built and suggest `/dock`.
+- **Execution rules** (embed verbatim): After plan approval, create `compass.md` if it doesn't exist (using the standard template: Branch / Stages checklist / Milestones / Notes sections). Then update `compass.md`: set Branch to the current branch, check off Orientation and Planning stages, and list the numbered milestones under the Milestones section. Then execute the milestone loop: for each remaining milestone, announce "Milestone X/N: <description>", build functionality, add or update tests, run `npm test` and fix failures, run `git add -A && git commit -m "<milestone>"`, add entry to `changelog.md` Done section then amend commit, update `compass.md` to check off that milestone then amend commit, report "Saved: <description> (X/N)". When all milestones are done, check off the Testing stage in `compass.md`, run Code Review: spawn the Quartermaster agent using the Task tool (foreground, `subagent_type: "quartermaster"`) to review the feature branch diff against main. On PASS: check off the Quartermaster review stage in `compass.md`, summarize what was built and suggest `/dock`. On FAIL: fix the issues, re-spawn the Quartermaster with rebuttal context. If the Quartermaster FAILs again with "ESCALATE TO CAPTAIN": spawn the Captain via Task tool (foreground, `subagent_type: "captain"`) with the disputed issues, your rebuttal, and the Quartermaster's objections; follow the Captain's ruling (AGREE WITH QUARTERMASTER → fix before docking; AGREE WITH SAILING AGENT → proceed; COMPROMISE → fix blocking items, log rest to `tech-backlog.md`). After review passes, summarize what was built and suggest `/dock`.
 
 ## Step 4: Build milestone by milestone
 
-After planning, look at the dependency tags on your milestones:
+After planning, look at the dependency tags on your milestones. **detailed only:** Read `compass.md` to find the milestone checklist and resume from the first unchecked milestone.
 
 ### If all milestones are sequential (all tagged `[depends-on: N]`)
 
@@ -137,7 +137,8 @@ Execute them one by one:
 4. Run `npm test` — **simple:** fix failures silently. **detailed:** fix before continuing.
 5. `git add -A && git commit -m "<milestone description>"`
 6. Add entry to `changelog.md` Done section. Amend: `git commit --amend --no-edit`
-7. **simple:** Say: "Saved: <what changed>". **detailed:** Report: "Saved: <description> (X/N)"
+7. **detailed only:** Update `compass.md` to check off this milestone. Amend: `git commit --amend --no-edit`
+8. **simple:** Say: "Saved: <what changed>". **detailed:** Report: "Saved: <description> (X/N)"
 
 ### If independent milestones exist
 
@@ -166,12 +167,13 @@ Use agent teams to parallelize independent work:
 
 ## Step 4.5: Code Review
 
-After all milestones are built and committed, spawn the Quartermaster to review the feature branch:
+After all milestones are built and committed, **detailed only:** check off the Testing stage in `compass.md`. Then spawn the Quartermaster to review the feature branch:
 
 1. Use the **Task tool** (foreground, `subagent_type: "quartermaster"`)
 2. Wait for the Quartermaster's verdict
 
 **On PASS:**
+- **detailed only:** Check off the Quartermaster review stage in `compass.md`
 - Proceed to Step 5
 
 **On FAIL:**
@@ -197,7 +199,7 @@ For a large milestone where implementation and tests are clearly separable, the 
 ## Step 5: Complete
 
 **simple:** Say: "Feature complete. Type /dock when ready to merge."
-**detailed:** Summarize everything that was built across all milestones. Suggest `/dock` to merge.
+**detailed:** Add a note to `compass.md` under Notes: "Sail complete — ready to /dock." Summarize everything that was built across all milestones. Suggest `/dock` to merge.
 
 ## If something goes wrong
 

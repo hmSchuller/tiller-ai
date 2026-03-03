@@ -132,6 +132,20 @@ describe('scaffold integration', () => {
   it('initializes a git repo with initial commit', async () => {
     expect(await exists('.git')).toBe(true);
   });
+
+  it('creates compass.md with blank template', async () => {
+    expect(await exists('compass.md')).toBe(true);
+    const content = await read('compass.md');
+    expect(content).toContain('compass.md');
+    expect(content).toContain('(none — on main)');
+    expect(content).toContain('Orientation');
+    expect(content).toContain('Milestones');
+  });
+
+  it('.gitignore excludes compass.md', async () => {
+    const content = await read('.gitignore');
+    expect(content).toContain('compass.md');
+  });
 });
 
 describe('scaffold integration — existing .gitignore', () => {
@@ -165,5 +179,10 @@ describe('scaffold integration — existing .gitignore', () => {
     const content = await readFile(join(dir, '.gitignore'), 'utf-8');
     const count = (str: string, sub: string) => str.split(sub).length - 1;
     expect(count(content, '.tiller.local.json')).toBe(1);
+  });
+
+  it('appends compass.md to existing .gitignore', async () => {
+    const content = await readFile(join(dir, '.gitignore'), 'utf-8');
+    expect(content).toContain('compass.md');
   });
 });

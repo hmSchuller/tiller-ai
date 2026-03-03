@@ -245,6 +245,38 @@ describe('generateSailSkill', () => {
     const result = generateSailSkill(simpleConfig);
     expect(result).toContain('requirements summary from Step 2.7');
   });
+
+  it('reads compass.md in Step 1 orient', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('compass.md');
+  });
+
+  it('detailed mode creates compass.md if missing and updates it in Step 3 execution rules', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain("create `compass.md` if it doesn't exist");
+    expect(result).toContain('check off Orientation and Planning stages');
+  });
+
+  it('Step 4 reads compass.md to resume from unchecked milestone', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('Read `compass.md` to find the milestone checklist');
+  });
+
+  it('Step 4 checks off milestones in compass.md after each commit', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('check off this milestone');
+  });
+
+  it('Step 4.5 checks off Testing and Quartermaster review stages in compass.md', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('check off the Testing stage');
+    expect(result).toContain('Check off the Quartermaster review stage');
+  });
+
+  it('Step 5 notes completion in compass.md', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('Sail complete — ready to /dock');
+  });
 });
 
 describe('generateAnchorSkill', () => {

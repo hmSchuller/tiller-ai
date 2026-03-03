@@ -247,4 +247,38 @@ describe('upgradeCommand', () => {
       expect(matches).toHaveLength(1);
     });
   });
+
+  describe('gitignore handling', () => {
+    it('appends missing tiller entries to existing .gitignore during upgrade', async () => {
+      await setupProject(tmpDir);
+      await writeFile(join(tmpDir, '.gitignore'), '# My project\nbuild/\n', 'utf-8');
+
+      const { upgradeCommand } = await import('../../src/commands/upgrade.js');
+      await upgradeCommand({ yes: true });
+
+      const content = await readFile(join(tmpDir, '.gitignore'), 'utf-8');
+      expect(content).toContain('compass.md');
+      expect(content).toContain('.tiller.local.json');
+      expect(content).toContain('# My project');
+    });
+
+    it('does not duplicate gitignore entries already present', async () => {
+      await setupProject(tmpDir);
+      await writeFile(join(tmpDir, '.gitignore'), '# Tiller\n.tiller.local.json\ncompass.md\n', 'utf-8');
+
+      const { upgradeCommand } = await import('../../src/commands/upgrade.js');
+      await upgradeCommand({ yes: true });
+
+      const content = await readFile(join(tmpDir, '.gitignore'), 'utf-8');
+      const compassCount = (content.match(/compass\.md/g) || []).length;
+      expect(compassCount).toBe(1);
+    });
+
+    it('skips gitignore update when no .gitignore exists', async () => {
+      await setupProject(tmpDir);
+      // No .gitignore written — upgrade should not throw
+      const { upgradeCommand } = await import('../../src/commands/upgrade.js');
+      await expect(upgradeCommand({ yes: true })).resolves.toBeUndefined();
+    });
+  });
 });

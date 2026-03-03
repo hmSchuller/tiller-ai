@@ -3,6 +3,9 @@
 > Shared project history. Updated by /sail, /anchor, and /dock. Committed and shared.
 
 ## Done
+- [2026-03-03] fix: create compass.md during sail if missing (upgraded projects without init don't get left without a compass)
+- [2026-03-03] feat: restore compass.md as local sail waypoint for detailed mode — gitignored checklist persists branch/milestones/stages across context clears; wired into orient, plan, build, review, and session-resume hook; upgrade command now syncs gitignore entries
+
 - [2026-03-03] docked feature/upgrade-instructions-in-tiller-md
 
 - [2026-03-02] docked feature/bump-version-to-0-3-1

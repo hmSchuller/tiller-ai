@@ -3,6 +3,7 @@ import { readFile, unlink } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { writeFile } from '../utils/fs.js';
+import { TILLER_GITIGNORE_ENTRIES } from '../scaffold/gitignore.js';
 import { generatePostWriteHook } from '../scaffold/hooks/post-write.js';
 import { generateSecretScanHook } from '../scaffold/hooks/secret-scan.js';
 import { generateSessionResumeHook } from '../scaffold/hooks/session-resume.js';
@@ -108,6 +109,25 @@ export async function upgradeCommand(opts: { yes?: boolean } = {}): Promise<void
     await writeFile(resolve(cwd, '.claude/agents/captain.md'), generateCaptainAgent(config));
     await writeFile(resolve(cwd, '.claude/agents/cartographer.md'), generateCartographerAgent(config));
     await writeFile(resolve(cwd, '.claude/.tiller.json'), generateTillerManifest(config, TILLER_VERSION));
+
+    // Ensure all tiller gitignore entries are present
+    const gitignorePath = resolve(cwd, '.gitignore');
+    let existingGitignore: string | null = null;
+    try {
+      existingGitignore = await readFile(gitignorePath, 'utf-8');
+    } catch {
+      // no .gitignore — skip
+    }
+    if (existingGitignore !== null) {
+      const missing = TILLER_GITIGNORE_ENTRIES.filter(
+        (entry) => !existingGitignore!.split('\n').some((line) => line.trim() === entry)
+      );
+      if (missing.length > 0) {
+        const appendBlock = '\n# Tiller\n' + missing.join('\n') + '\n';
+        await writeFile(gitignorePath, existingGitignore + appendBlock);
+      }
+    }
+
     s.stop('Done!');
   } catch (err) {
     s.stop('Failed.');

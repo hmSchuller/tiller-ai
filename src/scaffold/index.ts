@@ -25,6 +25,7 @@ import { generateBosunAgent } from './agents/bosun.js';
 import { generateCaptainAgent } from './agents/captain.js';
 import { generateCartographerAgent } from './agents/cartographer.js';
 import { generateTechBacklog } from './tech-backlog.js';
+import { generateCompass } from './compass.js';
 
 export async function scaffold(config: ProjectConfig, targetDir: string): Promise<void> {
   const p = (rel: string) => join(targetDir, rel);
@@ -92,6 +93,7 @@ export async function scaffold(config: ProjectConfig, targetDir: string): Promis
 
   // Shared tracking files
   await writeFile(p('tech-backlog.md'), generateTechBacklog(config));
+  await writeFile(p('compass.md'), generateCompass(config));
 
   // Git
   if (!isGitRepo(targetDir)) {
