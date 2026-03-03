@@ -3,6 +3,7 @@
 > Shared project history. Updated by /sail, /anchor, and /dock. Committed and shared.
 
 ## Done
+- [2026-03-03] fix: use relative @../.tiller/TILLER.md import path in .claude/CLAUDE.md
 - [2026-03-03] docked feature/bump-version
 - [2026-03-03] chore: bump version to 0.4.0
 - [2026-03-03] docked feature/move-tiller-config-to-tiller-folder

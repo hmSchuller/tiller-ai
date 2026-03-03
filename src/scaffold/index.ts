@@ -66,8 +66,8 @@ export async function scaffold(config: ProjectConfig, targetDir: string): Promis
   }
   if (existingClaudeMd === null) {
     await writeFile(claudeMdPath, generateUserClaudeMd());
-  } else if (!existingClaudeMd.includes('@.tiller/TILLER.md')) {
-    await writeFile(claudeMdPath, '@.tiller/TILLER.md\n\n' + existingClaudeMd);
+  } else if (!existingClaudeMd.includes('@../.tiller/TILLER.md')) {
+    await writeFile(claudeMdPath, '@../.tiller/TILLER.md\n\n' + existingClaudeMd);
   }
   // else: already has the import — leave unchanged
   await writeFile(p('.claude/settings.json'), generateSettingsJson(config));

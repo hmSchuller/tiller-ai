@@ -129,11 +129,15 @@ export async function upgradeCommand(opts: { yes?: boolean } = {}): Promise<void
     if (existingClaudeMd !== null) {
       // Migrate old import to new path
       if (existingClaudeMd.includes('@.claude/TILLER.md')) {
-        await writeFile(claudeMdPath, existingClaudeMd.replace('@.claude/TILLER.md', '@.tiller/TILLER.md'));
-        existingClaudeMd = existingClaudeMd.replace('@.claude/TILLER.md', '@.tiller/TILLER.md');
+        existingClaudeMd = existingClaudeMd.replace('@.claude/TILLER.md', '@../.tiller/TILLER.md');
+        await writeFile(claudeMdPath, existingClaudeMd);
       }
-      if (!existingClaudeMd.includes('@.tiller/TILLER.md')) {
-        await writeFile(claudeMdPath, '@.tiller/TILLER.md\n\n' + existingClaudeMd);
+      if (existingClaudeMd.includes('@.tiller/TILLER.md') && !existingClaudeMd.includes('@../.tiller/TILLER.md')) {
+        existingClaudeMd = existingClaudeMd.replace('@.tiller/TILLER.md', '@../.tiller/TILLER.md');
+        await writeFile(claudeMdPath, existingClaudeMd);
+      }
+      if (!existingClaudeMd.includes('@../.tiller/TILLER.md')) {
+        await writeFile(claudeMdPath, '@../.tiller/TILLER.md\n\n' + existingClaudeMd);
       }
     }
     await writeFile(resolve(cwd, '.claude/settings.json'), generateSettingsJson(config));

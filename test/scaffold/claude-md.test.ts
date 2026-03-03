@@ -116,9 +116,9 @@ describe('generateTillerMd — config source', () => {
 });
 
 describe('generateUserClaudeMd', () => {
-  it('contains the @.tiller/TILLER.md import line', () => {
+  it('contains the @../.tiller/TILLER.md import line', () => {
     const result = generateUserClaudeMd();
-    expect(result).toContain('@.tiller/TILLER.md');
+    expect(result).toContain('@../.tiller/TILLER.md');
   });
 
   it('does not contain Tiller rules content', () => {
@@ -131,6 +131,6 @@ describe('generateUserClaudeMd', () => {
 
   it('contains only the import line (no extra noise)', () => {
     const result = generateUserClaudeMd();
-    expect(result.trim()).toBe('@.tiller/TILLER.md');
+    expect(result.trim()).toBe('@../.tiller/TILLER.md');
   });
 });

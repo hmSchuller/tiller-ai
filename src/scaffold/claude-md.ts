@@ -108,5 +108,5 @@ Tiller provides four specialist agents in \`.claude/agents/\`. They are native C
 }
 
 export function generateUserClaudeMd(): string {
-  return `@.tiller/TILLER.md\n`;
+  return `@../.tiller/TILLER.md\n`;
 }
