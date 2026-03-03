@@ -251,9 +251,9 @@ describe('generateSailSkill', () => {
     expect(result).toContain('compass.md');
   });
 
-  it('detailed mode updates compass.md in Step 3 execution rules', () => {
+  it('detailed mode creates compass.md if missing and updates it in Step 3 execution rules', () => {
     const result = generateSailSkill(simpleConfig);
-    expect(result).toContain('update `compass.md`');
+    expect(result).toContain("create `compass.md` if it doesn't exist");
     expect(result).toContain('check off Orientation and Planning stages');
   });
 
