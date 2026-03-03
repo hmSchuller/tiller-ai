@@ -38,5 +38,5 @@ Vitest unit and integration tests. Unit tests cover individual generators; integ
 
 **Path:** `website/`
 
-Static Astro site deployed to GitHub Pages. Nautical theme with navy/teal/gold palette. Not part of the npm package — exists purely for project marketing. The landing page is assembled from section components in `website/src/components/` (Hero, Problem, Features, HowItWorks, GettingStarted, Footer). Edit those components for content changes; the GitHub Actions pipeline handles deployment.
+Static Astro site deployed to GitHub Pages. Nautical theme with navy/teal/gold palette. Not part of the npm package — exists purely for project marketing. The landing page is assembled from section components in `website/src/components/` (Hero, Problem, Features, WaysToWork, HowItWorks, GettingStarted, Footer). The WaysToWork component showcases three personas (Solo Creator using simple mode, Solo Developer and Engineering Team using detailed mode) with feature cards explaining how Tiller supports each workflow. Edit those components for content changes; the GitHub Actions pipeline handles deployment.
 
