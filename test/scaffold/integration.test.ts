@@ -45,12 +45,12 @@ describe('scaffold integration', () => {
   it('creates .claude/CLAUDE.md with TILLER.md import', async () => {
     expect(await exists('.claude/CLAUDE.md')).toBe(true);
     const content = await read('.claude/CLAUDE.md');
-    expect(content).toContain('@.claude/TILLER.md');
+    expect(content).toContain('@.tiller/TILLER.md');
   });
 
-  it('creates .claude/TILLER.md with Tiller rules', async () => {
-    expect(await exists('.claude/TILLER.md')).toBe(true);
-    const content = await read('.claude/TILLER.md');
+  it('creates .tiller/TILLER.md with Tiller rules', async () => {
+    expect(await exists('.tiller/TILLER.md')).toBe(true);
+    const content = await read('.tiller/TILLER.md');
     expect(content).toContain('Vibe loop');
   });
 
@@ -60,9 +60,9 @@ describe('scaffold integration', () => {
     expect(() => JSON.parse(content)).not.toThrow();
   });
 
-  it('creates .claude/.tiller.json', async () => {
-    expect(await exists('.claude/.tiller.json')).toBe(true);
-    const content = JSON.parse(await read('.claude/.tiller.json'));
+  it('creates .tiller/tiller.json', async () => {
+    expect(await exists('.tiller/tiller.json')).toBe(true);
+    const content = JSON.parse(await read('.tiller/tiller.json'));
     expect(content.mode).toBe('simple');
     expect(content.workflow).toBe('solo');
     expect(content.runCommand).toBe('echo ok');
@@ -75,9 +75,9 @@ describe('scaffold integration', () => {
     expect(content).toContain('v0 — initial scaffold');
   });
 
-  it('.gitignore excludes .tiller.local.json', async () => {
+  it('.gitignore excludes .tiller/local.json', async () => {
     const content = await read('.gitignore');
-    expect(content).toContain('.tiller.local.json');
+    expect(content).toContain('.tiller/local.json');
   });
 
   it('creates .gitignore', async () => {
@@ -96,9 +96,9 @@ describe('scaffold integration', () => {
     expect(await exists('.claude/hooks/session-resume.sh')).toBe(true);
   });
 
-  it('creates .claude/.tiller-tech-debt.json with correct defaults', async () => {
-    expect(await exists('.claude/.tiller-tech-debt.json')).toBe(true);
-    const content = JSON.parse(await read('.claude/.tiller-tech-debt.json'));
+  it('creates .tiller/tech-debt.json with correct defaults', async () => {
+    expect(await exists('.tiller/tech-debt.json')).toBe(true);
+    const content = JSON.parse(await read('.tiller/tech-debt.json'));
     expect(content.lastTechDebtAtFeature).toBe(0);
     expect(content.threshold).toBe(3);
   });
@@ -133,18 +133,18 @@ describe('scaffold integration', () => {
     expect(await exists('.git')).toBe(true);
   });
 
-  it('creates compass.md with blank template', async () => {
-    expect(await exists('compass.md')).toBe(true);
-    const content = await read('compass.md');
+  it('creates .tiller/compass.md with blank template', async () => {
+    expect(await exists('.tiller/compass.md')).toBe(true);
+    const content = await read('.tiller/compass.md');
     expect(content).toContain('compass.md');
     expect(content).toContain('(none — on main)');
     expect(content).toContain('Orientation');
     expect(content).toContain('Milestones');
   });
 
-  it('.gitignore excludes compass.md', async () => {
+  it('.gitignore excludes .tiller/compass.md', async () => {
     const content = await read('.gitignore');
-    expect(content).toContain('compass.md');
+    expect(content).toContain('.tiller/compass.md');
   });
 });
 
@@ -171,18 +171,18 @@ describe('scaffold integration — existing .gitignore', () => {
 
   it('appends missing tiller entries under a # Tiller comment', async () => {
     const content = await readFile(join(dir, '.gitignore'), 'utf-8');
-    expect(content).toContain('.tiller.local.json');
+    expect(content).toContain('.tiller/local.json');
     expect(content).toContain('# Tiller');
   });
 
   it('does not duplicate tiller entries when already present', async () => {
     const content = await readFile(join(dir, '.gitignore'), 'utf-8');
     const count = (str: string, sub: string) => str.split(sub).length - 1;
-    expect(count(content, '.tiller.local.json')).toBe(1);
+    expect(count(content, '.tiller/local.json')).toBe(1);
   });
 
-  it('appends compass.md to existing .gitignore', async () => {
+  it('appends .tiller/compass.md to existing .gitignore', async () => {
     const content = await readFile(join(dir, '.gitignore'), 'utf-8');
-    expect(content).toContain('compass.md');
+    expect(content).toContain('.tiller/compass.md');
   });
 });

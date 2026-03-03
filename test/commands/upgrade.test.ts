@@ -18,6 +18,7 @@ vi.mock('@clack/prompts', async (importOriginal) => {
 });
 
 async function setupProject(tmpDir: string) {
+  await mkdir(join(tmpDir, '.tiller'), { recursive: true });
   await mkdir(join(tmpDir, '.claude', 'hooks'), { recursive: true });
   await mkdir(join(tmpDir, '.claude', 'skills', 'setup'), { recursive: true });
   await mkdir(join(tmpDir, '.claude', 'skills', 'sail'), { recursive: true });
@@ -28,7 +29,7 @@ async function setupProject(tmpDir: string) {
   await mkdir(join(tmpDir, '.claude', 'skills', 'scout'), { recursive: true });
   await mkdir(join(tmpDir, '.claude', 'agents'), { recursive: true });
   const config = { projectName: 'test-proj', description: 'desc', runCommand: 'npm test', mode: 'detailed' as const, workflow: 'solo' as const };
-  await writeFile(join(tmpDir, '.claude', '.tiller.json'), generateTillerManifest(config, TILLER_VERSION), 'utf-8');
+  await writeFile(join(tmpDir, '.tiller', 'tiller.json'), generateTillerManifest(config, TILLER_VERSION), 'utf-8');
 }
 
 describe('upgradeCommand', () => {
@@ -59,7 +60,7 @@ describe('upgradeCommand', () => {
 
     await expect(upgradeCommand()).rejects.toThrow('process.exit called');
     expect(exitSpy).toHaveBeenCalledWith(1);
-    expect(prompts.cancel).toHaveBeenCalledWith(expect.stringContaining('.tiller.json'));
+    expect(prompts.cancel).toHaveBeenCalledWith(expect.stringContaining('.tiller/tiller.json'));
   });
 
   it('--yes skips confirmation and writes managed files', async () => {
@@ -72,7 +73,7 @@ describe('upgradeCommand', () => {
 
     expect(prompts.confirm).not.toHaveBeenCalled();
 
-    const manifest = JSON.parse(await readFile(join(tmpDir, '.claude', '.tiller.json'), 'utf-8'));
+    const manifest = JSON.parse(await readFile(join(tmpDir, '.tiller', 'tiller.json'), 'utf-8'));
     expect(manifest.version).toBe(TILLER_VERSION);
   });
 
@@ -83,7 +84,7 @@ describe('upgradeCommand', () => {
 
     await upgradeCommand({ yes: true });
 
-    const manifest = JSON.parse(await readFile(join(tmpDir, '.claude', '.tiller.json'), 'utf-8'));
+    const manifest = JSON.parse(await readFile(join(tmpDir, '.tiller', 'tiller.json'), 'utf-8'));
     expect(manifest.mode).toBe('detailed');
     expect(manifest.workflow).toBe('solo');
   });
@@ -160,7 +161,7 @@ describe('upgradeCommand', () => {
         runCommand: 'npm test',
         managedFiles: [...MANAGED_FILES, staleFile],
       };
-      await writeFile(join(tmpDir, '.claude', '.tiller.json'), JSON.stringify(oldManifest, null, 2), 'utf-8');
+      await writeFile(join(tmpDir, '.tiller', 'tiller.json'), JSON.stringify(oldManifest, null, 2), 'utf-8');
 
       const { upgradeCommand } = await import('../../src/commands/upgrade.js');
       await upgradeCommand({ yes: true });
@@ -179,7 +180,7 @@ describe('upgradeCommand', () => {
         runCommand: 'npm test',
         managedFiles: [...MANAGED_FILES, '.claude/skills/ghost/SKILL.md'],
       };
-      await writeFile(join(tmpDir, '.claude', '.tiller.json'), JSON.stringify(oldManifest, null, 2), 'utf-8');
+      await writeFile(join(tmpDir, '.tiller', 'tiller.json'), JSON.stringify(oldManifest, null, 2), 'utf-8');
 
       const { upgradeCommand } = await import('../../src/commands/upgrade.js');
       // Should not throw
@@ -193,8 +194,8 @@ describe('upgradeCommand', () => {
       await upgradeCommand({ yes: true });
 
       // Current managed files should still be listed in the updated manifest
-      const manifest = JSON.parse(await readFile(join(tmpDir, '.claude', '.tiller.json'), 'utf-8'));
-      expect(manifest.managedFiles).toContain('.claude/TILLER.md');
+      const manifest = JSON.parse(await readFile(join(tmpDir, '.tiller', 'tiller.json'), 'utf-8'));
+      expect(manifest.managedFiles).toContain('.tiller/TILLER.md');
     });
 
     it('does not delete .claude/CLAUDE.md even when listed as stale in old manifest', async () => {
@@ -211,7 +212,7 @@ describe('upgradeCommand', () => {
         runCommand: 'npm test',
         managedFiles: [...MANAGED_FILES, '.claude/CLAUDE.md'],
       };
-      await writeFile(join(tmpDir, '.claude', '.tiller.json'), JSON.stringify(oldManifest, null, 2), 'utf-8');
+      await writeFile(join(tmpDir, '.tiller', 'tiller.json'), JSON.stringify(oldManifest, null, 2), 'utf-8');
 
       const { upgradeCommand } = await import('../../src/commands/upgrade.js');
       await upgradeCommand({ yes: true });
@@ -221,7 +222,7 @@ describe('upgradeCommand', () => {
       expect(content).toContain('my custom instructions');
     });
 
-    it('adds @.claude/TILLER.md import to existing CLAUDE.md that lacks it', async () => {
+    it('adds @.tiller/TILLER.md import to existing CLAUDE.md that lacks it', async () => {
       await setupProject(tmpDir);
 
       await writeFile(join(tmpDir, '.claude', 'CLAUDE.md'), 'my custom instructions', 'utf-8');
@@ -230,11 +231,11 @@ describe('upgradeCommand', () => {
       await upgradeCommand({ yes: true });
 
       const content = await readFile(join(tmpDir, '.claude', 'CLAUDE.md'), 'utf-8');
-      expect(content).toContain('@.claude/TILLER.md');
+      expect(content).toContain('@.tiller/TILLER.md');
       expect(content).toContain('my custom instructions');
     });
 
-    it('does not duplicate @.claude/TILLER.md import if already present', async () => {
+    it('migrates @.claude/TILLER.md import to @.tiller/TILLER.md', async () => {
       await setupProject(tmpDir);
 
       await writeFile(join(tmpDir, '.claude', 'CLAUDE.md'), '@.claude/TILLER.md\n\nmy custom instructions', 'utf-8');
@@ -243,7 +244,20 @@ describe('upgradeCommand', () => {
       await upgradeCommand({ yes: true });
 
       const content = await readFile(join(tmpDir, '.claude', 'CLAUDE.md'), 'utf-8');
-      const matches = content.match(/@\.claude\/TILLER\.md/g);
+      expect(content).toContain('@.tiller/TILLER.md');
+      expect(content).not.toContain('@.claude/TILLER.md');
+    });
+
+    it('does not duplicate @.tiller/TILLER.md import if already present', async () => {
+      await setupProject(tmpDir);
+
+      await writeFile(join(tmpDir, '.claude', 'CLAUDE.md'), '@.tiller/TILLER.md\n\nmy custom instructions', 'utf-8');
+
+      const { upgradeCommand } = await import('../../src/commands/upgrade.js');
+      await upgradeCommand({ yes: true });
+
+      const content = await readFile(join(tmpDir, '.claude', 'CLAUDE.md'), 'utf-8');
+      const matches = content.match(/@\.tiller\/TILLER\.md/g);
       expect(matches).toHaveLength(1);
     });
   });
@@ -257,20 +271,20 @@ describe('upgradeCommand', () => {
       await upgradeCommand({ yes: true });
 
       const content = await readFile(join(tmpDir, '.gitignore'), 'utf-8');
-      expect(content).toContain('compass.md');
-      expect(content).toContain('.tiller.local.json');
+      expect(content).toContain('.tiller/compass.md');
+      expect(content).toContain('.tiller/local.json');
       expect(content).toContain('# My project');
     });
 
     it('does not duplicate gitignore entries already present', async () => {
       await setupProject(tmpDir);
-      await writeFile(join(tmpDir, '.gitignore'), '# Tiller\n.tiller.local.json\ncompass.md\n', 'utf-8');
+      await writeFile(join(tmpDir, '.gitignore'), '# Tiller\n.tiller/local.json\n.tiller/compass.md\n', 'utf-8');
 
       const { upgradeCommand } = await import('../../src/commands/upgrade.js');
       await upgradeCommand({ yes: true });
 
       const content = await readFile(join(tmpDir, '.gitignore'), 'utf-8');
-      const compassCount = (content.match(/compass\.md/g) || []).length;
+      const compassCount = (content.match(/\.tiller\/compass\.md/g) || []).length;
       expect(compassCount).toBe(1);
     });
 

@@ -94,7 +94,7 @@ describe('generateSailSkill', () => {
     const result = generateSailSkill(simpleConfig);
     expect(result).toContain('Step 2.5');
     expect(result).toContain('tech debt');
-    expect(result).toContain('.tiller-tech-debt.json');
+    expect(result).toContain('.tiller/tech-debt.json');
     expect(result).toContain('landedCount');
   });
 
@@ -251,15 +251,15 @@ describe('generateSailSkill', () => {
     expect(result).toContain('compass.md');
   });
 
-  it('detailed mode creates compass.md if missing and updates it in Step 3 execution rules', () => {
+  it('detailed mode creates .tiller/compass.md if missing and updates it in Step 3 execution rules', () => {
     const result = generateSailSkill(simpleConfig);
-    expect(result).toContain("create `compass.md` if it doesn't exist");
+    expect(result).toContain("create `.tiller/compass.md` if it doesn't exist");
     expect(result).toContain('check off Orientation and Planning stages');
   });
 
-  it('Step 4 reads compass.md to resume from unchecked milestone', () => {
+  it('Step 4 reads .tiller/compass.md to resume from unchecked milestone', () => {
     const result = generateSailSkill(simpleConfig);
-    expect(result).toContain('Read `compass.md` to find the milestone checklist');
+    expect(result).toContain('Read `.tiller/compass.md` to find the milestone checklist');
   });
 
   it('Step 4 checks off milestones in compass.md after each commit', () => {
@@ -377,8 +377,8 @@ describe('generateTechDebtSkill', () => {
     expect(result).toContain('--no-ff');
   });
 
-  it('updates .tiller-tech-debt.json state', () => {
-    expect(generateTechDebtSkill(simpleConfig)).toContain('.tiller-tech-debt.json');
+  it('updates .tiller/tech-debt.json state', () => {
+    expect(generateTechDebtSkill(simpleConfig)).toContain('.tiller/tech-debt.json');
   });
 
   it('includes simple and detailed mode reporting', () => {

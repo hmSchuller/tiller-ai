@@ -50,8 +50,12 @@ export async function scaffold(config: ProjectConfig, targetDir: string): Promis
   }
   await writeFile(p('changelog.md'), generateChangelog(config));
 
+  // .tiller/ files
+  await writeFile(p('.tiller/TILLER.md'), generateTillerMd(config));
+  await writeFile(p('.tiller/tiller.json'), generateTillerManifest(config, TILLER_VERSION));
+  await writeFile(p('.tiller/tech-debt.json'), generateTechDebtState());
+
   // .claude/ files
-  await writeFile(p('.claude/TILLER.md'), generateTillerMd(config));
   // .claude/CLAUDE.md: create on first init only; if it exists, add import line if missing
   const claudeMdPath = p('.claude/CLAUDE.md');
   let existingClaudeMd: string | null = null;
@@ -62,13 +66,11 @@ export async function scaffold(config: ProjectConfig, targetDir: string): Promis
   }
   if (existingClaudeMd === null) {
     await writeFile(claudeMdPath, generateUserClaudeMd());
-  } else if (!existingClaudeMd.includes('@.claude/TILLER.md')) {
-    await writeFile(claudeMdPath, '@.claude/TILLER.md\n\n' + existingClaudeMd);
+  } else if (!existingClaudeMd.includes('@.tiller/TILLER.md')) {
+    await writeFile(claudeMdPath, '@.tiller/TILLER.md\n\n' + existingClaudeMd);
   }
   // else: already has the import — leave unchanged
   await writeFile(p('.claude/settings.json'), generateSettingsJson(config));
-  await writeFile(p('.claude/.tiller.json'), generateTillerManifest(config, TILLER_VERSION));
-  await writeFile(p('.claude/.tiller-tech-debt.json'), generateTechDebtState());
 
   // Hooks
   await writeFile(p('.claude/hooks/post-write.sh'), generatePostWriteHook(config));
@@ -91,9 +93,9 @@ export async function scaffold(config: ProjectConfig, targetDir: string): Promis
   await writeFile(p('.claude/agents/captain.md'), generateCaptainAgent(config));
   await writeFile(p('.claude/agents/cartographer.md'), generateCartographerAgent(config));
 
-  // Shared tracking files
+  // Shared tracking files (compass and local.json are gitignored inside .tiller/)
   await writeFile(p('tech-backlog.md'), generateTechBacklog(config));
-  await writeFile(p('compass.md'), generateCompass(config));
+  await writeFile(p('.tiller/compass.md'), generateCompass(config));
 
   // Git
   if (!isGitRepo(targetDir)) {

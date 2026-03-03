@@ -36,9 +36,9 @@ describe('generateTillerMd', () => {
     expect(result).toContain('changelog.md');
   });
 
-  it('documents per-dev override via .tiller.local.json', () => {
+  it('documents per-dev override via .tiller/local.json', () => {
     const result = generateTillerMd(simpleConfig);
-    expect(result).toContain('.tiller.local.json');
+    expect(result).toContain('.tiller/local.json');
   });
 
   it('mentions agent team parallelization in vibe loop description', () => {
@@ -105,7 +105,7 @@ describe('generateTillerMd', () => {
 describe('generateTillerMd — config source', () => {
   it('references .tiller.json for mode, not CLAUDE.md', () => {
     const result = generateTillerMd(simpleConfig);
-    expect(result).toContain('.claude/.tiller.json');
+    expect(result).toContain('.tiller/tiller.json');
     expect(result).not.toContain('mode is set in CLAUDE.md');
   });
 
@@ -116,9 +116,9 @@ describe('generateTillerMd — config source', () => {
 });
 
 describe('generateUserClaudeMd', () => {
-  it('contains the @.claude/TILLER.md import line', () => {
+  it('contains the @.tiller/TILLER.md import line', () => {
     const result = generateUserClaudeMd();
-    expect(result).toContain('@.claude/TILLER.md');
+    expect(result).toContain('@.tiller/TILLER.md');
   });
 
   it('does not contain Tiller rules content', () => {
@@ -131,6 +131,6 @@ describe('generateUserClaudeMd', () => {
 
   it('contains only the import line (no extra noise)', () => {
     const result = generateUserClaudeMd();
-    expect(result.trim()).toBe('@.claude/TILLER.md');
+    expect(result.trim()).toBe('@.tiller/TILLER.md');
   });
 });

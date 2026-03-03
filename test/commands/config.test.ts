@@ -23,9 +23,9 @@ async function setupProject(
 ) {
   const mode = opts.mode ?? 'detailed';
   const workflow = opts.workflow ?? 'solo';
-  await mkdir(join(tmpDir, '.claude'), { recursive: true });
+  await mkdir(join(tmpDir, '.tiller'), { recursive: true });
   const config = { projectName: 'test-proj', description: 'desc', runCommand: 'npm test', mode, workflow };
-  await writeFile(join(tmpDir, '.claude/.tiller.json'), generateTillerManifest(config, TILLER_VERSION), 'utf-8');
+  await writeFile(join(tmpDir, '.tiller/tiller.json'), generateTillerManifest(config, TILLER_VERSION), 'utf-8');
 }
 
 describe('configCommand', () => {
@@ -56,10 +56,10 @@ describe('configCommand', () => {
 
     await expect(configCommand()).rejects.toThrow('process.exit called');
     expect(exitSpy).toHaveBeenCalledWith(1);
-    expect(prompts.cancel).toHaveBeenCalledWith(expect.stringContaining('.tiller.json'));
+    expect(prompts.cancel).toHaveBeenCalledWith(expect.stringContaining('.tiller/tiller.json'));
   });
 
-  it('writes mode and workflow to .tiller.local.json for local scope', async () => {
+  it('writes mode and workflow to .tiller/local.json for local scope', async () => {
     await setupProject(tmpDir, { mode: 'detailed', workflow: 'solo' });
 
     const prompts = await import('@clack/prompts');
@@ -71,15 +71,15 @@ describe('configCommand', () => {
     const { configCommand } = await import('../../src/commands/config.js');
     await configCommand();
 
-    const localPath = join(tmpDir, '.tiller.local.json');
+    const localPath = join(tmpDir, '.tiller/local.json');
     const content = JSON.parse(await readFile(localPath, 'utf-8'));
     expect(content.mode).toBe('simple');
     expect(content.workflow).toBe('team');
   });
 
-  it('merges with existing .tiller.local.json on local scope', async () => {
+  it('merges with existing .tiller/local.json on local scope', async () => {
     await setupProject(tmpDir);
-    const localPath = join(tmpDir, '.tiller.local.json');
+    const localPath = join(tmpDir, '.tiller/local.json');
     await writeFile(localPath, JSON.stringify({ someOtherKey: true }, null, 2), 'utf-8');
 
     const prompts = await import('@clack/prompts');
@@ -109,14 +109,14 @@ describe('configCommand', () => {
     const { configCommand } = await import('../../src/commands/config.js');
     await configCommand();
 
-    const manifest = JSON.parse(await readFile(join(tmpDir, '.claude/.tiller.json'), 'utf-8'));
+    const manifest = JSON.parse(await readFile(join(tmpDir, '.tiller/tiller.json'), 'utf-8'));
     expect(manifest.mode).toBe('simple');
     expect(manifest.workflow).toBe('team');
   });
 
   it('shows no-op message when local values already match', async () => {
     await setupProject(tmpDir);
-    const localPath = join(tmpDir, '.tiller.local.json');
+    const localPath = join(tmpDir, '.tiller/local.json');
     await writeFile(localPath, JSON.stringify({ mode: 'simple', workflow: 'team' }, null, 2), 'utf-8');
 
     const prompts = await import('@clack/prompts');

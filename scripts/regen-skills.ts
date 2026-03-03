@@ -13,10 +13,10 @@ import { generateBosunAgent } from '../src/scaffold/agents/bosun.ts';
 import { generateCaptainAgent } from '../src/scaffold/agents/captain.ts';
 import type { ProjectConfig } from '../src/scaffold/types.ts';
 
-// Read config from .tiller.json + .tiller.local.json
-const manifest = JSON.parse(await readFile('.claude/.tiller.json', 'utf-8'));
-const local = existsSync('.tiller.local.json')
-  ? JSON.parse(await readFile('.tiller.local.json', 'utf-8'))
+// Read config from .tiller/tiller.json + .tiller/local.json
+const manifest = JSON.parse(await readFile('.tiller/tiller.json', 'utf-8'));
+const local = existsSync('.tiller/local.json')
+  ? JSON.parse(await readFile('.tiller/local.json', 'utf-8'))
   : {};
 
 const config: ProjectConfig = {
