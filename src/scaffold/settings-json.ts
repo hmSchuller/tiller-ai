@@ -36,6 +36,17 @@ export function generateSettingsJson(_config: ProjectConfig): string {
           ],
         },
       ],
+      SubagentStart: [
+        {
+          matcher: 'Plan',
+          hooks: [
+            {
+              type: 'command',
+              command: 'bash .claude/hooks/plan-context.sh',
+            },
+          ],
+        },
+      ],
     },
     permissions: {
       allow: [
