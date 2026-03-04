@@ -602,10 +602,6 @@ describe('generateDockSkill', () => {
     expect(generateDockSkill(simpleConfig)).toContain('npm test');
   });
 
-  it('updates changelog.md', () => {
-    expect(generateDockSkill(simpleConfig)).toContain('changelog.md');
-  });
-
   it('updates changelog.md when docking', () => {
     expect(generateDockSkill(simpleConfig)).toContain('changelog.md');
   });
