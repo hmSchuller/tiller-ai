@@ -5,12 +5,12 @@
 
 ## Backlog
 
-- [minor] src/scaffold/skills/setup.ts: Step 4 body text refers to `.tiller.json` (old filename) in two places — should say `.tiller/tiller.json` to match the actual path
 - [minor] src/scaffold/hooks/plan-context.ts: comment on line 3 flags a known sync hazard — plan template is duplicated from sail.ts Step 3 and must be kept in sync manually; no automated guard exists
 - [major] src/scaffold/index.ts + src/commands/upgrade.ts: gitignore missing-entries logic (filter + split('\n') + append block) is duplicated verbatim in both files with no shared helper
 
 ## Done
 
+- [done 2026-03-04] src/scaffold/skills/setup.ts: Step 4 heading referred to `.tiller.json` (old filename) in both SIMPLE and DETAILED branches — corrected to `.tiller/tiller.json` to match the actual path
 - [done 2026-03-04] test/scaffold/skills.test.ts: duplicate test case — two identical `it` blocks in `generateDockSkill` both asserted `toContain('changelog.md')` with different names but the same body; removed the less descriptive duplicate
 - [done 2026-03-03] src/commands/upgrade.ts: `writeFile as fsWriteFile` from `node:fs/promises` was still used in `migrateLegacyFiles` for a `.gitignore` write — replaced with the shared `writeFile` utility from `utils/fs.ts` for consistency; removed the now-unused alias from the import
 
