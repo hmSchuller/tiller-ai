@@ -25,8 +25,16 @@ You are the Sailing Agent running a scheduled tech debt cleanup. Your job: deleg
    - Apply the Bosun's fix
    - Run `npm test` — if it fails, revert and skip (report "skipped — verify failed")
    - `git add -A && git commit -m "chore: tech debt — <short-desc>"`
-   - `git checkout main && git merge --no-ff chore/tech-debt-<short-desc> -m "chore: tech debt — <short-desc>"`
-   - `git branch -d chore/tech-debt-<short-desc>`
+   - Read workflow from `.tiller/local.json` if it exists, otherwise from `.tiller/tiller.json`. Default: solo.
+   - **If workflow is solo:**
+     - `git checkout main && git merge --no-ff chore/tech-debt-<short-desc> -m "chore: tech debt — <short-desc>"`
+     - `git branch -d chore/tech-debt-<short-desc>`
+   - **If workflow is team:**
+     - `git push origin chore/tech-debt-<short-desc>`
+     - Check if `gh` CLI is available: run `which gh`.
+     - If gh is available: run `gh pr create --fill` and print the PR URL.
+     - If gh is not available: run `git remote get-url origin` and say: "Push done. Open a PR at: <remote-url>/compare/chore/tech-debt-<short-desc>"
+     - Do NOT delete the chore branch locally.
    - `git checkout <original-branch> && git stash pop` (restore original state)
 
 ## Guardrails — you MUST NOT
