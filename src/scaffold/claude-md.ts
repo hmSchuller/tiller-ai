@@ -40,7 +40,7 @@ Single developer or local-only flow. /dock merges directly to main.
 
 ### team
 
-Multiple developers. /dock pushes the feature branch and opens a PR. Merging happens on GitHub/GitLab after review and CI.
+Multiple developers. /dock pushes the feature branch and opens a PR. Merging happens on GitHub/GitLab after review and CI. Tech debt chore branches (/tech-debt, /repair-hull) are also pushed and opened as PRs instead of merged locally.
 
 ## Vibe loop
 

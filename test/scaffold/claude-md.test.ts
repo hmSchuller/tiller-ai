@@ -100,6 +100,12 @@ describe('generateTillerMd', () => {
     const result = generateTillerMd(simpleConfig);
     expect(result).not.toContain('Do not edit manually');
   });
+
+  it('team section notes chore branches are pushed as PRs', () => {
+    const result = generateTillerMd(simpleConfig);
+    expect(result).toContain('Tech debt chore branches');
+    expect(result).toContain('pushed and opened as PRs');
+  });
 });
 
 describe('generateTillerMd — config source', () => {
