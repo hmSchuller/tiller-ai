@@ -44,7 +44,7 @@ Look at the project files silently. Do not ask the user about this.
 - \`Makefile\` with a \`test\` target → \`make test\`
 - Nothing recognizable → \`echo ok\` (can be updated later)
 
-**Step 4: Update .tiller.json and commit**
+**Step 4: Update .tiller/tiller.json and commit**
 
 Update \`runCommand\` and \`mode\` in \`.tiller/tiller.json\`.
 
@@ -73,7 +73,7 @@ Ask: "What command should I run to verify everything's working after a change?"
 
 Give suggestions based on what you see in the project. If they don't know yet, suggest \`echo ok\` as a placeholder.
 
-**Step 4: Update .tiller.json and commit**
+**Step 4: Update .tiller/tiller.json and commit**
 
 Update \`runCommand\` and \`mode\` in \`.tiller/tiller.json\`.
 
