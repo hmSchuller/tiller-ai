@@ -57,8 +57,19 @@ Run \`${config.runCommand}\`.
 
 ## Step 6: Merge & cleanup
 
+Read workflow from \`.tiller/local.json\` if it exists, otherwise from \`.tiller/tiller.json\`. Default: solo.
+
+**If workflow is solo:**
 - \`git checkout main && git merge --no-ff chore/repair-hull-<kebab-desc> -m "chore: repair-hull — <desc>"\`
 - \`git branch -d chore/repair-hull-<kebab-desc>\`
+
+**If workflow is team:**
+- \`git push origin chore/repair-hull-<kebab-desc>\`
+- Check if \`gh\` CLI is available: run \`which gh\`.
+- If gh is available: run \`gh pr create --fill\` and print the PR URL.
+- If gh is not available: run \`git remote get-url origin\` and say: "Push done. Open a PR at: <remote-url>/compare/chore/repair-hull-<kebab-desc>"
+- Do NOT delete the chore branch locally.
+
 - \`git checkout <original-branch> && git stash pop\` (restore original state)
 - Mark the item as done in \`tech-backlog.md\`
 

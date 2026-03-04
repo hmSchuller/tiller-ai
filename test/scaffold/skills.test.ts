@@ -483,6 +483,30 @@ describe('generateTechDebtSkill', () => {
     const result = generateTechDebtSkill(simpleConfig);
     expect(result).toContain('(landed|docked) feature/');
   });
+
+  it('solo workflow: merges chore branch with --no-ff', () => {
+    const result = generateTechDebtSkill(simpleConfig);
+    expect(result).toContain('--no-ff');
+    expect(result).toContain('git branch -d chore/tech-debt-');
+  });
+
+  it('team workflow: pushes chore branch and opens PR', () => {
+    const result = generateTechDebtSkill(teamSimpleConfig);
+    expect(result).toContain('git push origin chore/tech-debt-');
+    expect(result).toContain('gh pr create --fill');
+    expect(result).toContain('which gh');
+  });
+
+  it('team workflow: does not delete chore branch locally', () => {
+    const result = generateTechDebtSkill(teamSimpleConfig);
+    expect(result).toContain('Do NOT delete the chore branch locally');
+  });
+
+  it('reads workflow from local.json with fallback to tiller.json', () => {
+    const result = generateTechDebtSkill(simpleConfig);
+    expect(result).toContain('.tiller/local.json');
+    expect(result).toContain('.tiller/tiller.json');
+  });
 });
 
 describe('generateScoutSkill', () => {
@@ -698,5 +722,29 @@ describe('generateRepairHullSkill', () => {
     const result = generateRepairHullSkill(simpleConfig);
     expect(result).toContain('Guardrails');
     expect(result).toContain('MUST NOT');
+  });
+
+  it('solo workflow: merges chore branch with --no-ff', () => {
+    const result = generateRepairHullSkill(simpleConfig);
+    expect(result).toContain('--no-ff');
+    expect(result).toContain('git branch -d chore/repair-hull-');
+  });
+
+  it('team workflow: pushes chore branch and opens PR', () => {
+    const result = generateRepairHullSkill(teamSimpleConfig);
+    expect(result).toContain('git push origin chore/repair-hull-');
+    expect(result).toContain('gh pr create --fill');
+    expect(result).toContain('which gh');
+  });
+
+  it('team workflow: does not delete chore branch locally', () => {
+    const result = generateRepairHullSkill(teamSimpleConfig);
+    expect(result).toContain('Do NOT delete the chore branch locally');
+  });
+
+  it('reads workflow from local.json with fallback to tiller.json', () => {
+    const result = generateRepairHullSkill(simpleConfig);
+    expect(result).toContain('.tiller/local.json');
+    expect(result).toContain('.tiller/tiller.json');
   });
 });

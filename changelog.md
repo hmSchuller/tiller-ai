@@ -3,6 +3,7 @@
 > Shared project history. Updated by /sail, /anchor, and /dock. Committed and shared.
 
 ## Done
+- [2026-03-04] feat: team mode awareness in tech debt chore flow — /tech-debt and /repair-hull now push + open PR in team workflow instead of merging locally; TILLER.md documents the behavior
 - [2026-03-04] chore: add MIT LICENSE file to project root
 - [2026-03-03] docked feature/bump-to-0-5-0
 - [2026-03-03] bump version to 0.5.0
