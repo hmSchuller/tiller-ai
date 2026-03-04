@@ -678,6 +678,58 @@ describe('generateDockSkill', () => {
     expect(result).toContain('subagent_type: "captain"');
     expect(result).toContain('log to tech-backlog.md');
   });
+
+  it('includes Step 4 Quartermaster check', () => {
+    const result = generateDockSkill(simpleConfig);
+    expect(result).toContain('Step 4');
+    expect(result).toContain('Quartermaster check');
+    expect(result).toContain('subagent_type: "quartermaster"');
+  });
+
+  it('Step 4 handles three cases: QM ran, QM not run, history unavailable', () => {
+    const result = generateDockSkill(simpleConfig);
+    expect(result).toContain('Case A');
+    expect(result).toContain('Case B');
+    expect(result).toContain('Case C');
+  });
+
+  it('Step 4 asks user when session history is not available', () => {
+    const result = generateDockSkill(simpleConfig);
+    expect(result).toContain('context may have been cleared');
+    expect(result).toContain('Would you like me to run it now before docking');
+  });
+
+  it('Step 4 handles PASS, FAIL, and ESCALATE TO CAPTAIN outcomes', () => {
+    const result = generateDockSkill(simpleConfig);
+    expect(result).toContain('PASS');
+    expect(result).toContain('FAIL');
+    expect(result).toContain('ESCALATE TO CAPTAIN');
+  });
+
+  it('Step 4 escalates to Captain on unresolved disputes', () => {
+    const result = generateDockSkill(simpleConfig);
+    expect(result).toContain('AGREE WITH QUARTERMASTER');
+    expect(result).toContain('AGREE WITH SAILING AGENT');
+    expect(result).toContain('COMPROMISE');
+  });
+
+  it('cartographer is now Step 5 after QM check added', () => {
+    const result = generateDockSkill(simpleConfig);
+    expect(result).toContain('## Step 5: Run cartographer');
+  });
+
+  it('workflow check is now Step 7 after renumbering', () => {
+    const result = generateDockSkill(simpleConfig);
+    expect(result).toContain('## Step 7: Check workflow');
+    expect(result).toContain('## Step 7a: Solo');
+    expect(result).toContain('## Step 7b: Team');
+  });
+
+  it('changelog update is now Step 8 and confirm is Step 9', () => {
+    const result = generateDockSkill(simpleConfig);
+    expect(result).toContain('## Step 8: Update changelog.md');
+    expect(result).toContain('## Step 9: Confirm');
+  });
 });
 
 describe('generateRepairHullSkill', () => {
