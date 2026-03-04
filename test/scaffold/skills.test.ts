@@ -382,6 +382,35 @@ describe('generateAnchorSkill', () => {
     expect(result).toContain('simple');
     expect(result).toContain('detailed');
   });
+
+  it('includes Step 6 code review with Quartermaster', () => {
+    const result = generateAnchorSkill(simpleConfig);
+    expect(result).toContain('Step 6');
+    expect(result).toContain('Quartermaster');
+    expect(result).toContain('subagent_type: "quartermaster"');
+  });
+
+  it('escalates to Captain on unresolved disputes', () => {
+    const result = generateAnchorSkill(simpleConfig);
+    expect(result).toContain('Captain');
+    expect(result).toContain('subagent_type: "captain"');
+    expect(result).toContain('ESCALATE TO CAPTAIN');
+  });
+
+  it('handles PASS, FAIL, and Captain ruling outcomes', () => {
+    const result = generateAnchorSkill(simpleConfig);
+    expect(result).toContain('PASS');
+    expect(result).toContain('FAIL');
+    expect(result).toContain('AGREE WITH QUARTERMASTER');
+    expect(result).toContain('AGREE WITH SAILING AGENT');
+    expect(result).toContain('COMPROMISE');
+  });
+
+  it('Step 7 confirm comes after review step', () => {
+    const result = generateAnchorSkill(simpleConfig);
+    expect(result).toContain('Step 7');
+    expect(result).toContain('Anchored');
+  });
 });
 
 describe('generateRecapSkill', () => {

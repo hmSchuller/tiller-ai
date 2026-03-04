@@ -3,6 +3,7 @@
 > Shared project history. Updated by /sail, /anchor, and /dock. Committed and shared.
 
 ## Done
+- [2026-03-04] add Quartermaster review step to anchor skill — Steps 5-6 → 6-7, tests and regen
 - [2026-03-04] docked feature/team-mode-chore-flow
 - [2026-03-04] feat: team mode awareness in tech debt chore flow — /tech-debt and /repair-hull now push + open PR in team workflow instead of merging locally; TILLER.md documents the behavior
 - [2026-03-04] chore: add MIT LICENSE file to project root
