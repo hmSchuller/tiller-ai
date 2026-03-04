@@ -718,17 +718,17 @@ describe('generateDockSkill', () => {
     expect(result).toContain('## Step 5: Run cartographer');
   });
 
-  it('workflow check is now Step 7 after renumbering', () => {
+  it('workflow check is now Step 6 after renumbering', () => {
     const result = generateDockSkill(simpleConfig);
-    expect(result).toContain('## Step 7: Check workflow');
-    expect(result).toContain('## Step 7a: Solo');
-    expect(result).toContain('## Step 7b: Team');
+    expect(result).toContain('## Step 6: Check workflow');
+    expect(result).toContain('## Step 6a: Solo');
+    expect(result).toContain('## Step 6b: Team');
   });
 
-  it('changelog update is now Step 8 and confirm is Step 9', () => {
+  it('changelog update is now Step 7 and confirm is Step 8', () => {
     const result = generateDockSkill(simpleConfig);
-    expect(result).toContain('## Step 8: Update changelog.md');
-    expect(result).toContain('## Step 9: Confirm');
+    expect(result).toContain('## Step 7: Update changelog.md');
+    expect(result).toContain('## Step 8: Confirm');
   });
 });
 

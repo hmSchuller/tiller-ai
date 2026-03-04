@@ -76,14 +76,14 @@ Then handle any Structural Concerns the cartographer reported:
 - If recommending \`log to tech-backlog.md\`: add the items directly to \`tech-backlog.md\` (create the file if it doesn't exist).
 - If recommending \`monitor\` or no concerns: continue.
 
-## Step 7: Check workflow
+## Step 6: Check workflow
 
 Read workflow from \`.tiller/local.json\` if it exists, otherwise from \`.tiller/tiller.json\`. Default: solo.
 
-**If workflow is solo** → go to Step 7a (local merge).
-**If workflow is team** → go to Step 7b (open PR).
+**If workflow is solo** → go to Step 6a (local merge).
+**If workflow is team** → go to Step 6b (open PR).
 
-## Step 7a: Solo — merge to main
+## Step 6a: Solo — merge to main
 
 \`\`\`
 git checkout main
@@ -91,9 +91,9 @@ git merge --no-ff <feature-branch> -m "dock: <feature-branch>"
 git branch -d <feature-branch>
 \`\`\`
 
-Then go to Step 8.
+Then go to Step 7.
 
-## Step 7b: Team — open PR
+## Step 6b: Team — open PR
 
 First, update changelog so the single push includes it:
 
@@ -120,9 +120,9 @@ Print the PR URL. Say: "PR opened. Merge happens on GitHub after review and CI."
 Run \`git remote get-url origin\` to get the remote URL. Convert to a browser URL if needed.
 Say: "Push done. Open a PR at: <remote-url>/compare/<feature-branch>"
 
-Then go to Step 9 (do NOT delete the branch locally — it will be deleted after the PR merges remotely).
+Then go to Step 8 (do NOT delete the branch locally — it will be deleted after the PR merges remotely).
 
-## Step 8: Update changelog.md (solo only)
+## Step 7: Update changelog.md (solo only)
 
 1. Add an entry to the Done section of \`changelog.md\`:
    - \`- [YYYY-MM-DD] docked <feature-branch>\`
@@ -131,7 +131,7 @@ Then go to Step 9 (do NOT delete the branch locally — it will be deleted after
    git add changelog.md && git commit -m "update changelog: docked <feature-branch>"
    \`\`\`
 
-## Step 9: Confirm
+## Step 8: Confirm
 
 - **simple:** Say: "Done. Run \`/clear\` to reset context before starting your next feature, then \`/sail\` to continue."
 - **detailed:** Say: "Feature docked. Run \`/clear\` to reset context before your next feature, then \`/sail\` to continue."
