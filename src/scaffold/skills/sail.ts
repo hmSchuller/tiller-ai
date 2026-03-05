@@ -10,7 +10,27 @@ description: Start or continue work — features, fixes, and tasks. Usage: /sail
 
 Use this skill to contribute anything: new features, bug fixes, or incremental tasks on an existing branch. It handles branch routing automatically so you can focus on the work.
 
+## Step 0: Set up progress tracking
+
+Create all tasks upfront using \`TaskCreate\` so the user sees a visible checklist:
+
+1. "Dust off compass" — read/create \`.tiller/compass.md\`
+2. "Orient" (Step 1)
+3. "Branch routing" (Step 2)
+4. "Tech debt check" (Step 2.5)
+5. "Requirements interview" (Step 2.7)
+6. "Plan milestones" (Step 3)
+7. "Build" (Step 4) — placeholder, will be replaced by per-milestone tasks after planning
+8. "Code review" (Step 4.5)
+9. "Complete" (Step 5)
+
+Save the returned task IDs for later \`TaskUpdate\` calls. Proceed immediately — do not wait for user input.
+
 ## Step 1: Orient
+
+\`TaskUpdate\` → mark "Dust off compass" as \`in_progress\`. Read or create \`.tiller/compass.md\`. \`TaskUpdate\` → mark "Dust off compass" as \`completed\`.
+
+\`TaskUpdate\` → mark "Orient" as \`in_progress\`.
 
 Read \`.tiller/tiller.json\` (and \`.tiller/local.json\` if it exists), \`changelog.md\`, and \`.tiller/compass.md\` (if it exists) to understand current state.
 If \`codebase-map.md\` exists, read it to get a structural overview of the codebase.
@@ -21,7 +41,11 @@ State the current mode from \`.tiller/tiller.json\` (or \`.tiller/local.json\` i
 **If mode is simple:** Do not narrate the orient step.
 **If mode is detailed:** Summarize the current state in 2-3 sentences.
 
+\`TaskUpdate\` → mark "Orient" as \`completed\`.
+
 ## Step 2: Branch routing
+
+\`TaskUpdate\` → mark "Branch routing" as \`in_progress\`.
 
 ### Branch prefix selection
 
@@ -57,7 +81,11 @@ Convert $ARGUMENTS to kebab-case for the branch name (e.g. "fix broken auth redi
 
 **No arguments + on main** → list open feature and fix branches briefly, ask what to work on.
 
+\`TaskUpdate\` → mark "Branch routing" as \`completed\`.
+
 ## Step 2.5: Tech debt check
+
+\`TaskUpdate\` → mark "Tech debt check" as \`in_progress\`.
 
 Before planning, check if a tech debt cleanup is due:
 
@@ -71,7 +99,11 @@ Before planning, check if a tech debt cleanup is due:
    - Wait for user response before continuing to Step 3
 5. Continue to Step 2.7 regardless of whether the tech debt agent ran or critical items were found (unless user chooses to address debt first)
 
-## Step 2.7: Requirements Interview ⚠️ REQUIRED — do not skip
+\`TaskUpdate\` → mark "Tech debt check" as \`completed\`.
+
+## Step 2.7: Requirements Interview
+
+\`TaskUpdate\` → mark "Requirements interview" as \`in_progress\`. ⚠️ REQUIRED — do not skip
 
 Gather requirements from the user before planning. This eliminates ambiguity and reduces rework.
 
@@ -114,7 +146,11 @@ In detailed mode, also cover:
 
 Compile all answers into a **Requirements Summary** (bulleted list). Present it to the user: "Here's what I understand — anything to correct or add?" Wait for confirmation before proceeding to Step 3.
 
-## Step 3: Plan milestones ⚠️ REQUIRED — do not skip
+\`TaskUpdate\` → mark "Requirements interview" as \`completed\`.
+
+## Step 3: Plan milestones
+
+\`TaskUpdate\` → mark "Plan milestones" as \`in_progress\`. ⚠️ REQUIRED — do not skip
 
 Use the requirements summary from Step 2.7 to inform milestone breakdown.
 
@@ -143,6 +179,10 @@ After plan approval, evaluate scope per Step 3.5 (count milestones, files, subsy
 Will run after all milestones are complete (Step 4.5).
 \`\`\`
 
+\`TaskUpdate\` → mark "Plan milestones" as \`completed\`.
+
+After planning produces milestones, dynamically create one \`TaskCreate\` per milestone (e.g. "Build: <milestone description>"), then delete the placeholder "Build" task.
+
 ## Step 3.5: Evaluate scope
 
 Before building, classify the task into a tier using these heuristics on the milestones from Step 3:
@@ -155,6 +195,8 @@ Before building, classify the task into a tier using these heuristics on the mil
 **If mode is detailed:** Announce: "Scope assessment: **<tier>** — <rationale>" and ask the user to confirm or override the tier. Wait for confirmation before proceeding.
 
 ## Step 4: Build milestone by milestone
+
+For each milestone, \`TaskUpdate\` → mark its task as \`in_progress\` at the start, and \`completed\` at the end.
 
 After planning, look at the dependency tags on your milestones. **detailed only:** Read \`.tiller/compass.md\` to find the milestone checklist and resume from the first unchecked milestone. Use the tier from Step 3.5 to select the execution path.
 
@@ -222,7 +264,9 @@ The main agent becomes a pure orchestrator. It does NOT implement any code itsel
 11. Repeat until all milestones are done
 12. Shut down the team via \`SendMessage\` with \`type: "shutdown_request"\`
 
-## Step 4.5: Code Review ⚠️ REQUIRED — do not skip
+## Step 4.5: Code Review
+
+\`TaskUpdate\` → mark "Code review" as \`in_progress\`. ⚠️ REQUIRED — do not skip
 
 After all milestones are built and committed, **detailed only:** check off the Testing stage in \`.tiller/compass.md\`. Then spawn the Quartermaster to review the feature branch:
 
@@ -253,7 +297,11 @@ For a large milestone where implementation and tests are clearly separable, the 
 - Worker reports back via \`SendMessage\` when done
 - Lead reviews, runs \`${config.runCommand}\`, commits
 
+\`TaskUpdate\` → mark "Code review" as \`completed\`.
+
 ## Step 5: Complete
+
+\`TaskUpdate\` → mark "Complete" as \`in_progress\`, then \`completed\` after announcing.
 
 **simple:** Say: "Feature complete. Type /dock when ready to merge."
 **detailed:** Add a note to \`.tiller/compass.md\` under Notes: "Sail complete — ready to /dock." Summarize everything that was built across all milestones. Suggest \`/dock\` to merge.

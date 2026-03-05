@@ -314,6 +314,34 @@ describe('generateSailSkill', () => {
     expect(result).toContain('requirements summary from Step 2.7');
   });
 
+  it('includes Step 0 with TaskCreate for progress tracking', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('Step 0: Set up progress tracking');
+    expect(result).toContain('TaskCreate');
+    expect(result).toContain('Dust off compass');
+    expect(result).toContain('"Orient"');
+    expect(result).toContain('"Branch routing"');
+    expect(result).toContain('"Tech debt check"');
+    expect(result).toContain('"Requirements interview"');
+    expect(result).toContain('"Plan milestones"');
+    expect(result).toContain('"Build"');
+    expect(result).toContain('"Code review"');
+    expect(result).toContain('"Complete"');
+  });
+
+  it('uses TaskUpdate to mark steps in_progress and completed', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('TaskUpdate');
+    expect(result).toContain('in_progress');
+    expect(result).toContain('completed');
+  });
+
+  it('dynamically creates per-milestone tasks after planning', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('dynamically create one `TaskCreate` per milestone');
+    expect(result).toContain('delete the placeholder "Build" task');
+  });
+
   it('reads compass.md in Step 1 orient', () => {
     const result = generateSailSkill(simpleConfig);
     expect(result).toContain('compass.md');
@@ -404,6 +432,26 @@ describe('generateAnchorSkill', () => {
     expect(result).toContain('AGREE WITH QUARTERMASTER');
     expect(result).toContain('AGREE WITH SAILING AGENT');
     expect(result).toContain('COMPROMISE');
+  });
+
+  it('includes Step 0 with TaskCreate for progress tracking', () => {
+    const result = generateAnchorSkill(simpleConfig);
+    expect(result).toContain('Step 0: Set up progress tracking');
+    expect(result).toContain('TaskCreate');
+    expect(result).toContain('"Check branch"');
+    expect(result).toContain('"Run verify"');
+    expect(result).toContain('"Describe changes"');
+    expect(result).toContain('"Commit"');
+    expect(result).toContain('"Update changelog"');
+    expect(result).toContain('"Code review"');
+    expect(result).toContain('"Confirm"');
+  });
+
+  it('uses TaskUpdate to mark steps in_progress and completed', () => {
+    const result = generateAnchorSkill(simpleConfig);
+    expect(result).toContain('TaskUpdate');
+    expect(result).toContain('in_progress');
+    expect(result).toContain('completed');
   });
 
   it('Step 7 confirm comes after review step', () => {
@@ -723,6 +771,27 @@ describe('generateDockSkill', () => {
     expect(result).toContain('## Step 6: Check workflow');
     expect(result).toContain('## Step 6a: Solo');
     expect(result).toContain('## Step 6b: Team');
+  });
+
+  it('includes Step 0 with TaskCreate for progress tracking', () => {
+    const result = generateDockSkill(simpleConfig);
+    expect(result).toContain('Step 0: Set up progress tracking');
+    expect(result).toContain('TaskCreate');
+    expect(result).toContain('"Check branch"');
+    expect(result).toContain('"Run verify"');
+    expect(result).toContain('"Commit uncommitted changes"');
+    expect(result).toContain('"Quartermaster check"');
+    expect(result).toContain('"Run cartographer"');
+    expect(result).toContain('"Check workflow & merge/PR"');
+    expect(result).toContain('"Update changelog"');
+    expect(result).toContain('"Confirm"');
+  });
+
+  it('uses TaskUpdate to mark steps in_progress and completed', () => {
+    const result = generateDockSkill(simpleConfig);
+    expect(result).toContain('TaskUpdate');
+    expect(result).toContain('in_progress');
+    expect(result).toContain('completed');
   });
 
   it('changelog update is now Step 7 and confirm is Step 8', () => {

@@ -5,7 +5,24 @@ description: Merge completed feature to main and clean up the branch
 
 # /dock — Merge feature to main
 
+## Step 0: Set up progress tracking
+
+Create all tasks upfront using `TaskCreate` so the user sees a visible checklist:
+
+1. "Check branch" (Step 1)
+2. "Run verify" (Step 2)
+3. "Commit uncommitted changes" (Step 3)
+4. "Quartermaster check" (Step 4)
+5. "Run cartographer" (Step 5)
+6. "Check workflow & merge/PR" (Step 6)
+7. "Update changelog" (Step 7)
+8. "Confirm" (Step 8)
+
+Save the returned task IDs for later `TaskUpdate` calls. Proceed immediately — do not wait for user input.
+
 ## Step 1: Check branch
+
+`TaskUpdate` → mark "Check branch" as `in_progress`.
 
 Run `git branch --show-current`.
 
@@ -15,7 +32,11 @@ If on `main`:
 
 Save the current branch name as `<feature-branch>`.
 
+`TaskUpdate` → mark "Check branch" as `completed`.
+
 ## Step 2: Run verify
+
+`TaskUpdate` → mark "Run verify" as `in_progress`.
 
 Run `npm test`
 
@@ -23,7 +44,11 @@ If it fails:
 - **simple:** Say: "Something's not working, let me sort it out." Fix it first.
 - **detailed:** Show the error output. Do NOT proceed. Say: "Verify failed. Fix the errors and try /dock again." Stop.
 
+`TaskUpdate` → mark "Run verify" as `completed`.
+
 ## Step 3: Commit any uncommitted changes
+
+`TaskUpdate` → mark "Commit uncommitted changes" as `in_progress`.
 
 Run `git status --porcelain`.
 
@@ -33,7 +58,11 @@ git add -A
 git commit -m "wip: save before docking"
 ```
 
+`TaskUpdate` → mark "Commit uncommitted changes" as `completed`.
+
 ## Step 4: Quartermaster check
+
+`TaskUpdate` → mark "Quartermaster check" as `in_progress`.
 
 Determine whether the Quartermaster has already reviewed the current work in this session:
 
@@ -55,7 +84,11 @@ Determine whether the Quartermaster has already reviewed the current work in thi
 - If yes → run the Quartermaster as in Case B.
 - If no → proceed to Step 5.
 
+`TaskUpdate` → mark "Quartermaster check" as `completed`.
+
 ## Step 5: Run cartographer
+
+`TaskUpdate` → mark "Run cartographer" as `in_progress`.
 
 Use the **Task tool** (foreground, `subagent_type: "cartographer"`).
 
@@ -73,7 +106,11 @@ Then handle any Structural Concerns the cartographer reported:
 - If recommending `log to tech-backlog.md`: add the items directly to `tech-backlog.md` (create the file if it doesn't exist).
 - If recommending `monitor` or no concerns: continue.
 
+`TaskUpdate` → mark "Run cartographer" as `completed`.
+
 ## Step 6: Check workflow
+
+`TaskUpdate` → mark "Check workflow & merge/PR" as `in_progress`.
 
 Read workflow from `.tiller/local.json` if it exists, otherwise from `.tiller/tiller.json`. Default: solo.
 
@@ -119,7 +156,11 @@ Say: "Push done. Open a PR at: <remote-url>/compare/<feature-branch>"
 
 Then go to Step 8 (do NOT delete the branch locally — it will be deleted after the PR merges remotely).
 
+`TaskUpdate` → mark "Check workflow & merge/PR" as `completed`.
+
 ## Step 7: Update changelog.md (solo only)
+
+`TaskUpdate` → mark "Update changelog" as `in_progress`.
 
 1. Add an entry to the Done section of `changelog.md`:
    - `- [YYYY-MM-DD] docked <feature-branch>`
@@ -128,7 +169,13 @@ Then go to Step 8 (do NOT delete the branch locally — it will be deleted after
    git add changelog.md && git commit -m "update changelog: docked <feature-branch>"
    ```
 
+`TaskUpdate` → mark "Update changelog" as `completed`.
+
 ## Step 8: Confirm
+
+`TaskUpdate` → mark "Confirm" as `in_progress`.
 
 - **simple:** Say: "Done. Run `/clear` to reset context before starting your next feature, then `/sail` to continue."
 - **detailed:** Say: "Feature docked. Run `/clear` to reset context before your next feature, then `/sail` to continue."
+
+`TaskUpdate` → mark "Confirm" as `completed`.
