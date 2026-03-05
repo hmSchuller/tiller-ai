@@ -8,7 +8,7 @@ const program = new Command();
 
 program
   .name('tiller')
-  .description('Scaffold Claude Code projects with a structured vibe loop')
+  .description('Scaffold AI coding tool projects with a structured vibe loop')
   .version(TILLER_VERSION);
 
 program
@@ -17,6 +17,7 @@ program
   .option('-y, --yes', 'Skip interactive prompts using defaults')
   .option('--mode <mode>', 'Mode to use: simple or detailed (default: simple)')
   .option('--workflow <workflow>', 'Workflow to use: solo or team (default: solo)')
+  .option('--tools <tools>', 'Comma-separated list of AI tools: claude, copilot, opencode (default: claude)')
   .action(initCommand);
 
 program

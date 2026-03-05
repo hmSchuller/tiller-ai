@@ -22,8 +22,20 @@ import { generateCaptainAgent } from '../scaffold/agents/captain.js';
 import { generateCartographerAgent } from '../scaffold/agents/cartographer.js';
 import { generateScoutSkill } from '../scaffold/skills/scout.js';
 import { generateRepairHullSkill } from '../scaffold/skills/repair-hull.js';
-import { generateTillerManifest, MANAGED_FILES, TILLER_VERSION, type TillerManifest } from '../scaffold/tiller-manifest.js';
-import type { ProjectConfig } from '../scaffold/types.js';
+import { generateTillerManifest, getManagedFiles, TILLER_VERSION, type TillerManifest } from '../scaffold/tiller-manifest.js';
+import type { ProjectConfig, ToolTarget } from '../scaffold/types.js';
+import { generateAgentsMd } from '../scaffold/opencode/agents-md.js';
+import { generateOpenCodeJson } from '../scaffold/opencode/opencode-json.js';
+import { generateOCQuartermasterAgent } from '../scaffold/opencode/agents/quartermaster.js';
+import { generateOCBosunAgent } from '../scaffold/opencode/agents/bosun.js';
+import { generateOCCaptainAgent } from '../scaffold/opencode/agents/captain.js';
+import { generateOCCartographerAgent } from '../scaffold/opencode/agents/cartographer.js';
+import { generateCopilotInstructions } from '../scaffold/copilot/copilot-instructions.js';
+import { generateCopilotQuartermasterAgent } from '../scaffold/copilot/agents/quartermaster.js';
+import { generateCopilotBosunAgent } from '../scaffold/copilot/agents/bosun.js';
+import { generateCopilotCaptainAgent } from '../scaffold/copilot/agents/captain.js';
+import { generateCopilotCartographerAgent } from '../scaffold/copilot/agents/cartographer.js';
+import { generateCopilotHooksJson } from '../scaffold/copilot/hooks-json.js';
 
 async function migrateLegacyFiles(cwd: string): Promise<void> {
   // Ensure .tiller/ directory exists
@@ -81,6 +93,8 @@ export async function upgradeCommand(opts: { yes?: boolean } = {}): Promise<void
     process.exit(1);
   }
 
+  const tools: ToolTarget[] = manifest.tools ?? ['claude'];
+
   if (!opts.yes) {
     const go = await confirm({
       message: `Upgrade Tiller files from v${manifest.version} to v${TILLER_VERSION}? (managed files will be overwritten)`,
@@ -98,12 +112,15 @@ export async function upgradeCommand(opts: { yes?: boolean } = {}): Promise<void
     runCommand: manifest.runCommand,
     mode: manifest.mode,
     workflow: manifest.workflow ?? 'solo',
+    tools,
   };
+
+  const newManagedFiles = getManagedFiles(tools);
 
   // Remove files that were managed by the old version but are no longer managed.
   // Never delete .claude/CLAUDE.md — it is user-owned content.
   const staleFiles = (manifest.managedFiles ?? []).filter(
-    (f) => !MANAGED_FILES.includes(f) && f !== '.claude/CLAUDE.md'
+    (f) => !newManagedFiles.includes(f) && f !== '.claude/CLAUDE.md'
   );
   for (const f of staleFiles) {
     try {
@@ -119,45 +136,98 @@ export async function upgradeCommand(opts: { yes?: boolean } = {}): Promise<void
   const cwd = process.cwd();
   try {
     await writeFile(resolve(cwd, '.tiller/TILLER.md'), generateTillerMd(config));
-    // Ensure .claude/CLAUDE.md has the import line; never overwrite user content
-    const claudeMdPath = resolve(cwd, '.claude/CLAUDE.md');
-    let existingClaudeMd: string | null = null;
-    try {
-      existingClaudeMd = await readFile(claudeMdPath, 'utf-8');
-    } catch {
-      // file doesn't exist
+
+    // Claude Code files
+    if (tools.includes('claude')) {
+      // Ensure .claude/CLAUDE.md has the import line; never overwrite user content
+      const claudeMdPath = resolve(cwd, '.claude/CLAUDE.md');
+      let existingClaudeMd: string | null = null;
+      try {
+        existingClaudeMd = await readFile(claudeMdPath, 'utf-8');
+      } catch {
+        // file doesn't exist
+      }
+      if (existingClaudeMd !== null) {
+        // Migrate old import to new path
+        if (existingClaudeMd.includes('@.claude/TILLER.md')) {
+          existingClaudeMd = existingClaudeMd.replace('@.claude/TILLER.md', '@../.tiller/TILLER.md');
+          await writeFile(claudeMdPath, existingClaudeMd);
+        }
+        if (existingClaudeMd.includes('@.tiller/TILLER.md') && !existingClaudeMd.includes('@../.tiller/TILLER.md')) {
+          existingClaudeMd = existingClaudeMd.replace('@.tiller/TILLER.md', '@../.tiller/TILLER.md');
+          await writeFile(claudeMdPath, existingClaudeMd);
+        }
+        if (!existingClaudeMd.includes('@../.tiller/TILLER.md')) {
+          await writeFile(claudeMdPath, '@../.tiller/TILLER.md\n\n' + existingClaudeMd);
+        }
+      }
+      await writeFile(resolve(cwd, '.claude/settings.json'), generateSettingsJson(config));
+      await writeFile(resolve(cwd, '.claude/hooks/post-write.sh'), generatePostWriteHook(config));
+      await writeFile(resolve(cwd, '.claude/hooks/secret-scan.sh'), generateSecretScanHook(config));
+      await writeFile(resolve(cwd, '.claude/hooks/session-resume.sh'), generateSessionResumeHook(config));
+      await writeFile(resolve(cwd, '.claude/hooks/plan-context.sh'), generatePlanContextHook(config));
+      await writeFile(resolve(cwd, '.claude/skills/setup/SKILL.md'), generateSetupSkill(config));
+      await writeFile(resolve(cwd, '.claude/skills/sail/SKILL.md'), generateSailSkill(config));
+      await writeFile(resolve(cwd, '.claude/skills/anchor/SKILL.md'), generateAnchorSkill(config));
+      await writeFile(resolve(cwd, '.claude/skills/recap/SKILL.md'), generateRecapSkill(config));
+      await writeFile(resolve(cwd, '.claude/skills/dock/SKILL.md'), generateDockSkill(config));
+      await writeFile(resolve(cwd, '.claude/skills/tech-debt/SKILL.md'), generateTechDebtSkill(config));
+      await writeFile(resolve(cwd, '.claude/skills/scout/SKILL.md'), generateScoutSkill(config));
+      await writeFile(resolve(cwd, '.claude/skills/repair-hull/SKILL.md'), generateRepairHullSkill(config));
+      await writeFile(resolve(cwd, '.claude/agents/quartermaster.md'), generateQuartermasterAgent(config));
+      await writeFile(resolve(cwd, '.claude/agents/bosun.md'), generateBosunAgent(config));
+      await writeFile(resolve(cwd, '.claude/agents/captain.md'), generateCaptainAgent(config));
+      await writeFile(resolve(cwd, '.claude/agents/cartographer.md'), generateCartographerAgent(config));
     }
-    if (existingClaudeMd !== null) {
-      // Migrate old import to new path
-      if (existingClaudeMd.includes('@.claude/TILLER.md')) {
-        existingClaudeMd = existingClaudeMd.replace('@.claude/TILLER.md', '@../.tiller/TILLER.md');
-        await writeFile(claudeMdPath, existingClaudeMd);
-      }
-      if (existingClaudeMd.includes('@.tiller/TILLER.md') && !existingClaudeMd.includes('@../.tiller/TILLER.md')) {
-        existingClaudeMd = existingClaudeMd.replace('@.tiller/TILLER.md', '@../.tiller/TILLER.md');
-        await writeFile(claudeMdPath, existingClaudeMd);
-      }
-      if (!existingClaudeMd.includes('@../.tiller/TILLER.md')) {
-        await writeFile(claudeMdPath, '@../.tiller/TILLER.md\n\n' + existingClaudeMd);
+
+    // OpenCode files
+    if (tools.includes('opencode')) {
+      await writeFile(resolve(cwd, 'AGENTS.md'), generateAgentsMd(config));
+      await writeFile(resolve(cwd, 'opencode.json'), generateOpenCodeJson(config));
+      await writeFile(resolve(cwd, '.opencode/agents/quartermaster.md'), generateOCQuartermasterAgent(config));
+      await writeFile(resolve(cwd, '.opencode/agents/bosun.md'), generateOCBosunAgent(config));
+      await writeFile(resolve(cwd, '.opencode/agents/captain.md'), generateOCCaptainAgent(config));
+      await writeFile(resolve(cwd, '.opencode/agents/cartographer.md'), generateOCCartographerAgent(config));
+
+      if (!tools.includes('claude')) {
+        await writeFile(resolve(cwd, '.opencode/skills/setup/SKILL.md'), generateSetupSkill(config));
+        await writeFile(resolve(cwd, '.opencode/skills/sail/SKILL.md'), generateSailSkill(config));
+        await writeFile(resolve(cwd, '.opencode/skills/anchor/SKILL.md'), generateAnchorSkill(config));
+        await writeFile(resolve(cwd, '.opencode/skills/recap/SKILL.md'), generateRecapSkill(config));
+        await writeFile(resolve(cwd, '.opencode/skills/dock/SKILL.md'), generateDockSkill(config));
+        await writeFile(resolve(cwd, '.opencode/skills/tech-debt/SKILL.md'), generateTechDebtSkill(config));
+        await writeFile(resolve(cwd, '.opencode/skills/scout/SKILL.md'), generateScoutSkill(config));
+        await writeFile(resolve(cwd, '.opencode/skills/repair-hull/SKILL.md'), generateRepairHullSkill(config));
       }
     }
-    await writeFile(resolve(cwd, '.claude/settings.json'), generateSettingsJson(config));
-    await writeFile(resolve(cwd, '.claude/hooks/post-write.sh'), generatePostWriteHook(config));
-    await writeFile(resolve(cwd, '.claude/hooks/secret-scan.sh'), generateSecretScanHook(config));
-    await writeFile(resolve(cwd, '.claude/hooks/session-resume.sh'), generateSessionResumeHook(config));
-    await writeFile(resolve(cwd, '.claude/hooks/plan-context.sh'), generatePlanContextHook(config));
-    await writeFile(resolve(cwd, '.claude/skills/setup/SKILL.md'), generateSetupSkill(config));
-    await writeFile(resolve(cwd, '.claude/skills/sail/SKILL.md'), generateSailSkill(config));
-    await writeFile(resolve(cwd, '.claude/skills/anchor/SKILL.md'), generateAnchorSkill(config));
-    await writeFile(resolve(cwd, '.claude/skills/recap/SKILL.md'), generateRecapSkill(config));
-    await writeFile(resolve(cwd, '.claude/skills/dock/SKILL.md'), generateDockSkill(config));
-    await writeFile(resolve(cwd, '.claude/skills/tech-debt/SKILL.md'), generateTechDebtSkill(config));
-    await writeFile(resolve(cwd, '.claude/skills/scout/SKILL.md'), generateScoutSkill(config));
-    await writeFile(resolve(cwd, '.claude/skills/repair-hull/SKILL.md'), generateRepairHullSkill(config));
-    await writeFile(resolve(cwd, '.claude/agents/quartermaster.md'), generateQuartermasterAgent(config));
-    await writeFile(resolve(cwd, '.claude/agents/bosun.md'), generateBosunAgent(config));
-    await writeFile(resolve(cwd, '.claude/agents/captain.md'), generateCaptainAgent(config));
-    await writeFile(resolve(cwd, '.claude/agents/cartographer.md'), generateCartographerAgent(config));
+
+    // Copilot files
+    if (tools.includes('copilot')) {
+      await writeFile(resolve(cwd, '.github/copilot-instructions.md'), generateCopilotInstructions(config));
+
+      // Skills (same SKILL.md format as Claude)
+      await writeFile(resolve(cwd, '.github/skills/setup/SKILL.md'), generateSetupSkill(config));
+      await writeFile(resolve(cwd, '.github/skills/sail/SKILL.md'), generateSailSkill(config));
+      await writeFile(resolve(cwd, '.github/skills/anchor/SKILL.md'), generateAnchorSkill(config));
+      await writeFile(resolve(cwd, '.github/skills/recap/SKILL.md'), generateRecapSkill(config));
+      await writeFile(resolve(cwd, '.github/skills/dock/SKILL.md'), generateDockSkill(config));
+      await writeFile(resolve(cwd, '.github/skills/tech-debt/SKILL.md'), generateTechDebtSkill(config));
+      await writeFile(resolve(cwd, '.github/skills/scout/SKILL.md'), generateScoutSkill(config));
+      await writeFile(resolve(cwd, '.github/skills/repair-hull/SKILL.md'), generateRepairHullSkill(config));
+
+      // Agents (.agent.md format)
+      await writeFile(resolve(cwd, '.github/agents/quartermaster.agent.md'), generateCopilotQuartermasterAgent(config));
+      await writeFile(resolve(cwd, '.github/agents/bosun.agent.md'), generateCopilotBosunAgent(config));
+      await writeFile(resolve(cwd, '.github/agents/captain.agent.md'), generateCopilotCaptainAgent(config));
+      await writeFile(resolve(cwd, '.github/agents/cartographer.agent.md'), generateCopilotCartographerAgent(config));
+
+      // Hooks
+      await writeFile(resolve(cwd, '.github/hooks/hooks.json'), generateCopilotHooksJson(config));
+      await writeFile(resolve(cwd, '.github/hooks/post-write.sh'), generatePostWriteHook(config));
+      await writeFile(resolve(cwd, '.github/hooks/secret-scan.sh'), generateSecretScanHook(config));
+      await writeFile(resolve(cwd, '.github/hooks/session-resume.sh'), generateSessionResumeHook(config));
+    }
+
     await writeFile(resolve(cwd, '.tiller/tiller.json'), generateTillerManifest(config, TILLER_VERSION));
 
     // Ensure all tiller gitignore entries are present
@@ -185,5 +255,5 @@ export async function upgradeCommand(opts: { yes?: boolean } = {}): Promise<void
   }
 
   const removedNote = staleFiles.length > 0 ? ` Removed ${staleFiles.length} stale file(s).` : '';
-  outro(`Upgraded to v${TILLER_VERSION}. Managed files: ${MANAGED_FILES.length}.${removedNote}`);
+  outro(`Upgraded to v${TILLER_VERSION}. Managed files: ${newManagedFiles.length}.${removedNote}`);
 }

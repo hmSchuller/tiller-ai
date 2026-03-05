@@ -3,6 +3,10 @@
   "mode": "detailed",
   "workflow": "solo",
   "runCommand": "npm test",
+  "tools": [
+    "copilot",
+    "claude"
+  ],
   "managedFiles": [
     ".tiller/TILLER.md",
     ".claude/settings.json",
@@ -21,6 +25,23 @@
     ".claude/agents/quartermaster.md",
     ".claude/agents/bosun.md",
     ".claude/agents/captain.md",
-    ".claude/agents/cartographer.md"
+    ".claude/agents/cartographer.md",
+    ".github/copilot-instructions.md",
+    ".github/skills/setup/SKILL.md",
+    ".github/skills/sail/SKILL.md",
+    ".github/skills/anchor/SKILL.md",
+    ".github/skills/recap/SKILL.md",
+    ".github/skills/dock/SKILL.md",
+    ".github/skills/tech-debt/SKILL.md",
+    ".github/skills/scout/SKILL.md",
+    ".github/skills/repair-hull/SKILL.md",
+    ".github/agents/quartermaster.agent.md",
+    ".github/agents/bosun.agent.md",
+    ".github/agents/captain.agent.md",
+    ".github/agents/cartographer.agent.md",
+    ".github/hooks/hooks.json",
+    ".github/hooks/post-write.sh",
+    ".github/hooks/secret-scan.sh",
+    ".github/hooks/session-resume.sh"
   ]
 }
