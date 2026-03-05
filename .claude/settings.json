@@ -20,6 +20,15 @@
             "command": "bash .claude/hooks/secret-scan.sh"
           }
         ]
+      },
+      {
+        "matcher": "ExitPlanMode",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/plan-context.sh"
+          }
+        ]
       }
     ],
     "SessionStart": [
@@ -29,17 +38,6 @@
           {
             "type": "command",
             "command": "bash .claude/hooks/session-resume.sh"
-          }
-        ]
-      }
-    ],
-    "SubagentStart": [
-      {
-        "matcher": "Plan",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/plan-context.sh"
           }
         ]
       }
