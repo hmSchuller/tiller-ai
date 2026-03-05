@@ -4,7 +4,7 @@ import type { ProjectConfig } from '../types.js';
 // If the template changes, update both files. See: src/scaffold/skills/sail.ts
 export function generatePlanContextHook(config: ProjectConfig): string {
   return `#!/usr/bin/env bash
-# SubagentStart hook for Plan agents — injects /sail Step 3 context
+# PreToolUse hook on ExitPlanMode — injects /sail Step 3 context
 # so the Plan agent knows the rigid plan template and compass state.
 
 COMPASS=""

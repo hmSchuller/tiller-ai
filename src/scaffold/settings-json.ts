@@ -24,6 +24,15 @@ export function generateSettingsJson(_config: ProjectConfig): string {
             },
           ],
         },
+        {
+          matcher: 'ExitPlanMode',
+          hooks: [
+            {
+              type: 'command',
+              command: 'bash .claude/hooks/plan-context.sh',
+            },
+          ],
+        },
       ],
       SessionStart: [
         {
@@ -32,17 +41,6 @@ export function generateSettingsJson(_config: ProjectConfig): string {
             {
               type: 'command',
               command: 'bash .claude/hooks/session-resume.sh',
-            },
-          ],
-        },
-      ],
-      SubagentStart: [
-        {
-          matcher: 'Plan',
-          hooks: [
-            {
-              type: 'command',
-              command: 'bash .claude/hooks/plan-context.sh',
             },
           ],
         },

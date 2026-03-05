@@ -54,11 +54,12 @@ describe('generateSettingsJson', () => {
     expect(result).toContain('session-resume.sh');
   });
 
-  it('includes SubagentStart hook with Plan matcher', () => {
+  it('includes PreToolUse hook with ExitPlanMode matcher', () => {
     const result = JSON.parse(generateSettingsJson(simpleConfig));
-    const subagentHooks = result.hooks.SubagentStart;
-    expect(subagentHooks).toBeDefined();
-    expect(subagentHooks[0].matcher).toBe('Plan');
+    const preHooks = result.hooks.PreToolUse;
+    expect(preHooks).toBeDefined();
+    const exitPlanHook = preHooks.find((h: { matcher: string }) => h.matcher === 'ExitPlanMode');
+    expect(exitPlanHook).toBeDefined();
   });
 
   it('references plan-context.sh', () => {
