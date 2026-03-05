@@ -440,7 +440,6 @@ describe('generateAnchorSkill', () => {
     expect(result).toContain('TaskCreate');
     expect(result).toContain('"Check branch"');
     expect(result).toContain('"Run verify"');
-    expect(result).toContain('"Describe changes"');
     expect(result).toContain('"Commit"');
     expect(result).toContain('"Update changelog"');
     expect(result).toContain('"Code review"');

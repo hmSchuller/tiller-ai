@@ -14,11 +14,10 @@ Create all tasks upfront using \`TaskCreate\` so the user sees a visible checkli
 
 1. "Check branch" (Step 1)
 2. "Run verify" (Step 2)
-3. "Describe changes" (Step 3)
-4. "Commit" (Step 4)
-5. "Update changelog" (Step 5)
-6. "Code review" (Step 6)
-7. "Confirm" (Step 7)
+3. "Commit" (Step 3)
+4. "Update changelog" (Step 4)
+5. "Code review" (Step 5)
+6. "Confirm" (Step 6)
 
 Save the returned task IDs for later \`TaskUpdate\` calls. Proceed immediately — do not wait for user input.
 
@@ -46,21 +45,15 @@ If it fails:
 
 \`TaskUpdate\` → mark "Run verify" as \`completed\`.
 
-## Step 3: Describe changes
+## Step 3: Commit
 
-\`TaskUpdate\` → mark "Describe changes" as \`in_progress\`.
+\`TaskUpdate\` → mark "Commit" as \`in_progress\`.
 
 If $ARGUMENTS is provided, use that as the commit message.
 
 Otherwise, run \`git diff --stat HEAD\` and infer a short, descriptive commit message.
 
 Format: \`<verb> <what> — <brief detail if needed>\`
-
-\`TaskUpdate\` → mark "Describe changes" as \`completed\`.
-
-## Step 4: Commit
-
-\`TaskUpdate\` → mark "Commit" as \`in_progress\`.
 
 \`\`\`
 git add -A
@@ -69,7 +62,7 @@ git commit -m "<message>"
 
 \`TaskUpdate\` → mark "Commit" as \`completed\`.
 
-## Step 5: Update changelog.md
+## Step 4: Update changelog.md
 
 \`TaskUpdate\` → mark "Update changelog" as \`in_progress\`.
 
@@ -82,7 +75,7 @@ Run \`git add changelog.md && git commit --amend --no-edit\`.
 
 \`TaskUpdate\` → mark "Update changelog" as \`completed\`.
 
-## Step 6: Code Review
+## Step 5: Code Review
 
 \`TaskUpdate\` → mark "Code review" as \`in_progress\`.
 
@@ -99,18 +92,18 @@ Spawn the Quartermaster to review the feature branch diff against main:
 **On FAIL:**
 - Review the issues list
 - Fix the issues, then present a rebuttal to the Quartermaster: re-spawn via Task tool (\`subagent_type: "quartermaster"\`) with the rebuttal context
-- If Quartermaster returns PASS (or PASS WITH NOTES): proceed to Step 7
+- If Quartermaster returns PASS (or PASS WITH NOTES): proceed to Step 6
 - If Quartermaster returns FAIL again and says "ESCALATE TO CAPTAIN":
   - Spawn the Captain via the **Task tool** (foreground, \`subagent_type: "captain"\`) with a summary of: the disputed issues, the Anchor Agent's rebuttal, and the Quartermaster's maintained objections
   - Wait for the Captain's ruling
   - Present the Captain's ruling to the user
   - If ruling is AGREE WITH QUARTERMASTER: fix the required items before finishing
-  - If ruling is AGREE WITH SAILING AGENT: proceed to Step 7
-  - If ruling is COMPROMISE: fix the blocking items, log the rest to \`tech-backlog.md\`, proceed to Step 7
+  - If ruling is AGREE WITH SAILING AGENT: proceed to Step 6
+  - If ruling is COMPROMISE: fix the blocking items, log the rest to \`tech-backlog.md\`, proceed to Step 6
 
 \`TaskUpdate\` → mark "Code review" as \`completed\`.
 
-## Step 7: Confirm
+## Step 6: Confirm
 
 \`TaskUpdate\` → mark "Confirm" as \`in_progress\`.
 
