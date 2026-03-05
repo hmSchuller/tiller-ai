@@ -3,6 +3,7 @@
 > Shared project history. Updated by /sail, /anchor, and /dock. Committed and shared.
 
 ## Done
+- [2026-03-05] docked feature/task-list-progress-tracking
 - [2026-03-05] add TaskCreate/TaskUpdate progress tracking to sail, anchor, and dock skills
 - [2026-03-05] docked fix/plan-context-hook-event-type
 - [2026-03-05] fix plan-context.sh hook — move from SubagentStart/Plan to PreToolUse/ExitPlanMode
