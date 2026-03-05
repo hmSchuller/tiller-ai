@@ -1,6 +1,6 @@
 import type { ProjectConfig } from '../types.js';
 
-export function generateOpenCodeJson(config: ProjectConfig): string {
+export function generateOpenCodeJson(_config: ProjectConfig): string {
   const openCodeConfig = {
     $schema: 'https://opencode.ai/schema.json',
     permissions: {

@@ -201,6 +201,85 @@ describe('scaffold integration — existing .gitignore', () => {
   });
 });
 
+describe('scaffold integration — opencode only', () => {
+  let dir: string;
+
+  const openCodeConfig: ProjectConfig = {
+    projectName: 'opencode-smoke-test',
+    description: 'Integration test project for OpenCode',
+    runCommand: 'echo ok',
+    mode: 'simple',
+    workflow: 'solo',
+    tools: ['opencode'],
+  };
+
+  beforeAll(async () => {
+    dir = await mkdtemp(join(tmpdir(), 'tiller-opencode-'));
+    await scaffold(openCodeConfig, dir);
+  });
+
+  afterAll(async () => {
+    await rm(dir, { recursive: true, force: true });
+  });
+
+  async function ocExists(rel: string): Promise<boolean> {
+    try {
+      await access(join(dir, rel));
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  it('creates AGENTS.md', async () => {
+    expect(await ocExists('AGENTS.md')).toBe(true);
+    const content = await readFile(join(dir, 'AGENTS.md'), 'utf-8');
+    expect(content).toContain('Protocol enforcement');
+  });
+
+  it('creates opencode.json with valid JSON', async () => {
+    expect(await ocExists('opencode.json')).toBe(true);
+    const content = await readFile(join(dir, 'opencode.json'), 'utf-8');
+    expect(() => JSON.parse(content)).not.toThrow();
+  });
+
+  it('creates all 4 agents in .opencode/agents/', async () => {
+    for (const agent of ['quartermaster', 'bosun', 'captain', 'cartographer']) {
+      expect(await ocExists(`.opencode/agents/${agent}.md`)).toBe(true);
+    }
+  });
+
+  it('creates skills in .opencode/skills/ (no claude)', async () => {
+    for (const skill of ['setup', 'sail', 'anchor', 'recap', 'dock', 'tech-debt', 'scout', 'repair-hull']) {
+      expect(await ocExists(`.opencode/skills/${skill}/SKILL.md`)).toBe(true);
+    }
+  });
+
+  it('does NOT create Claude-specific files', async () => {
+    expect(await ocExists('.claude/settings.json')).toBe(false);
+    expect(await ocExists('.claude/agents/quartermaster.md')).toBe(false);
+  });
+
+  it('does NOT create Copilot-specific files', async () => {
+    expect(await ocExists('.github/copilot-instructions.md')).toBe(false);
+    expect(await ocExists('.github/agents/quartermaster.agent.md')).toBe(false);
+  });
+
+  it('creates shared .tiller/ files', async () => {
+    expect(await ocExists('.tiller/TILLER.md')).toBe(true);
+    expect(await ocExists('.tiller/tiller.json')).toBe(true);
+  });
+
+  it('manifest lists opencode managed files', async () => {
+    const manifest = JSON.parse(await readFile(join(dir, '.tiller/tiller.json'), 'utf-8'));
+    expect(manifest.tools).toEqual(['opencode']);
+    expect(manifest.managedFiles).toContain('AGENTS.md');
+    expect(manifest.managedFiles).toContain('opencode.json');
+    expect(manifest.managedFiles).toContain('.opencode/agents/quartermaster.md');
+    expect(manifest.managedFiles).toContain('.opencode/skills/sail/SKILL.md');
+  });
+});
+
 describe('scaffold integration — copilot only', () => {
   let dir: string;
 

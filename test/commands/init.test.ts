@@ -167,6 +167,31 @@ describe('initCommand', () => {
     expect(prompts.select).not.toHaveBeenCalled();
   });
 
+  it('--yes uses provided tools flag', async () => {
+    const { scaffold } = await import('../../src/scaffold/index.js');
+    const { initCommand } = await import('../../src/commands/init.js');
+
+    await initCommand({ yes: true, tools: 'claude,copilot' });
+
+    expect(scaffold).toHaveBeenCalledWith(
+      expect.objectContaining({ tools: ['claude', 'copilot'] }),
+      expect.any(String),
+    );
+  });
+
+  it('--yes exits with error on invalid tool', async () => {
+    const prompts = await import('@clack/prompts');
+    const exitSpy = vi.spyOn(process, 'exit').mockImplementation((() => {
+      throw new Error('process.exit called');
+    }) as never);
+
+    const { initCommand } = await import('../../src/commands/init.js');
+
+    await expect(initCommand({ yes: true, tools: 'invalid-tool' })).rejects.toThrow('process.exit called');
+    expect(exitSpy).toHaveBeenCalledWith(1);
+    expect(prompts.cancel).toHaveBeenCalledWith(expect.stringContaining('invalid-tool'));
+  });
+
   it('exits when user cancels workflow selection', async () => {
     const prompts = await import('@clack/prompts');
     const cancelSymbol = Symbol.for('clack/cancel');
