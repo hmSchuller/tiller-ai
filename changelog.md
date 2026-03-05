@@ -3,6 +3,7 @@
 > Shared project history. Updated by /sail, /anchor, and /dock. Committed and shared.
 
 ## Done
+- [2026-03-05] docked fix/plan-context-hook-event-type
 - [2026-03-05] fix plan-context.sh hook — move from SubagentStart/Plan to PreToolUse/ExitPlanMode
 - [2026-03-05] bump version to 0.6.0
 - [2026-03-04] docked feature/dock-quartermaster-check
