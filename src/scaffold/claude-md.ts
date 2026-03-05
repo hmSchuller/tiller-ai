@@ -46,7 +46,7 @@ Multiple developers. /dock pushes the feature branch and opens a PR. Merging hap
 
 Every piece of work follows this loop:
 
-1. **Orient** — read \`.tiller/tiller.json\` (and \`.tiller/local.json\` if present) and changelog.md (shared); if \`codebase-map.md\` exists, read it for a structural overview
+1. **Orient** — read \`.tiller/tiller.json\` (and \`.tiller/local.json\` if present) and changelog.md (shared); if \`codebase-map.md\` exists, read it for a structural overview; read \`.tiller/compass.md\` if it exists — if it doesn't and you're on a feature/fix branch, create it from the standard template (see Compass section below)
 2. **Plan** — in detailed mode, enter plan mode with milestones and wait for approval
 3. **Build** — implement milestone by milestone; milestones tagged \`[independent]\` may be parallelized using agent teams (TeamCreate + Task tool); each milestone includes tests, verify, and auto-commit
 4. **Review** — Quartermaster inspects the feature branch diff and issues PASS or FAIL; one round of negotiation allowed; unresolved disagreements escalate to Captain
@@ -58,6 +58,33 @@ Every piece of work follows this loop:
 - Always work on a feature branch (feature/<name>)
 - Run the verify command before every anchor and dock
 - \`changelog.md\` is committed and shared — it tracks the project's done log
+
+## Compass
+
+\`.tiller/compass.md\` is a per-dev, gitignored waypoint file that tracks sail progress across context clears. Every developer has their own copy — it is never committed.
+
+During sailing, always keep compass.md updated with the current branch, stage checkboxes, and milestone status. On context clear or new session, read it first (Orient step) to resume without losing state.
+
+Standard template:
+\`\`\`
+# compass.md — local session waypoint (gitignored)
+> Tracks sail progress across context clears. Each dev has their own copy.
+
+## Branch
+(none — on main)
+
+## Stages
+- [ ] Orientation
+- [ ] Planning
+- [ ] Execution
+- [ ] Testing
+- [ ] Quartermaster review
+
+## Milestones
+(filled in during planning)
+
+## Notes
+\`\`\`
 
 ## Per-dev overrides
 

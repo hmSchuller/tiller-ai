@@ -1,6 +1,6 @@
 {
   "name": "tiller-ai",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Scaffold Claude Code projects with a structured vibe loop",
   "type": "module",
   "bin": {

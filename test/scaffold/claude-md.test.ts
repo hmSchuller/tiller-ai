@@ -80,6 +80,33 @@ describe('generateTillerMd', () => {
     expect(result).toContain('codebase-map.md');
   });
 
+  it('mentions compass.md in the vibe loop orient step', () => {
+    const result = generateTillerMd(simpleConfig);
+    expect(result).toContain('compass.md');
+  });
+
+  it('has a Compass section after File discipline', () => {
+    const result = generateTillerMd(simpleConfig);
+    expect(result).toContain('## Compass');
+    const fileDisciplineIdx = result.indexOf('## File discipline');
+    const compassIdx = result.indexOf('## Compass');
+    expect(fileDisciplineIdx).toBeGreaterThan(-1);
+    expect(compassIdx).toBeGreaterThan(fileDisciplineIdx);
+  });
+
+  it('Compass section explains it is gitignored and per-dev', () => {
+    const result = generateTillerMd(simpleConfig);
+    expect(result).toContain('gitignored');
+    expect(result).toContain('per-dev');
+  });
+
+  it('Compass section includes the template structure', () => {
+    const result = generateTillerMd(simpleConfig);
+    expect(result).toContain('## Branch');
+    expect(result).toContain('## Stages');
+    expect(result).toContain('## Milestones');
+  });
+
   it('has an Upgrading section with key commands', () => {
     const result = generateTillerMd(simpleConfig);
     expect(result).toContain('## Upgrading');

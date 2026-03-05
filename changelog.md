@@ -3,6 +3,7 @@
 > Shared project history. Updated by /sail, /anchor, and /dock. Committed and shared.
 
 ## Done
+- [2026-03-05] bump version to 0.6.0
 - [2026-03-04] docked feature/dock-quartermaster-check
 - [2026-03-04] feat: add Quartermaster check to /dock skill — Step 4 handles QM ran/not-run/context-cleared cases; Steps renumbered 4-8
 - [2026-03-04] docked feature/anchor-quartermaster-review
