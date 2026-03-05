@@ -6,6 +6,7 @@ export const simpleConfig: ProjectConfig = {
   runCommand: 'npm test',
   mode: 'simple',
   workflow: 'solo',
+  tools: ['claude'],
 };
 
 export const detailedConfig: ProjectConfig = {
@@ -14,6 +15,7 @@ export const detailedConfig: ProjectConfig = {
   runCommand: 'npm run verify',
   mode: 'detailed',
   workflow: 'solo',
+  tools: ['claude'],
 };
 
 export const teamSimpleConfig: ProjectConfig = {
@@ -22,4 +24,32 @@ export const teamSimpleConfig: ProjectConfig = {
   runCommand: 'npm test',
   mode: 'simple',
   workflow: 'team',
+  tools: ['claude'],
+};
+
+export const multiToolConfig: ProjectConfig = {
+  projectName: 'multi-tool-project',
+  description: 'A project using multiple AI tools',
+  runCommand: 'npm test',
+  mode: 'simple',
+  workflow: 'solo',
+  tools: ['claude', 'opencode', 'copilot'],
+};
+
+export const openCodeOnlyConfig: ProjectConfig = {
+  projectName: 'opencode-project',
+  description: 'A project using only OpenCode',
+  runCommand: 'npm test',
+  mode: 'simple',
+  workflow: 'solo',
+  tools: ['opencode'],
+};
+
+export const copilotOnlyConfig: ProjectConfig = {
+  projectName: 'copilot-project',
+  description: 'A project using only Copilot',
+  runCommand: 'npm test',
+  mode: 'simple',
+  workflow: 'solo',
+  tools: ['copilot'],
 };

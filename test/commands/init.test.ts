@@ -12,6 +12,7 @@ vi.mock('@clack/prompts', async (importOriginal) => {
     cancel: vi.fn(),
     spinner: vi.fn(() => ({ start: vi.fn(), stop: vi.fn() })),
     select: vi.fn(),
+    multiselect: vi.fn(),
     isCancel: vi.fn((val) => val === Symbol.for('clack/cancel')),
   };
 });
@@ -40,6 +41,7 @@ describe('initCommand', () => {
 
   it('calls scaffold with selected mode and workflow', async () => {
     const prompts = await import('@clack/prompts');
+    vi.mocked(prompts.multiselect).mockResolvedValueOnce(['claude']);
     vi.mocked(prompts.select)
       .mockResolvedValueOnce('detailed')
       .mockResolvedValueOnce('team');
@@ -50,13 +52,14 @@ describe('initCommand', () => {
     await initCommand();
 
     expect(scaffold).toHaveBeenCalledWith(
-      expect.objectContaining({ mode: 'detailed', workflow: 'team' }),
+      expect.objectContaining({ mode: 'detailed', workflow: 'team', tools: ['claude'] }),
       expect.any(String),
     );
   });
 
   it('calls scaffold with simple/solo defaults when selected', async () => {
     const prompts = await import('@clack/prompts');
+    vi.mocked(prompts.multiselect).mockResolvedValueOnce(['claude']);
     vi.mocked(prompts.select)
       .mockResolvedValueOnce('simple')
       .mockResolvedValueOnce('solo');
@@ -67,14 +70,31 @@ describe('initCommand', () => {
     await initCommand();
 
     expect(scaffold).toHaveBeenCalledWith(
-      expect.objectContaining({ mode: 'simple', workflow: 'solo' }),
+      expect.objectContaining({ mode: 'simple', workflow: 'solo', tools: ['claude'] }),
       expect.any(String),
     );
+  });
+
+  it('exits when user cancels tools selection', async () => {
+    const prompts = await import('@clack/prompts');
+    const cancelSymbol = Symbol.for('clack/cancel');
+    vi.mocked(prompts.multiselect).mockResolvedValueOnce(cancelSymbol as unknown as string[]);
+    vi.mocked(prompts.isCancel).mockImplementation((val) => val === cancelSymbol);
+
+    const exitSpy = vi.spyOn(process, 'exit').mockImplementation((() => {
+      throw new Error('process.exit called');
+    }) as never);
+
+    const { initCommand } = await import('../../src/commands/init.js');
+
+    await expect(initCommand()).rejects.toThrow('process.exit called');
+    expect(exitSpy).toHaveBeenCalledWith(0);
   });
 
   it('exits when user cancels mode selection', async () => {
     const prompts = await import('@clack/prompts');
     const cancelSymbol = Symbol.for('clack/cancel');
+    vi.mocked(prompts.multiselect).mockResolvedValueOnce(['claude']);
     vi.mocked(prompts.select).mockResolvedValueOnce(cancelSymbol as unknown as string);
     vi.mocked(prompts.isCancel).mockImplementation((val) => val === cancelSymbol);
 
@@ -150,6 +170,7 @@ describe('initCommand', () => {
   it('exits when user cancels workflow selection', async () => {
     const prompts = await import('@clack/prompts');
     const cancelSymbol = Symbol.for('clack/cancel');
+    vi.mocked(prompts.multiselect).mockResolvedValueOnce(['claude']);
     vi.mocked(prompts.select)
       .mockResolvedValueOnce('simple')
       .mockResolvedValueOnce(cancelSymbol as unknown as string);

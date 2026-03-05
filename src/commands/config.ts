@@ -4,7 +4,7 @@ import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { writeFile } from '../utils/fs.js';
 import { generateTillerManifest, TILLER_VERSION, type TillerManifest } from '../scaffold/tiller-manifest.js';
-import type { ProjectConfig } from '../scaffold/types.js';
+import type { ProjectConfig, ToolTarget } from '../scaffold/types.js';
 
 export async function configCommand(): Promise<void> {
   intro('tiller-ai config — update mode and workflow');
@@ -100,12 +100,14 @@ export async function configCommand(): Promise<void> {
   if (isProjectScope) {
     s.start('Updating project settings...');
 
+    const tools: ToolTarget[] = manifest.tools ?? ['claude'];
     const config: ProjectConfig = {
       projectName: '',
       description: '',
       runCommand: manifest.runCommand,
       mode: newMode,
       workflow: newWorkflow,
+      tools,
     };
 
     try {

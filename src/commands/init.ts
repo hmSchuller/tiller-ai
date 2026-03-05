@@ -1,9 +1,11 @@
-import { intro, outro, spinner, select, isCancel, cancel } from '@clack/prompts';
+import { intro, outro, spinner, select, multiselect, isCancel, cancel } from '@clack/prompts';
 import { resolve, basename } from 'node:path';
 import { scaffold } from '../scaffold/index.js';
-import type { ProjectConfig } from '../scaffold/types.js';
+import type { ProjectConfig, ToolTarget } from '../scaffold/types.js';
 
-export async function initCommand(opts: { yes?: boolean; mode?: string; workflow?: string } = {}): Promise<void> {
+const VALID_TOOLS: ToolTarget[] = ['claude', 'copilot', 'opencode'];
+
+export async function initCommand(opts: { yes?: boolean; mode?: string; workflow?: string; tools?: string } = {}): Promise<void> {
   const targetDir = resolve(process.cwd());
   const projectName = basename(targetDir);
 
@@ -11,6 +13,7 @@ export async function initCommand(opts: { yes?: boolean; mode?: string; workflow
 
   let mode: 'simple' | 'detailed';
   let workflow: 'solo' | 'team';
+  let tools: ToolTarget[];
 
   if (opts.yes) {
     if (opts.mode && opts.mode !== 'simple' && opts.mode !== 'detailed') {
@@ -23,7 +26,33 @@ export async function initCommand(opts: { yes?: boolean; mode?: string; workflow
     }
     mode = (opts.mode as 'simple' | 'detailed') ?? 'simple';
     workflow = (opts.workflow as 'solo' | 'team') ?? 'solo';
+
+    if (opts.tools) {
+      const parsed = opts.tools.split(',').map((t) => t.trim()) as ToolTarget[];
+      const invalid = parsed.filter((t) => !VALID_TOOLS.includes(t));
+      if (invalid.length > 0) {
+        cancel(`Invalid tool(s): ${invalid.join(', ')}. Must be one or more of: ${VALID_TOOLS.join(', ')}`);
+        process.exit(1);
+      }
+      tools = parsed;
+    } else {
+      tools = ['claude'];
+    }
   } else {
+    const toolsAnswer = await multiselect({
+      message: 'Which AI coding tools do you use?',
+      options: [
+        { value: 'claude', label: 'Claude Code', hint: 'Anthropic\'s CLI — skills, agents, hooks' },
+        { value: 'copilot', label: 'GitHub Copilot', hint: 'Copilot coding agent — custom instructions' },
+        { value: 'opencode', label: 'OpenCode', hint: 'Open-source CLI — skills, agents, commands' },
+      ],
+      required: true,
+    });
+
+    if (isCancel(toolsAnswer)) {
+      process.exit(0);
+    }
+
     const modeAnswer = await select({
       message: 'Mode',
       options: [
@@ -48,6 +77,7 @@ export async function initCommand(opts: { yes?: boolean; mode?: string; workflow
       process.exit(0);
     }
 
+    tools = toolsAnswer as ToolTarget[];
     mode = modeAnswer as 'simple' | 'detailed';
     workflow = workflowAnswer as 'solo' | 'team';
   }
@@ -58,6 +88,7 @@ export async function initCommand(opts: { yes?: boolean; mode?: string; workflow
     runCommand: '',
     mode,
     workflow,
+    tools,
   };
 
   const s = spinner();
@@ -71,9 +102,15 @@ export async function initCommand(opts: { yes?: boolean; mode?: string; workflow
     throw err;
   }
 
+  const toolNames = tools.map((t) => {
+    if (t === 'claude') return 'Claude Code';
+    if (t === 'copilot') return 'GitHub Copilot';
+    return 'OpenCode';
+  });
+
   outro(
     `Scaffolded in ./${projectName}\n\n` +
-    `  claude\n\n` +
+    `  Tools: ${toolNames.join(', ')}\n\n` +
     `Then run /setup to configure the project with AI assistance.`
   );
 }

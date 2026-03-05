@@ -3,6 +3,7 @@ import { mkdtemp, rm, readFile, mkdir, writeFile, stat, access } from 'node:fs/p
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { generateTillerManifest, MANAGED_FILES, TILLER_VERSION } from '../../src/scaffold/tiller-manifest.js';
+import type { ToolTarget } from '../../src/scaffold/types.js';
 
 vi.mock('@clack/prompts', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@clack/prompts')>();
@@ -21,7 +22,7 @@ async function setupLegacyProject(tmpDir: string) {
   await mkdir(join(tmpDir, '.claude', 'hooks'), { recursive: true });
   await mkdir(join(tmpDir, '.claude', 'skills', 'sail'), { recursive: true });
   await mkdir(join(tmpDir, '.claude', 'agents'), { recursive: true });
-  const config = { projectName: 'test-proj', description: 'desc', runCommand: 'npm test', mode: 'detailed' as const, workflow: 'solo' as const };
+  const config = { projectName: 'test-proj', description: 'desc', runCommand: 'npm test', mode: 'detailed' as const, workflow: 'solo' as const, tools: ['claude'] as ToolTarget[] };
   await writeFile(join(tmpDir, '.claude', '.tiller.json'), generateTillerManifest(config, TILLER_VERSION), 'utf-8');
   await writeFile(join(tmpDir, '.claude', 'TILLER.md'), '# Tiller old', 'utf-8');
   await writeFile(join(tmpDir, '.claude', '.tiller-tech-debt.json'), '{"lastTechDebtAtFeature":0,"threshold":3}', 'utf-8');
@@ -40,7 +41,7 @@ async function setupProject(tmpDir: string) {
   await mkdir(join(tmpDir, '.claude', 'skills', 'tech-debt'), { recursive: true });
   await mkdir(join(tmpDir, '.claude', 'skills', 'scout'), { recursive: true });
   await mkdir(join(tmpDir, '.claude', 'agents'), { recursive: true });
-  const config = { projectName: 'test-proj', description: 'desc', runCommand: 'npm test', mode: 'detailed' as const, workflow: 'solo' as const };
+  const config = { projectName: 'test-proj', description: 'desc', runCommand: 'npm test', mode: 'detailed' as const, workflow: 'solo' as const, tools: ['claude'] as ToolTarget[] };
   await writeFile(join(tmpDir, '.tiller', 'tiller.json'), generateTillerManifest(config, TILLER_VERSION), 'utf-8');
 }
 

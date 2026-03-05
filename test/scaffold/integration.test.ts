@@ -11,6 +11,16 @@ const config: ProjectConfig = {
   runCommand: 'echo ok',
   mode: 'simple',
   workflow: 'solo',
+  tools: ['claude'],
+};
+
+const copilotConfig: ProjectConfig = {
+  projectName: 'copilot-smoke-test',
+  description: 'Integration test project for Copilot',
+  runCommand: 'echo ok',
+  mode: 'simple',
+  workflow: 'solo',
+  tools: ['copilot'],
 };
 
 let tmpDir: string;
@@ -188,5 +198,77 @@ describe('scaffold integration — existing .gitignore', () => {
   it('appends .tiller/compass.md to existing .gitignore', async () => {
     const content = await readFile(join(dir, '.gitignore'), 'utf-8');
     expect(content).toContain('.tiller/compass.md');
+  });
+});
+
+describe('scaffold integration — copilot only', () => {
+  let dir: string;
+
+  beforeAll(async () => {
+    dir = await mkdtemp(join(tmpdir(), 'tiller-copilot-'));
+    await scaffold(copilotConfig, dir);
+  });
+
+  afterAll(async () => {
+    await rm(dir, { recursive: true, force: true });
+  });
+
+  async function cpExists(rel: string): Promise<boolean> {
+    try {
+      await access(join(dir, rel));
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  it('creates .github/copilot-instructions.md', async () => {
+    expect(await cpExists('.github/copilot-instructions.md')).toBe(true);
+  });
+
+  it('creates all 8 skills in .github/skills/', async () => {
+    for (const skill of ['setup', 'sail', 'anchor', 'recap', 'dock', 'tech-debt', 'scout', 'repair-hull']) {
+      expect(await cpExists(`.github/skills/${skill}/SKILL.md`)).toBe(true);
+    }
+  });
+
+  it('creates all 4 agents as .agent.md files', async () => {
+    for (const agent of ['quartermaster', 'bosun', 'captain', 'cartographer']) {
+      expect(await cpExists(`.github/agents/${agent}.agent.md`)).toBe(true);
+    }
+  });
+
+  it('creates hooks.json', async () => {
+    expect(await cpExists('.github/hooks/hooks.json')).toBe(true);
+    const content = await readFile(join(dir, '.github/hooks/hooks.json'), 'utf-8');
+    const parsed = JSON.parse(content);
+    expect(parsed.version).toBe(1);
+  });
+
+  it('creates hook shell scripts', async () => {
+    expect(await cpExists('.github/hooks/post-write.sh')).toBe(true);
+    expect(await cpExists('.github/hooks/secret-scan.sh')).toBe(true);
+    expect(await cpExists('.github/hooks/session-resume.sh')).toBe(true);
+  });
+
+  it('does NOT create Claude-specific files', async () => {
+    expect(await cpExists('.claude/settings.json')).toBe(false);
+    expect(await cpExists('.claude/hooks/post-write.sh')).toBe(false);
+    expect(await cpExists('.claude/skills/sail/SKILL.md')).toBe(false);
+    expect(await cpExists('.claude/agents/quartermaster.md')).toBe(false);
+  });
+
+  it('creates shared .tiller/ files', async () => {
+    expect(await cpExists('.tiller/TILLER.md')).toBe(true);
+    expect(await cpExists('.tiller/tiller.json')).toBe(true);
+  });
+
+  it('manifest lists copilot managed files', async () => {
+    const manifest = JSON.parse(await readFile(join(dir, '.tiller/tiller.json'), 'utf-8'));
+    expect(manifest.tools).toEqual(['copilot']);
+    expect(manifest.managedFiles).toContain('.github/copilot-instructions.md');
+    expect(manifest.managedFiles).toContain('.github/skills/sail/SKILL.md');
+    expect(manifest.managedFiles).toContain('.github/agents/quartermaster.agent.md');
+    expect(manifest.managedFiles).toContain('.github/hooks/hooks.json');
   });
 });
