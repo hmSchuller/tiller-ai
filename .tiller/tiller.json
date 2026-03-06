@@ -3,7 +3,9 @@
   "mode": "detailed",
   "workflow": "solo",
   "runCommand": "npm test",
-  "tools": ["copilot"],
+  "tools": [
+    "copilot"
+  ],
   "managedFiles": [
     ".tiller/TILLER.md",
     ".github/copilot-instructions.md",
@@ -22,6 +24,9 @@
     ".github/hooks/hooks.json",
     ".github/hooks/post-write.sh",
     ".github/hooks/secret-scan.sh",
-    ".github/hooks/session-resume.sh"
+    ".github/hooks/session-resume.sh",
+    ".github/hooks/session-log.sh",
+    ".github/hooks/inbox-check.sh",
+    ".github/hooks/agent-complete.sh"
   ]
 }
