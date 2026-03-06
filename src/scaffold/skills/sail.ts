@@ -1,9 +1,10 @@
-import type { ProjectConfig } from '../types.js';
+import type { ProjectConfig } from "../types.js";
 
 export function generateSailSkill(config: ProjectConfig): string {
-  return `---
+  return (
+    `---
 name: sail
-description: Start or continue work — features, fixes, and tasks. Usage: /sail [description]
+description: Start or continue work — features, fixes, and tasks.
 ---
 
 # /sail — Start or continue work
@@ -89,7 +90,8 @@ Convert $ARGUMENTS to kebab-case for the branch name (e.g. "fix broken auth redi
 
 Before planning, check if a tech debt cleanup is due:
 
-1. Count lines in \`changelog.md\` matching the pattern \`- [` + `[^]]*] (landed|docked) feature/\` — this is \`landedCount\`
+1. Count lines in \`changelog.md\` matching the pattern \`- [` +
+    `[^]]*] (landed|docked) feature/\` — this is \`landedCount\`
 2. Read \`.tiller/tech-debt.json\` — get \`lastTechDebtAtFeature\` and \`threshold\` (default threshold: 3)
 3. If \`(landedCount - lastTechDebtAtFeature) >= threshold\`:
    - Use the **Task tool** (foreground, \`subagent_type: "general-purpose"\`) with the contents of \`.claude/skills/tech-debt/SKILL.md\` as the prompt
@@ -310,5 +312,6 @@ For a large milestone where implementation and tests are clearly separable, the 
 
 **simple:** Fix it yourself first. Only tell the user if you genuinely can't resolve it.
 **detailed:** Explain what happened and what you plan to do.
-`;
+`
+  );
 }

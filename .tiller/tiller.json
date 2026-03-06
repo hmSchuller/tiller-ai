@@ -4,8 +4,8 @@
   "workflow": "solo",
   "runCommand": "npm test",
   "tools": [
-    "copilot",
-    "claude"
+    "claude",
+    "copilot"
   ],
   "managedFiles": [
     ".tiller/TILLER.md",

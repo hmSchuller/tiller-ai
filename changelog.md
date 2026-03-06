@@ -3,6 +3,7 @@
 > Shared project history. Updated by /sail, /anchor, and /dock. Committed and shared.
 
 ## Done
+- [2026-03-06] remove usage descriptions from skill frontmatter — not all CLI providers support it; regen managed files
 - [2026-03-06] add tools selection to config command — extract regenerateFiles, add multiselect prompt, delete stale files on tool removal
 - [2026-03-06] docked feature/update_flow
 - [2026-03-05] docked feature/task-list-progress-tracking
