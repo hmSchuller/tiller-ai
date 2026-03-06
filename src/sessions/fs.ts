@@ -98,12 +98,13 @@ export function appendInboxMessage(
 ): void {
   const inboxPath = join(sessionDir(projectRoot, slug), `${agentName}.inbox.md`);
   const block = [
-    '---',
+    '<!-- TILLER-MSG -->',
     `timestamp: ${message.timestamp}`,
     `from: ${message.from}`,
     'delivered: false',
-    '---',
+    '<!-- /TILLER-MSG-HEAD -->',
     message.content,
+    '<!-- /TILLER-MSG -->',
     '',
   ].join('\n');
   appendFileSync(inboxPath, block, 'utf-8');
@@ -113,23 +114,23 @@ function parseInbox(raw: string): InboxMessage[] {
   if (!raw.trim()) return [];
 
   const messages: InboxMessage[] = [];
-  // Split on frontmatter delimiters: each message starts with ---\n<fields>\n---\n<content>
-  const blocks = raw.split(/^---$/m);
+  const msgRegex = /<!-- TILLER-MSG -->\n([\s\S]*?)<!-- \/TILLER-MSG-HEAD -->\n([\s\S]*?)<!-- \/TILLER-MSG -->/g;
+  let match;
 
-  // blocks alternate: [before-first-fence, frontmatter1, content1, frontmatter2, content2, ...]
-  // First element is empty or whitespace if file starts with ---
-  for (let i = 1; i < blocks.length - 1; i += 2) {
-    const frontmatter = blocks[i].trim();
-    const content = (blocks[i + 1] ?? '').trim();
+  while ((match = msgRegex.exec(raw)) !== null) {
+    const header = match[1].trim();
+    const content = match[2].trim();
 
-    const timestampMatch = frontmatter.match(/^timestamp:\s*(.+)$/m);
-    const fromMatch = frontmatter.match(/^from:\s*(.+)$/m);
-    const deliveredMatch = frontmatter.match(/^delivered:\s*(.+)$/m);
+    const timestampMatch = header.match(/^timestamp:\s*(.+)$/m);
+    const fromMatch = header.match(/^from:\s*(.+)$/m);
+    const deliveredMatch = header.match(/^delivered:\s*(.+)$/m);
 
     if (timestampMatch && fromMatch && deliveredMatch) {
+      const from = fromMatch[1].trim();
+      if (from !== 'orchestrator' && from !== 'user') continue;
       messages.push({
         timestamp: timestampMatch[1].trim(),
-        from: fromMatch[1].trim() as InboxMessage['from'],
+        from,
         delivered: deliveredMatch[1].trim() === 'true',
         content,
       });
@@ -143,12 +144,13 @@ function serializeInbox(messages: InboxMessage[]): string {
   return messages
     .map((m) => {
       return [
-        '---',
+        '<!-- TILLER-MSG -->',
         `timestamp: ${m.timestamp}`,
         `from: ${m.from}`,
         `delivered: ${m.delivered}`,
-        '---',
+        '<!-- /TILLER-MSG-HEAD -->',
         m.content,
+        '<!-- /TILLER-MSG -->',
         '',
       ].join('\n');
     })

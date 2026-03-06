@@ -362,6 +362,10 @@ export function createDashboardRequestHandler(cwd: string) {
       const sessionDetailMatch = req.method === 'GET' && requestUrl.pathname.match(/^\/api\/sessions\/([^/]+)$/);
       if (sessionDetailMatch) {
         const slug = decodeURIComponent(sessionDetailMatch[1]);
+        if (slug.includes('..')) {
+          sendJson(res, 400, { ok: false, error: getRequestIssue('Invalid path segment.') });
+          return;
+        }
         const session = readSession(cwd, slug);
         if (!session) {
           sendJson(res, 404, { error: 'Session not found' });
@@ -391,9 +395,20 @@ export function createDashboardRequestHandler(cwd: string) {
       if (inboxPostMatch) {
         const slug = decodeURIComponent(inboxPostMatch[1]);
         const agentName = decodeURIComponent(inboxPostMatch[2]);
+
+        if (slug.includes('..') || agentName.includes('..')) {
+          sendJson(res, 400, { ok: false, error: getRequestIssue('Invalid path segment.') });
+          return;
+        }
+
         const session = readSession(cwd, slug);
         if (!session) {
           sendJson(res, 404, { error: 'Session not found' });
+          return;
+        }
+
+        if (!session.agents.some((a) => a.name === agentName)) {
+          sendJson(res, 404, { error: 'Agent not found' });
           return;
         }
 

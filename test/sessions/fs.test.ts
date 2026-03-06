@@ -265,5 +265,26 @@ describe('sessions/fs', () => {
         expect(() => markMessagesDelivered(tmpDir, 'feature-inbox-test', 'nonexistent')).not.toThrow();
       });
     });
+
+    describe('content with --- delimiters', () => {
+      it('handles message content containing --- without corruption', () => {
+        appendInboxMessage(tmpDir, 'feature-inbox-test', 'qm', {
+          timestamp: '2026-01-01T00:00:00Z',
+          from: 'user',
+          content: 'Here is some code:\n---\ntitle: example\n---\nDone.',
+        });
+        appendInboxMessage(tmpDir, 'feature-inbox-test', 'qm', {
+          timestamp: '2026-01-01T00:01:00Z',
+          from: 'orchestrator',
+          content: 'Second message after the tricky one.',
+        });
+
+        const messages = readInbox(tmpDir, 'feature-inbox-test', 'qm');
+        expect(messages).toHaveLength(2);
+        expect(messages[0].content).toContain('---');
+        expect(messages[0].content).toContain('title: example');
+        expect(messages[1].content).toBe('Second message after the tricky one.');
+      });
+    });
   });
 });

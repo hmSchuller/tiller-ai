@@ -515,6 +515,56 @@ describe('dashboard server', () => {
     expect(payload).toEqual({ error: 'Session not found' });
   });
 
+  it('POST /api/sessions/:slug/inbox/:agent returns 404 for unregistered agent', async () => {
+    await setupProject(tmpDir);
+    createSession(tmpDir, 'feature/auth');
+
+    const server = await startDashboardServer(tmpDir);
+    servers.push(server);
+
+    const response = await fetch(`${server.url}/api/sessions/feature-auth/inbox/unknown-agent`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ content: 'Hello' }),
+    });
+    const payload = await response.json();
+
+    expect(response.status).toBe(404);
+    expect(payload).toEqual({ error: 'Agent not found' });
+  });
+
+  it('rejects path traversal in session slug', async () => {
+    await setupProject(tmpDir);
+
+    const server = await startDashboardServer(tmpDir);
+    servers.push(server);
+
+    const response = await fetch(`${server.url}/api/sessions/${encodeURIComponent('../../evil')}`, {
+      method: 'GET',
+    });
+
+    expect(response.status).toBe(400);
+  });
+
+  it('rejects path traversal in agent name for inbox POST', async () => {
+    await setupProject(tmpDir);
+    createSession(tmpDir, 'feature/auth');
+
+    const server = await startDashboardServer(tmpDir);
+    servers.push(server);
+
+    const response = await fetch(
+      `${server.url}/api/sessions/feature-auth/inbox/${encodeURIComponent('../../evil')}`,
+      {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ content: 'Hello' }),
+      },
+    );
+
+    expect(response.status).toBe(400);
+  });
+
   it('keeps the server available when automatic browser opening fails', async () => {
     await setupProject(tmpDir);
     const openBrowser = vi.fn().mockRejectedValue(new Error('no browser'));

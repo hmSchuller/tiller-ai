@@ -43,19 +43,16 @@ if ! grep -q "delivered: false" "$INBOX_FILE" 2>/dev/null; then
   exit 0
 fi
 
-# Collect undelivered message content
+# Collect undelivered message content using TILLER-MSG delimiters
 MESSAGES=$(python3 -c "
-import sys
+import sys, re
 raw = open(sys.argv[1]).read()
-blocks = raw.split('---')
+pattern = r'<!-- TILLER-MSG -->\\\\n(.*?)<!-- /TILLER-MSG-HEAD -->\\\\n(.*?)<!-- /TILLER-MSG -->'
+matches = re.findall(pattern, raw, re.DOTALL)
 parts = []
-i = 1
-while i < len(blocks) - 1:
-    fm = blocks[i].strip()
-    content = blocks[i+1].strip() if i+1 < len(blocks) else ''
-    if 'delivered: false' in fm:
-        parts.append(content)
-    i += 2
+for header, content in matches:
+    if 'delivered: false' in header:
+        parts.append(content.strip())
 print(' | '.join(parts))
 " "$INBOX_FILE" 2>/dev/null || echo "You have unread inbox messages.")
 
@@ -63,7 +60,7 @@ print(' | '.join(parts))
 sed -i.bak 's/delivered: false/delivered: true/g' "$INBOX_FILE" && rm -f "\${INBOX_FILE}.bak"
 
 # Escape message for JSON
-ESCAPED_MSG=$(printf '%s' "$MESSAGES" | sed 's/\\\\/\\\\\\\\/g; s/"/\\\\"/g' | tr '\\n' ' ')
+ESCAPED_MSG=$(printf '%s' "$MESSAGES" | sed 's/\\\\\\\\/\\\\\\\\\\\\\\\\/g; s/"/\\\\"/g' | tr '\\n' ' ')
 
 echo "{\\"permissionDecision\\":\\"deny\\",\\"permissionDecisionReason\\":\\"📬 INBOX MESSAGE: \${ESCAPED_MSG}. After processing this message, retry your action.\\"}"
 exit 0
