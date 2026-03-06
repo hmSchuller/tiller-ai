@@ -401,7 +401,8 @@ describe('generateSailSkill', () => {
 
   it('registers agents in session.json before spawning', () => {
     const result = generateSailSkill(simpleConfig);
-    expect(result).toContain('Register each worker agent in the session before spawning');
+    expect(result).toContain('Sub-agent registration rule');
+    expect(result).toContain('MUST register it in the session BEFORE spawning');
   });
 
   it('reuses existing session folder when resuming', () => {

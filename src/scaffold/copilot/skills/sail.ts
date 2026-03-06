@@ -13,6 +13,39 @@ Use this skill to contribute anything: new features, bug fixes, or incremental t
 
 **All user interaction uses \`AskUserQuestion\` only. No chat prompts, no \`EnterPlanMode\`. One continuous prompt.**
 
+## Sub-agent registration rule (applies to ALL steps)
+
+**Every time** you spawn a sub-agent (via the Task tool), you MUST register it in the session BEFORE spawning:
+
+\`\`\`bash
+ts=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+python3 -c "
+import json, sys
+f = sys.argv[1]; ts = sys.argv[2]; name = sys.argv[3]; atype = sys.argv[4]
+d = json.load(open(f))
+d['agents'].append({'name': name, 'type': atype, 'status': 'active', 'startedAt': ts})
+json.dump(d, open(f, 'w'), indent=2)
+" ".tiller/sessions/<slug>/session.json" "$ts" "<agent-name>" "<agent-type>"
+echo "<agent-name>" > .tiller/sessions/<slug>/current-agent
+\`\`\`
+
+Use descriptive names and types: e.g. \`"interviewer" "requirements"\`, \`"planner" "planning"\`, \`"worker-1" "fleet"\`, \`"quartermaster" "review"\`.
+
+After a sub-agent completes, mark it completed and restore the lead agent:
+
+\`\`\`bash
+python3 -c "
+import json, sys
+f = sys.argv[1]; name = sys.argv[2]
+d = json.load(open(f))
+for a in d.get('agents', []):
+    if a.get('name') == name:
+        a['status'] = 'completed'
+json.dump(d, open(f, 'w'), indent=2)
+" ".tiller/sessions/<slug>/session.json" "<agent-name>"
+echo "sail-lead" > .tiller/sessions/<slug>/current-agent
+\`\`\`
+
 ## Step 0: Set up progress tracking and session
 
 Create all tasks upfront using \`TaskCreate\` so the user sees a visible checklist:
@@ -200,40 +233,12 @@ After acceptance:
 
 The main agent is a **pure orchestrator**. It does NOT implement any code itself — all implementation is delegated to spawned agents.
 
-### Setup
-
-1. Register each worker agent in the session before spawning. For each agent, run:
-   \`\`\`bash
-   ts=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-   python3 -c "
-   import json, sys
-   f = sys.argv[1]; ts = sys.argv[2]; name = sys.argv[3]
-   d = json.load(open(f))
-   d['agents'].append({'name': name, 'type': 'fleet', 'status': 'active', 'startedAt': ts})
-   json.dump(d, open(f, 'w'), indent=2)
-   " ".tiller/sessions/<slug>/session.json" "$ts" "worker-<N>"
-   echo "worker-<N>" > .tiller/sessions/<slug>/current-agent
-   \`\`\`
-
 ### Execution
 
-3. Group all currently unblocked milestones and use \`/fleet implement milestones: <list>\` to execute them in parallel
-4. For sequential milestones (those with dependencies), execute them one by one using the Task tool after their dependencies complete
-5. Do NOT implement any code yourself — delegate everything
-6. When a worker completes: mark it as completed in the session, then review the changes and run \`${config.runCommand}\`:
-   \`\`\`bash
-   python3 -c "
-   import json, sys
-   f = sys.argv[1]; name = sys.argv[2]
-   d = json.load(open(f))
-   for a in d.get('agents', []):
-       if a.get('name') == name:
-           a['status'] = 'completed'
-   json.dump(d, open(f, 'w'), indent=2)
-   " ".tiller/sessions/<slug>/session.json" "worker-<N>"
-   echo "sail-lead" > .tiller/sessions/<slug>/current-agent
-   \`\`\`
-   Then fix integration issues if needed
+1. Group all currently unblocked milestones and use \`/fleet implement milestones: <list>\` to execute them in parallel (register each worker per the sub-agent registration rule above)
+2. For sequential milestones (those with dependencies), execute them one by one using the Task tool after their dependencies complete
+3. Do NOT implement any code yourself — delegate everything
+4. When a worker completes: follow the sub-agent completion rule above, then review the changes, run \`${config.runCommand}\`, and fix integration issues if needed
 7. Commit incrementally: \`git add -A && git commit -m "<milestone description>"\`
 8. Add entry to \`changelog.md\` Done section. Amend: \`git commit --amend --no-edit\`
 9. **detailed only:** Update \`.tiller/compass.md\` to check off the milestone. Amend: \`git commit --amend --no-edit\`

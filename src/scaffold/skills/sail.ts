@@ -11,6 +11,39 @@ description: Start or continue work — features, fixes, and tasks.
 
 Use this skill to contribute anything: new features, bug fixes, or incremental tasks on an existing branch. It handles branch routing automatically so you can focus on the work.
 
+## Sub-agent registration rule (applies to ALL steps)
+
+**Every time** you spawn a sub-agent (via the Agent tool), you MUST register it in the session BEFORE spawning:
+
+\`\`\`bash
+ts=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+python3 -c "
+import json, sys
+f = sys.argv[1]; ts = sys.argv[2]; name = sys.argv[3]; atype = sys.argv[4]
+d = json.load(open(f))
+d['agents'].append({'name': name, 'type': atype, 'status': 'active', 'startedAt': ts})
+json.dump(d, open(f, 'w'), indent=2)
+" ".tiller/sessions/<slug>/session.json" "$ts" "<agent-name>" "<agent-type>"
+echo "<agent-name>" > .tiller/sessions/<slug>/current-agent
+\`\`\`
+
+Use descriptive names and types: e.g. \`"interviewer" "requirements"\`, \`"planner" "planning"\`, \`"worker-1" "fleet"\`, \`"quartermaster" "review"\`.
+
+After a sub-agent completes, mark it completed and restore the lead agent:
+
+\`\`\`bash
+python3 -c "
+import json, sys
+f = sys.argv[1]; name = sys.argv[2]
+d = json.load(open(f))
+for a in d.get('agents', []):
+    if a.get('name') == name:
+        a['status'] = 'completed'
+json.dump(d, open(f, 'w'), indent=2)
+" ".tiller/sessions/<slug>/session.json" "<agent-name>"
+echo "sail-lead" > .tiller/sessions/<slug>/current-agent
+\`\`\`
+
 ## Step 0: Set up progress tracking and session
 
 Create all tasks upfront using \`TaskCreate\` so the user sees a visible checklist:
@@ -232,12 +265,7 @@ All milestones run one by one, no agent spawning:
 
 Use \`/fleet\` to execute independent milestones in parallel:
 
-**Setup:**
-1. Register each worker agent in the session before spawning. For each agent, append to \`.tiller/sessions/<slug>/session.json\` agents array:
-   \`\`\`json
-   {"name":"worker-<N>","type":"fleet","status":"active","startedAt":"<ISO-timestamp>"}
-   \`\`\`
-2. Set \`TILLER_AGENT_NAME\` environment variable for each spawned agent so hooks can identify it
+**Setup:** Register each worker agent per the sub-agent registration rule above (use type \`"fleet"\`).
 
 **Execution:**
 3. Use \`/fleet implement milestones: <list of independent milestones>\` to execute independent milestones in parallel
@@ -252,12 +280,7 @@ Use \`/fleet\` to execute independent milestones in parallel:
 
 The main agent becomes a pure orchestrator. It does NOT implement any code itself — all implementation is delegated to spawned agents.
 
-**Setup:**
-1. Register each worker agent in the session before spawning. For each agent, append to \`.tiller/sessions/<slug>/session.json\` agents array:
-   \`\`\`json
-   {"name":"worker-<N>","type":"fleet","status":"active","startedAt":"<ISO-timestamp>"}
-   \`\`\`
-2. Set \`TILLER_AGENT_NAME\` environment variable for each spawned agent so hooks can identify it
+**Setup:** Register each worker agent per the sub-agent registration rule above (use type \`"fleet"\`).
 
 **Execution:**
 3. Group all currently unblocked milestones and use \`/fleet implement milestones: <list>\` to execute them in parallel, selecting the model based on milestone complexity:
