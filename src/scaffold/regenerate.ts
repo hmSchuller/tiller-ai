@@ -31,6 +31,7 @@ import { generateCopilotBosunAgent } from './copilot/agents/bosun.js';
 import { generateCopilotCaptainAgent } from './copilot/agents/captain.js';
 import { generateCopilotCartographerAgent } from './copilot/agents/cartographer.js';
 import { generateCopilotHooksJson } from './copilot/hooks-json.js';
+import { generateCopilotSailSkill } from './copilot/skills/sail.js';
 import { generateTillerManifest, getManagedFiles, TILLER_VERSION } from './tiller-manifest.js';
 import { TILLER_GITIGNORE_ENTRIES } from './gitignore.js';
 import type { ProjectConfig } from './types.js';
@@ -111,7 +112,7 @@ export async function regenerateFiles(config: ProjectConfig, cwd: string, opts?:
   if (tools.includes('copilot')) {
     await writeFile(resolve(cwd, '.github/copilot-instructions.md'), generateCopilotInstructions(config));
     await writeFile(resolve(cwd, '.github/skills/setup/SKILL.md'), generateSetupSkill(config));
-    await writeFile(resolve(cwd, '.github/skills/sail/SKILL.md'), generateSailSkill(config));
+    await writeFile(resolve(cwd, '.github/skills/sail/SKILL.md'), generateCopilotSailSkill(config));
     await writeFile(resolve(cwd, '.github/skills/anchor/SKILL.md'), generateAnchorSkill(config));
     await writeFile(resolve(cwd, '.github/skills/recap/SKILL.md'), generateRecapSkill(config));
     await writeFile(resolve(cwd, '.github/skills/dock/SKILL.md'), generateDockSkill(config));
