@@ -9,11 +9,14 @@ import {
   type FormValues,
 } from './view-model.js';
 
+export type DashboardTab = 'config' | 'sessions';
+
 export type DashboardAppState = {
   dashState: DashboardState | null;
   status: DashboardStatus | null;
   formDisabled: boolean;
   form: FormValues;
+  activeTab: DashboardTab;
 };
 
 function getErrorMessage(error: unknown, fallback: string): string {
@@ -26,6 +29,14 @@ export function createInitialAppState(): DashboardAppState {
     status: { message: 'Loading dashboard…', tone: 'info' },
     formDisabled: true,
     form: cloneFormValues(DEFAULT_FORM_VALUES),
+    activeTab: 'config',
+  };
+}
+
+export function switchTab(currentState: DashboardAppState, tab: DashboardTab): DashboardAppState {
+  return {
+    ...currentState,
+    activeTab: tab,
   };
 }
 

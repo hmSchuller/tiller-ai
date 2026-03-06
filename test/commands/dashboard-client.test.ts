@@ -16,6 +16,7 @@ import { Hero } from '../../src/commands/dashboard/client/components/Hero.js';
 import { buildCssVarBlock } from '../../src/commands/dashboard/client/theme.js';
 import type { DashboardViewProps } from '../../src/commands/dashboard/client/app.js';
 import { DashboardView } from '../../src/commands/dashboard/client/app.js';
+import { TabBar } from '../../src/commands/dashboard/client/components/TabBar.js';
 import {
   applyLoadError,
   applyLoadResponse,
@@ -24,6 +25,7 @@ import {
   applySaveResponse,
   applySaveStart,
   createInitialAppState,
+  switchTab,
   updateScope,
   updateToolSelection,
 } from '../../src/commands/dashboard/client/state.js';
@@ -230,6 +232,17 @@ describe('dashboard client state', () => {
     expect(saveErrorState.status).toEqual({ message: 'save failed', tone: 'error' });
     expect(saveErrorState.formDisabled).toBe(false);
   });
+
+  it('defaults activeTab to config and switches via switchTab', () => {
+    const initial = createInitialAppState();
+    expect(initial.activeTab).toBe('config');
+
+    const switched = switchTab(initial, 'sessions');
+    expect(switched.activeTab).toBe('sessions');
+
+    const switchedBack = switchTab(switched, 'config');
+    expect(switchedBack.activeTab).toBe('config');
+  });
 });
 
 // ── theme ─────────────────────────────────────────────────────────────────────
@@ -358,6 +371,47 @@ describe('SnapshotCard component', () => {
   });
 });
 
+describe('TabBar component', () => {
+  const tabs = [
+    { id: 'config', label: 'Config' },
+    { id: 'sessions', label: 'Sessions' },
+  ];
+
+  it('renders all tabs with correct labels', () => {
+    const html = renderToStaticMarkup(
+      createElement(TabBar, { tabs, activeTab: 'config', onTabChange: () => {} }),
+    );
+    expect(html).toContain('Config');
+    expect(html).toContain('Sessions');
+    expect(html).toContain('role="tablist"');
+  });
+
+  it('marks the active tab with aria-selected true', () => {
+    const html = renderToStaticMarkup(
+      createElement(TabBar, { tabs, activeTab: 'config', onTabChange: () => {} }),
+    );
+    expect(html).toContain('aria-selected="true"');
+    expect(html).toContain('aria-selected="false"');
+  });
+
+  it('applies active class only to the selected tab', () => {
+    const html = renderToStaticMarkup(
+      createElement(TabBar, { tabs, activeTab: 'sessions', onTabChange: () => {} }),
+    );
+    // The sessions tab should have the active class
+    expect(html).toContain('tab-button active');
+  });
+
+  it('renders each tab with role="tab"', () => {
+    const html = renderToStaticMarkup(
+      createElement(TabBar, { tabs, activeTab: 'config', onTabChange: () => {} }),
+    );
+    // Two tab roles expected
+    const tabRoleCount = (html.match(/role="tab"/g) || []).length;
+    expect(tabRoleCount).toBe(2);
+  });
+});
+
 // ── DashboardView (presentational root) ──────────────────────────────────────
 
 function makeViewProps(
@@ -371,11 +425,13 @@ function makeViewProps(
     projectRows: [{ label: 'Mode', value: 'detailed' }],
     localRows: [],
     effectiveRows: [{ label: 'Mode', value: 'detailed' }],
+    activeTab: 'config',
     onSubmit: noop,
     onScopeChange: noop,
     onModeChange: noop,
     onWorkflowChange: noop,
     onToolChange: noop,
+    onTabChange: noop,
     ...overrides,
   };
 }
@@ -477,5 +533,29 @@ describe('DashboardView component', () => {
     const html = renderToStaticMarkup(createElement(DashboardView, makeViewProps()));
     expect(html).toContain('config-form');
     expect(html).toContain('Save settings');
+  });
+
+  it('renders the tab bar with Config and Sessions tabs', () => {
+    const html = renderToStaticMarkup(createElement(DashboardView, makeViewProps()));
+    expect(html).toContain('role="tablist"');
+    expect(html).toContain('Config');
+    expect(html).toContain('Sessions');
+  });
+
+  it('shows config content when activeTab is config', () => {
+    const html = renderToStaticMarkup(
+      createElement(DashboardView, makeViewProps({ activeTab: 'config' })),
+    );
+    expect(html).toContain('panel-grid');
+    expect(html).not.toContain('sessions-placeholder');
+  });
+
+  it('shows sessions placeholder when activeTab is sessions', () => {
+    const html = renderToStaticMarkup(
+      createElement(DashboardView, makeViewProps({ activeTab: 'sessions' })),
+    );
+    expect(html).toContain('sessions-placeholder');
+    expect(html).toContain('Sessions view coming soon...');
+    expect(html).not.toContain('panel-grid');
   });
 });

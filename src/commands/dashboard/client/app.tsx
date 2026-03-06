@@ -17,6 +17,8 @@ import {
   applySaveStart,
   createInitialAppState,
   type DashboardAppState,
+  type DashboardTab,
+  switchTab,
   updateMode,
   updateScope,
   updateToolSelection,
@@ -26,6 +28,7 @@ import { Hero } from './components/Hero.js';
 import { StatusBanner } from './components/StatusBanner.js';
 import { SnapshotCard } from './components/SnapshotCard.js';
 import { SettingsForm } from './components/SettingsForm.js';
+import { TabBar } from './components/TabBar.js';
 
 async function readDashboardState(): Promise<DashboardStateResponse> {
   const response = await fetch('/api/config', { cache: 'no-store' });
@@ -40,12 +43,19 @@ export type DashboardViewProps = {
   projectRows: PanelRow[];
   localRows: PanelRow[];
   effectiveRows: PanelRow[];
+  activeTab: DashboardTab;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void | Promise<void>;
   onScopeChange: (event: ChangeEvent<HTMLInputElement>) => void;
   onModeChange: (event: ChangeEvent<HTMLSelectElement>) => void;
   onWorkflowChange: (event: ChangeEvent<HTMLSelectElement>) => void;
   onToolChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  onTabChange: (id: string) => void;
 };
+
+const DASHBOARD_TABS = [
+  { id: 'config', label: 'Config' },
+  { id: 'sessions', label: 'Sessions' },
+];
 
 export function DashboardView({
   status,
@@ -54,32 +64,39 @@ export function DashboardView({
   projectRows,
   localRows,
   effectiveRows,
+  activeTab,
   onSubmit,
   onScopeChange,
   onModeChange,
   onWorkflowChange,
   onToolChange,
+  onTabChange,
 }: DashboardViewProps) {
   return (
     <main className="shell">
       <Hero />
+      <TabBar tabs={DASHBOARD_TABS} activeTab={activeTab} onTabChange={onTabChange} />
       <StatusBanner status={status} />
-      <div className="layout">
-        <SettingsForm
-          form={form}
-          formDisabled={formDisabled}
-          onSubmit={onSubmit}
-          onScopeChange={onScopeChange}
-          onModeChange={onModeChange}
-          onWorkflowChange={onWorkflowChange}
-          onToolChange={onToolChange}
-        />
-        <section className="panel-grid">
-          <SnapshotCard title="Project values" items={projectRows} />
-          <SnapshotCard title="Local overrides" items={localRows} />
-          <SnapshotCard title="Effective config" items={effectiveRows} />
-        </section>
-      </div>
+      {activeTab === 'config' ? (
+        <div className="layout">
+          <SettingsForm
+            form={form}
+            formDisabled={formDisabled}
+            onSubmit={onSubmit}
+            onScopeChange={onScopeChange}
+            onModeChange={onModeChange}
+            onWorkflowChange={onWorkflowChange}
+            onToolChange={onToolChange}
+          />
+          <section className="panel-grid">
+            <SnapshotCard title="Project values" items={projectRows} />
+            <SnapshotCard title="Local overrides" items={localRows} />
+            <SnapshotCard title="Effective config" items={effectiveRows} />
+          </section>
+        </div>
+      ) : (
+        <div className="sessions-placeholder">Sessions view coming soon...</div>
+      )}
     </main>
   );
 }
@@ -180,6 +197,10 @@ export function DashboardApp() {
     setAppState((currentState) => updateToolSelection(currentState, tool, event.target.checked));
   };
 
+  const onTabChange = (id: string): void => {
+    setAppState((currentState) => switchTab(currentState, id as DashboardTab));
+  };
+
   const projectRows = appState.dashState ? getSnapshotRows(appState.dashState.project) : [];
   const localRows = appState.dashState ? getLocalRows(appState.dashState.local) : [];
   const effectiveRows = appState.dashState ? getSnapshotRows(appState.dashState.effective) : [];
@@ -192,11 +213,13 @@ export function DashboardApp() {
       projectRows={projectRows}
       localRows={localRows}
       effectiveRows={effectiveRows}
+      activeTab={appState.activeTab}
       onSubmit={handleSubmit}
       onScopeChange={onScopeChange}
       onModeChange={onModeChange}
       onWorkflowChange={onWorkflowChange}
       onToolChange={onToolChange}
+      onTabChange={onTabChange}
     />
   );
 }
