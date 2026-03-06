@@ -22,7 +22,7 @@ import type {
   SaveRequest,
   WorkflowMode,
 } from './contracts.js';
-import { CLIENT_ASSET_PATH } from './contracts.js';
+import { CLIENT_ASSET_PATH, CLIENT_CSS_ASSET_PATH } from './contracts.js';
 import { DASHBOARD_HTML } from './page.js';
 
 const DEFAULT_HOST = '127.0.0.1';
@@ -263,9 +263,9 @@ async function handleSaveRequest(cwd: string, payload: unknown): Promise<{ statu
   return { statusCode: 200, body: toStateResponse(await readConfig(cwd)) };
 }
 
-async function readClientAsset(): Promise<Buffer> {
+async function readDistAsset(assetPath: string): Promise<Buffer> {
   const candidates = PACKAGE_ROOT
-    ? [resolve(PACKAGE_ROOT, 'dist', CLIENT_ASSET_PATH.replace(/^\//, ''))]
+    ? [resolve(PACKAGE_ROOT, 'dist', assetPath.replace(/^\//, ''))]
     : [];
 
   for (const candidate of candidates) {
@@ -275,7 +275,7 @@ async function readClientAsset(): Promise<Buffer> {
       // try next candidate
     }
   }
-  throw new Error('Client bundle not found.');
+  throw new Error(`Asset not found: ${assetPath}`);
 }
 
 function findPackageRoot(startDir: string): string | null {
@@ -302,7 +302,7 @@ export function createDashboardRequestHandler(cwd: string) {
     try {
       if ((req.method === 'GET' || req.method === 'HEAD') && requestUrl.pathname === CLIENT_ASSET_PATH) {
         try {
-          const content = await readClientAsset();
+          const content = await readDistAsset(CLIENT_ASSET_PATH);
           res.writeHead(200, {
             'content-type': 'text/javascript; charset=utf-8',
             'cache-control': 'no-store',
@@ -310,6 +310,20 @@ export function createDashboardRequestHandler(cwd: string) {
           res.end(content);
         } catch {
           sendJson(res, 404, { ok: false, error: getRequestIssue('Client bundle not found. Run npm run build first.', 'not-found') });
+        }
+        return;
+      }
+
+      if ((req.method === 'GET' || req.method === 'HEAD') && requestUrl.pathname === CLIENT_CSS_ASSET_PATH) {
+        try {
+          const content = await readDistAsset(CLIENT_CSS_ASSET_PATH);
+          res.writeHead(200, {
+            'content-type': 'text/css; charset=utf-8',
+            'cache-control': 'no-store',
+          });
+          res.end(content);
+        } catch {
+          sendJson(res, 404, { ok: false, error: getRequestIssue('Client CSS bundle not found. Run npm run build first.', 'not-found') });
         }
         return;
       }

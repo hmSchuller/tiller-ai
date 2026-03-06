@@ -3,6 +3,7 @@ import type { ToolTarget } from '../../scaffold/types.js';
 export type { ToolTarget } from '../../scaffold/types.js';
 
 export const CLIENT_ASSET_PATH = '/dashboard-client.js' as const;
+export const CLIENT_CSS_ASSET_PATH = '/dashboard-client.css' as const;
 
 export const CONFIG_MODE_OPTIONS = ['simple', 'detailed'] as const;
 export const WORKFLOW_MODE_OPTIONS = ['solo', 'team'] as const;

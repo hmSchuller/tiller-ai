@@ -1,5 +1,9 @@
+import './styles.css';
+import { applyTheme } from './theme.js';
 import { createRoot } from 'react-dom/client';
 import { DashboardApp } from './app.js';
+
+applyTheme();
 
 const container = document.getElementById('app');
 

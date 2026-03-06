@@ -27,9 +27,10 @@ describe('dashboard server', () => {
   const repoRoot = fileURLToPath(new URL('../../', import.meta.url));
 
   beforeAll(async () => {
-    // Remove any pre-existing bundle so the 404 test runs deterministically
-    // before the controlled build inside the nested describe rebuilds it.
+    // Remove any pre-existing bundles so the 404 tests run deterministically
+    // before the controlled build inside the nested describe rebuilds them.
     await rm(join(repoRoot, 'dist/dashboard-client.js'), { force: true });
+    await rm(join(repoRoot, 'dist/dashboard-client.css'), { force: true });
   });
 
   beforeEach(async () => {
@@ -56,6 +57,7 @@ describe('dashboard server', () => {
     const html = await fetch(server.url).then((response) => response.text());
     expect(html).toContain('Tiller Config Dashboard');
     expect(html).toContain('<script type="module" src="/dashboard-client.js">');
+    expect(html).toContain('<link rel="stylesheet" href="/dashboard-client.css"');
     expect(html).toContain('<div id="app">');
   });
 
@@ -66,6 +68,22 @@ describe('dashboard server', () => {
     servers.push(server);
 
     const response = await fetch(`${server.url}/dashboard-client.js`);
+    const payload = await response.json();
+
+    expect(response.status).toBe(404);
+    expect(payload).toMatchObject({
+      ok: false,
+      error: { scope: 'request', reason: 'not-found' },
+    });
+  });
+
+  it('returns 404 for the CSS asset when the bundle has not been built', async () => {
+    await setupProject(tmpDir);
+
+    const server = await startDashboardServer(tmpDir);
+    servers.push(server);
+
+    const response = await fetch(`${server.url}/dashboard-client.css`);
     const payload = await response.json();
 
     expect(response.status).toBe(404);
@@ -367,6 +385,20 @@ describe('dashboard server', () => {
       const response = await fetch(`${server.url}/dashboard-client.js`);
       expect(response.status).toBe(200);
       expect(response.headers.get('content-type')).toContain('text/javascript');
+
+      const content = await response.text();
+      expect(content.length).toBeGreaterThan(0);
+    });
+
+    it('serves the built CSS bundle with 200 and correct content-type', async () => {
+      await setupProject(tmpDir);
+
+      const server = await startDashboardServer(tmpDir);
+      servers.push(server);
+
+      const response = await fetch(`${server.url}/dashboard-client.css`);
+      expect(response.status).toBe(200);
+      expect(response.headers.get('content-type')).toContain('text/css');
 
       const content = await response.text();
       expect(content.length).toBeGreaterThan(0);

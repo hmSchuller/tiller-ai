@@ -1,0 +1,382 @@
+/* Tiller Dashboard — styles.css
+ * Consumes CSS custom properties injected by theme.ts via applyTheme().
+ * All layout, presentation, and component styles live here.
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:root {
+  color-scheme: dark;
+  font-family: var(--font-family);
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--color-bg);
+  background-image: var(--color-bg-gradient);
+  color: var(--color-text);
+}
+
+/* ── Shell ─────────────────────────────────────────────────────── */
+
+.shell {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-5) var(--space-12);
+}
+
+/* ── Hero ──────────────────────────────────────────────────────── */
+
+.hero {
+  margin-bottom: var(--space-6);
+  padding: var(--space-8);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-hero);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: var(--color-accent-gradient);
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 3px var(--space-3);
+  border-radius: 999px;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.30);
+  color: var(--color-accent);
+  font-size: 0.73rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  margin-bottom: var(--space-3);
+}
+
+.hero-title {
+  margin: 0 0 var(--space-3);
+  font-size: clamp(1.4rem, 2.5vw, 1.9rem);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  background: linear-gradient(135deg, #e2e8f0 30%, #94a3b8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-description {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.93rem;
+  line-height: 1.65;
+  max-width: 58ch;
+}
+
+.hero-description code {
+  font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Monaco, Consolas,
+    monospace;
+  font-size: 0.85em;
+  padding: 1px 5px;
+  background: rgba(148, 163, 184, 0.12);
+  border-radius: 4px;
+}
+
+/* ── Status banner ─────────────────────────────────────────────── */
+
+.status-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.status-banner.hidden {
+  display: none;
+}
+
+.status-icon {
+  flex-shrink: 0;
+  font-style: normal;
+  font-size: 0.95rem;
+  margin-top: 1px;
+}
+
+.status-banner.info {
+  background: var(--color-info-bg);
+  border-color: var(--color-info-border);
+  color: var(--color-info-text);
+}
+
+.status-banner.success {
+  background: var(--color-success-bg);
+  border-color: var(--color-success-border);
+  color: var(--color-success-text);
+}
+
+.status-banner.warn {
+  background: var(--color-warn-bg);
+  border-color: var(--color-warn-border);
+  color: var(--color-warn-text);
+}
+
+.status-banner.error {
+  background: var(--color-error-bg);
+  border-color: var(--color-error-border);
+  color: var(--color-error-text);
+}
+
+/* ── Page layout ───────────────────────────────────────────────── */
+
+.layout {
+  display: grid;
+  gap: var(--space-5);
+}
+
+@media (min-width: 980px) {
+  .layout {
+    grid-template-columns: minmax(340px, 380px) 1fr;
+    align-items: start;
+  }
+}
+
+/* ── Card ──────────────────────────────────────────────────────── */
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-card);
+}
+
+.card-title {
+  margin: 0 0 var(--space-4);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-text-subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ── Settings form ─────────────────────────────────────────────── */
+
+.settings-form {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.settings-form-title {
+  margin: 0 0 var(--space-2);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.settings-form-hint {
+  margin: 0 0 var(--space-3);
+  font-size: 0.86rem;
+  color: var(--color-text-subtle);
+  line-height: 1.55;
+}
+
+.settings-form-hint code {
+  font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Monaco, Consolas,
+    monospace;
+  font-size: 0.84em;
+  padding: 1px 5px;
+  background: rgba(148, 163, 184, 0.12);
+  border-radius: 4px;
+}
+
+.form-field {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.form-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-text-subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+fieldset {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  margin: 0;
+}
+
+fieldset legend {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-text-subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  padding: 0 var(--space-2);
+}
+
+select {
+  width: 100%;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-input);
+  background: rgba(15, 23, 42, 0.90);
+  color: var(--color-text);
+  padding: var(--space-3) var(--space-4);
+  font: inherit;
+  font-size: 0.92rem;
+  outline: none;
+  transition: border-color 0.15s ease;
+  cursor: pointer;
+}
+
+select:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.20);
+}
+
+.choice-row {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.choice-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-inset);
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: background 0.12s ease;
+  user-select: none;
+}
+
+.choice-item:hover {
+  background: rgba(51, 65, 85, 0.80);
+}
+
+input[type='radio'],
+input[type='checkbox'] {
+  accent-color: var(--color-accent);
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.save-btn {
+  width: 100%;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--color-accent-gradient);
+  color: #fff;
+  padding: var(--space-3) var(--space-4);
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.025em;
+  transition: opacity 0.15s ease, transform 0.1s ease;
+}
+
+.save-btn:hover:not(:disabled) {
+  opacity: 0.90;
+  transform: translateY(-1px);
+}
+
+.save-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.save-btn:disabled,
+select:disabled,
+input:disabled,
+.choice-item:has(input:disabled) {
+  cursor: not-allowed;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+/* ── Snapshot panels ───────────────────────────────────────────── */
+
+.panel-grid {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.snapshot-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.snapshot-rows {
+  display: grid;
+  gap: 0;
+  margin: 0;
+}
+
+.snapshot-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.snapshot-row:first-child {
+  padding-top: 0;
+}
+
+.snapshot-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.snapshot-label {
+  font-size: 0.80rem;
+  font-weight: 600;
+  color: var(--color-text-subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.snapshot-value {
+  margin: 0;
+  font-size: 0.90rem;
+  font-weight: 600;
+  color: var(--color-text);
+  text-align: right;
+}
+
+.snapshot-empty {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--color-text-subtle);
+  font-style: italic;
+}

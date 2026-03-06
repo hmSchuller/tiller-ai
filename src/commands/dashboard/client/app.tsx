@@ -1,6 +1,5 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
 import type { ConfigMode, DashboardState, DashboardStateResponse, ToolTarget, WorkflowMode } from '../contracts.js';
-import { CONFIG_MODE_OPTIONS, TOOL_OPTIONS, WORKFLOW_MODE_OPTIONS } from '../contracts.js';
 import {
   DEFAULT_FORM_VALUES,
   cloneFormValues,
@@ -12,6 +11,10 @@ import {
   type PanelRow,
   type Tone,
 } from './view-model.js';
+import { Hero } from './components/Hero.js';
+import { StatusBanner } from './components/StatusBanner.js';
+import { SnapshotCard } from './components/SnapshotCard.js';
+import { SettingsForm } from './components/SettingsForm.js';
 
 type AppState = {
   dashState: DashboardState | null;
@@ -25,128 +28,55 @@ async function readDashboardState(): Promise<DashboardStateResponse> {
   return (await response.json()) as DashboardStateResponse;
 }
 
-function StatusBanner(props: { status: AppState['status'] }) {
-  if (!props.status) {
-    return <div id="status" className="status hidden" role="status" aria-live="polite" />;
-  }
-
-  return (
-    <div id="status" className={`status ${props.status.tone}`} role="status" aria-live="polite">
-      {props.status.message}
-    </div>
-  );
-}
-
-function SnapshotPanel(props: { title: string; items: PanelRow[] }) {
-  return (
-    <article className="card">
-      <h3>{props.title}</h3>
-      <dl className="panel">
-        {props.items.map((row) => (
-          <div key={`${props.title}-${row.label}`} className="panel-row">
-            <dt>{row.label}</dt>
-            <dd>{row.value}</dd>
-          </div>
-        ))}
-      </dl>
-    </article>
-  );
-}
-
-function FormSection(props: {
-  form: FormValues;
+/** Pure presentational view — no hooks, safe to use with renderToStaticMarkup. */
+export type DashboardViewProps = {
+  status: { message: string; tone: Tone } | null;
   formDisabled: boolean;
+  form: FormValues;
+  projectRows: PanelRow[];
+  localRows: PanelRow[];
+  effectiveRows: PanelRow[];
   onSubmit: (event: FormEvent<HTMLFormElement>) => void | Promise<void>;
   onScopeChange: (event: ChangeEvent<HTMLInputElement>) => void;
   onModeChange: (event: ChangeEvent<HTMLSelectElement>) => void;
   onWorkflowChange: (event: ChangeEvent<HTMLSelectElement>) => void;
   onToolChange: (event: ChangeEvent<HTMLInputElement>) => void;
-}) {
-  const { form, formDisabled, onModeChange, onScopeChange, onSubmit, onToolChange, onWorkflowChange } = props;
-  const toolLabels: Record<ToolTarget, string> = {
-    claude: 'Claude Code',
-    copilot: 'GitHub Copilot',
-    opencode: 'OpenCode',
-  };
+};
 
+export function DashboardView({
+  status,
+  formDisabled,
+  form,
+  projectRows,
+  localRows,
+  effectiveRows,
+  onSubmit,
+  onScopeChange,
+  onModeChange,
+  onWorkflowChange,
+  onToolChange,
+}: DashboardViewProps) {
   return (
-    <section className="card">
-      <h2>Update settings</h2>
-      <p className="help">
-        Local saves write <code>.tiller/local.json</code>. Project saves update{' '}
-        <code>.tiller/tiller.json</code> and will regenerate managed files when tool selection changes.
-      </p>
-      <form id="config-form" className="form-grid" onSubmit={onSubmit}>
-        <fieldset>
-          <legend>Apply changes to</legend>
-          <div className="choice-row">
-            <label className="inline-choice">
-              <input
-                type="radio"
-                name="scope"
-                value="local"
-                checked={form.scope === 'local'}
-                disabled={formDisabled}
-                onChange={onScopeChange}
-              />{' '}
-              Just me
-            </label>
-            <label className="inline-choice">
-              <input
-                type="radio"
-                name="scope"
-                value="project"
-                checked={form.scope === 'project'}
-                disabled={formDisabled}
-                onChange={onScopeChange}
-              />{' '}
-              Whole project
-            </label>
-          </div>
-        </fieldset>
-        <div>
-          <label htmlFor="mode">Mode</label>
-          <select id="mode" name="mode" value={form.mode} disabled={formDisabled} onChange={onModeChange}>
-            {CONFIG_MODE_OPTIONS.map((mode) => (
-              <option key={mode} value={mode}>
-                {mode}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label htmlFor="workflow">Workflow</label>
-          <select id="workflow" name="workflow" value={form.workflow} disabled={formDisabled} onChange={onWorkflowChange}>
-            {WORKFLOW_MODE_OPTIONS.map((workflow) => (
-              <option key={workflow} value={workflow}>
-                {workflow}
-              </option>
-            ))}
-          </select>
-        </div>
-        <fieldset>
-          <legend>CLI tools</legend>
-          <div className="choice-row">
-            {TOOL_OPTIONS.map((tool) => (
-              <label key={tool} className="inline-choice">
-                <input
-                  type="checkbox"
-                  name="tools"
-                  value={tool}
-                  checked={form.tools.includes(tool)}
-                  disabled={formDisabled}
-                  onChange={onToolChange}
-                />{' '}
-                {toolLabels[tool]}
-              </label>
-            ))}
-          </div>
-        </fieldset>
-        <button type="submit" disabled={formDisabled}>
-          Save settings
-        </button>
-      </form>
-    </section>
+    <main className="shell">
+      <Hero />
+      <StatusBanner status={status} />
+      <div className="layout">
+        <SettingsForm
+          form={form}
+          formDisabled={formDisabled}
+          onSubmit={onSubmit}
+          onScopeChange={onScopeChange}
+          onModeChange={onModeChange}
+          onWorkflowChange={onWorkflowChange}
+          onToolChange={onToolChange}
+        />
+        <section className="panel-grid">
+          <SnapshotCard title="Project values" items={projectRows} />
+          <SnapshotCard title="Local overrides" items={localRows} />
+          <SnapshotCard title="Effective config" items={effectiveRows} />
+        </section>
+      </div>
+    </main>
   );
 }
 
@@ -315,31 +245,18 @@ export function DashboardApp() {
   const effectiveRows = appState.dashState ? getSnapshotRows(appState.dashState.effective) : [];
 
   return (
-    <main className="shell">
-      <section className="hero">
-        <h1>Tiller config dashboard</h1>
-        <p>
-          Review project defaults, local overrides, and the effective configuration side by side.
-          Changes reuse the same save logic as <code>tiller-ai config</code>.
-        </p>
-      </section>
-      <StatusBanner status={appState.status} />
-      <div className="layout">
-        <FormSection
-          form={appState.form}
-          formDisabled={appState.formDisabled}
-          onSubmit={handleSubmit}
-          onScopeChange={onScopeChange}
-          onModeChange={onModeChange}
-          onWorkflowChange={onWorkflowChange}
-          onToolChange={onToolChange}
-        />
-        <section className="panel-grid">
-          <SnapshotPanel title="Project values" items={projectRows} />
-          <SnapshotPanel title="Local overrides" items={localRows} />
-          <SnapshotPanel title="Effective config" items={effectiveRows} />
-        </section>
-      </div>
-    </main>
+    <DashboardView
+      status={appState.status}
+      formDisabled={appState.formDisabled}
+      form={appState.form}
+      projectRows={projectRows}
+      localRows={localRows}
+      effectiveRows={effectiveRows}
+      onSubmit={handleSubmit}
+      onScopeChange={onScopeChange}
+      onModeChange={onModeChange}
+      onWorkflowChange={onWorkflowChange}
+      onToolChange={onToolChange}
+    />
   );
 }
