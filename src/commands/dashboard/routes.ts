@@ -1,4 +1,8 @@
+import { existsSync } from 'node:fs';
+import { readFile } from 'node:fs/promises';
 import type { IncomingMessage, ServerResponse } from 'node:http';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import type { ToolTarget } from '../../scaffold/types.js';
 import {
   getEffectiveConfig,
@@ -18,9 +22,11 @@ import type {
   SaveRequest,
   WorkflowMode,
 } from './contracts.js';
+import { CLIENT_ASSET_PATH } from './contracts.js';
 import { DASHBOARD_HTML } from './page.js';
 
 const DEFAULT_HOST = '127.0.0.1';
+const PACKAGE_ROOT = findPackageRoot(dirname(fileURLToPath(import.meta.url)));
 
 type ReadConfigSuccess = Extract<ReadConfigResult, { ok: true }>;
 
@@ -257,11 +263,57 @@ async function handleSaveRequest(cwd: string, payload: unknown): Promise<{ statu
   return { statusCode: 200, body: toStateResponse(await readConfig(cwd)) };
 }
 
+async function readClientAsset(): Promise<Buffer> {
+  const candidates = PACKAGE_ROOT
+    ? [resolve(PACKAGE_ROOT, 'dist', CLIENT_ASSET_PATH.replace(/^\//, ''))]
+    : [];
+
+  for (const candidate of candidates) {
+    try {
+      return await readFile(candidate);
+    } catch {
+      // try next candidate
+    }
+  }
+  throw new Error('Client bundle not found.');
+}
+
+function findPackageRoot(startDir: string): string | null {
+  let current = startDir;
+
+  while (true) {
+    if (existsSync(resolve(current, 'package.json'))) {
+      return current;
+    }
+
+    const parent = resolve(current, '..');
+    if (parent === current) {
+      return null;
+    }
+
+    current = parent;
+  }
+}
+
 export function createDashboardRequestHandler(cwd: string) {
   return async (req: IncomingMessage, res: ServerResponse): Promise<void> => {
     const requestUrl = new URL(req.url ?? '/', `http://${req.headers.host ?? DEFAULT_HOST}`);
 
     try {
+      if ((req.method === 'GET' || req.method === 'HEAD') && requestUrl.pathname === CLIENT_ASSET_PATH) {
+        try {
+          const content = await readClientAsset();
+          res.writeHead(200, {
+            'content-type': 'text/javascript; charset=utf-8',
+            'cache-control': 'no-store',
+          });
+          res.end(content);
+        } catch {
+          sendJson(res, 404, { ok: false, error: getRequestIssue('Client bundle not found. Run npm run build first.', 'not-found') });
+        }
+        return;
+      }
+
       if ((req.method === 'GET' || req.method === 'HEAD') && requestUrl.pathname === '/') {
         sendHtml(res, DASHBOARD_HTML);
         return;

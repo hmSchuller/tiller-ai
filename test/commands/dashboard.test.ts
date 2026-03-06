@@ -1,8 +1,10 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeAll, beforeEach, afterEach, vi } from 'vitest';
 import { mkdtemp, rm, writeFile, mkdir, readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
+import { fileURLToPath } from 'node:url';
 import { generateTillerManifest, TILLER_VERSION } from '../../src/scaffold/tiller-manifest.js';
 import type { ToolTarget } from '../../src/scaffold/types.js';
 import { dashboardCommand, startDashboardServer } from '../../src/commands/dashboard.js';
@@ -22,6 +24,13 @@ async function setupProject(
 describe('dashboard server', () => {
   let tmpDir: string;
   const servers: Array<{ close: () => Promise<void> }> = [];
+  const repoRoot = fileURLToPath(new URL('../../', import.meta.url));
+
+  beforeAll(async () => {
+    // Remove any pre-existing bundle so the 404 test runs deterministically
+    // before the controlled build inside the nested describe rebuilds it.
+    await rm(join(repoRoot, 'dist/dashboard-client.js'), { force: true });
+  });
 
   beforeEach(async () => {
     tmpDir = await mkdtemp(join(tmpdir(), 'tiller-dashboard-test-'));
@@ -38,6 +47,35 @@ describe('dashboard server', () => {
     await rm(tmpDir, { recursive: true, force: true });
   });
 
+  it('serves the dashboard page with client script tag referencing the asset path', async () => {
+    await setupProject(tmpDir, { mode: 'detailed', workflow: 'solo', tools: ['claude'] });
+
+    const server = await startDashboardServer(tmpDir);
+    servers.push(server);
+
+    const html = await fetch(server.url).then((response) => response.text());
+    expect(html).toContain('Tiller Config Dashboard');
+    expect(html).toContain('<script type="module" src="/dashboard-client.js">');
+    expect(html).toContain('<div id="app">');
+  });
+
+  it('returns 404 for the client asset when the bundle has not been built', async () => {
+    await setupProject(tmpDir);
+
+    const server = await startDashboardServer(tmpDir);
+    servers.push(server);
+
+    const response = await fetch(`${server.url}/dashboard-client.js`);
+    const payload = await response.json();
+
+    expect(response.status).toBe(404);
+    expect(payload).toMatchObject({
+      ok: false,
+      error: { scope: 'request', reason: 'not-found' },
+    });
+  });
+
+
   it('serves the dashboard page and computed config state', async () => {
     await setupProject(tmpDir, { mode: 'detailed', workflow: 'solo', tools: ['claude'] });
     await writeFile(
@@ -50,7 +88,7 @@ describe('dashboard server', () => {
     servers.push(server);
 
     const html = await fetch(server.url).then((response) => response.text());
-    expect(html).toContain('Tiller config dashboard');
+    expect(html).toContain('Tiller Config Dashboard');
 
     const payload = await fetch(`${server.url}/api/config`).then((response) => response.json());
     expect(payload).toMatchObject({
@@ -296,5 +334,52 @@ describe('dashboard server', () => {
     expect(openBrowser).toHaveBeenCalledWith(server.url);
     expect(log).toHaveBeenCalledWith(`Dashboard available at ${server.url}`);
     expect(log).toHaveBeenCalledWith(`Failed to open the browser automatically. Open this URL manually: ${server.url}`);
+  });
+
+  describe('with built client bundle', () => {
+    beforeAll(() => {
+      // Build only the dashboard-client entry (ESM, browser) into dist/.
+      // The outer beforeAll already cleared any stale bundle.
+      const result = spawnSync(
+        join(repoRoot, 'node_modules/.bin/tsup'),
+        [
+          '--entry.dashboard-client', 'src/commands/dashboard/client/index.tsx',
+          '--format', 'esm',
+          '--platform', 'browser',
+          '--target', 'es2022',
+          '--out-dir', 'dist',
+          '--no-clean',
+          '--no-dts',
+        ],
+        { cwd: repoRoot, stdio: 'pipe', encoding: 'utf-8' },
+      );
+      if (result.status !== 0) {
+        throw new Error(`Dashboard client build failed:\n${result.stderr}`);
+      }
+    }, 60_000);
+
+    it('serves the built client bundle with 200 and correct content-type', async () => {
+      await setupProject(tmpDir);
+
+      const server = await startDashboardServer(tmpDir);
+      servers.push(server);
+
+      const response = await fetch(`${server.url}/dashboard-client.js`);
+      expect(response.status).toBe(200);
+      expect(response.headers.get('content-type')).toContain('text/javascript');
+
+      const content = await response.text();
+      expect(content.length).toBeGreaterThan(0);
+    });
+
+    it('serves the page with a module script tag pointing at the bundle', async () => {
+      await setupProject(tmpDir);
+
+      const server = await startDashboardServer(tmpDir);
+      servers.push(server);
+
+      const html = await fetch(server.url).then((r) => r.text());
+      expect(html).toContain('<script type="module" src="/dashboard-client.js">');
+    });
   });
 });
