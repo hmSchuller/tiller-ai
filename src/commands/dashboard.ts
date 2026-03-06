@@ -40,7 +40,10 @@ function attachSignalHandlers(handle: DashboardServerHandle): DashboardServerHan
   const listeners = (['SIGINT', 'SIGTERM'] as const).map((signal) => {
     const listener = () => {
       cleanup();
-      void handle.close().finally(() => process.exit(0));
+      void handle.close().then(
+        () => process.exit(0),
+        () => process.exit(1),
+      );
     };
 
     process.once(signal, listener);

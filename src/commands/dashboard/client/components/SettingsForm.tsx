@@ -1,6 +1,12 @@
 import type { ChangeEvent, FormEvent } from 'react';
-import type { ConfigMode, ToolTarget, WorkflowMode } from '../../contracts.js';
-import { CONFIG_MODE_OPTIONS, TOOL_OPTIONS, WORKFLOW_MODE_OPTIONS } from '../../contracts.js';
+import {
+  CONFIG_MODE_LABELS,
+  CONFIG_MODE_OPTIONS,
+  TOOL_LABELS,
+  TOOL_OPTIONS,
+  WORKFLOW_MODE_LABELS,
+  WORKFLOW_MODE_OPTIONS,
+} from '../../contracts.js';
 import type { FormValues } from '../view-model.js';
 
 export type SettingsFormProps = {
@@ -13,26 +19,14 @@ export type SettingsFormProps = {
   onToolChange: (event: ChangeEvent<HTMLInputElement>) => void;
 };
 
-const MODE_LABELS: Record<string, string> = {
-  simple: 'Simple — concise, outcome-focused responses',
-  detailed: 'Detailed — explains decisions and trade-offs',
-};
-
-const WORKFLOW_LABELS: Record<string, string> = {
-  solo: 'Solo — merge directly to main',
-  team: 'Team — open a PR for review',
-};
-
-const TOOL_LABELS: Record<ToolTarget, string> = {
-  claude: 'Claude Code',
-  copilot: 'GitHub Copilot',
-  opencode: 'OpenCode',
-};
-
 const SCOPE_OPTIONS = [
   { value: 'local', label: 'Just me', hint: 'writes .tiller/local.json' },
   { value: 'project', label: 'Whole project', hint: 'updates .tiller/tiller.json' },
 ] as const;
+
+const FORM_HINT_ID = 'settings-form-hint';
+const SCOPE_HINT_ID = 'settings-scope-hint';
+const TOOL_HINT_ID = 'settings-tool-hint';
 
 export function SettingsForm({
   form,
@@ -46,14 +40,17 @@ export function SettingsForm({
   return (
     <section className="card">
       <h2 className="settings-form-title">Update settings</h2>
-      <p className="settings-form-hint">
+      <p id={FORM_HINT_ID} className="settings-form-hint">
         Local saves write <code>.tiller/local.json</code>. Project saves update{' '}
         <code>.tiller/tiller.json</code> and regenerate managed files when tool selection changes.
       </p>
 
-      <form id="config-form" className="settings-form" onSubmit={onSubmit}>
-        <fieldset>
+      <form id="config-form" className="settings-form" aria-describedby={FORM_HINT_ID} onSubmit={onSubmit}>
+        <fieldset aria-describedby={SCOPE_HINT_ID}>
           <legend>Apply changes to</legend>
+          <p id={SCOPE_HINT_ID} className="field-hint">
+            Choose whether this save updates your personal override or the shared project defaults.
+          </p>
           <div className="choice-row">
             {SCOPE_OPTIONS.map(({ value, label, hint }) => (
               <label key={value} className="choice-item">
@@ -65,11 +62,9 @@ export function SettingsForm({
                   disabled={formDisabled}
                   onChange={onScopeChange}
                 />
-                <span>
-                  {label}
-                  <small style={{ display: 'block', fontSize: '0.78rem', opacity: 0.65 }}>
-                    {hint}
-                  </small>
+                <span className="choice-item-copy">
+                  <span className="choice-item-label">{label}</span>
+                  <span className="choice-item-hint">{hint}</span>
                 </span>
               </label>
             ))}
@@ -83,7 +78,7 @@ export function SettingsForm({
           <select id="mode" name="mode" value={form.mode} disabled={formDisabled} onChange={onModeChange}>
             {CONFIG_MODE_OPTIONS.map((mode) => (
               <option key={mode} value={mode}>
-                {MODE_LABELS[mode] ?? mode}
+                {CONFIG_MODE_LABELS[mode] ?? mode}
               </option>
             ))}
           </select>
@@ -102,14 +97,17 @@ export function SettingsForm({
           >
             {WORKFLOW_MODE_OPTIONS.map((workflow) => (
               <option key={workflow} value={workflow}>
-                {WORKFLOW_LABELS[workflow] ?? workflow}
+                {WORKFLOW_MODE_LABELS[workflow] ?? workflow}
               </option>
             ))}
           </select>
         </div>
 
-        <fieldset>
+        <fieldset aria-describedby={TOOL_HINT_ID}>
           <legend>CLI tools</legend>
+          <p id={TOOL_HINT_ID} className="field-hint">
+            Select one or more supported CLI targets to keep their generated files in sync.
+          </p>
           <div className="choice-row">
             {TOOL_OPTIONS.map((tool) => (
               <label key={tool} className="choice-item">
@@ -121,7 +119,7 @@ export function SettingsForm({
                   disabled={formDisabled}
                   onChange={onToolChange}
                 />
-                {TOOL_LABELS[tool]}
+                <span className="choice-item-label">{TOOL_LABELS[tool]}</span>
               </label>
             ))}
           </div>

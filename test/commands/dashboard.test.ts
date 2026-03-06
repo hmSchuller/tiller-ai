@@ -188,6 +188,37 @@ describe('dashboard server', () => {
     });
   });
 
+  it('deduplicates repeated tool selections before persisting local saves', async () => {
+    await setupProject(tmpDir, { mode: 'detailed', workflow: 'solo', tools: ['claude'] });
+
+    const server = await startDashboardServer(tmpDir);
+    servers.push(server);
+
+    const response = await fetch(`${server.url}/api/config`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        scope: 'local',
+        mode: 'simple',
+        workflow: 'solo',
+        tools: ['copilot', 'copilot', 'claude'],
+      }),
+    });
+    const payload = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(payload).toMatchObject({
+      ok: true,
+      state: {
+        local: { tools: ['copilot', 'claude'] },
+        effective: { tools: ['copilot', 'claude'] },
+      },
+    });
+
+    const localConfig = JSON.parse(await readFile(join(tmpDir, '.tiller/local.json'), 'utf-8'));
+    expect(localConfig.tools).toEqual(['copilot', 'claude']);
+  });
+
   it('reopens with the persisted local state after a save', async () => {
     await setupProject(tmpDir, { mode: 'detailed', workflow: 'solo', tools: ['claude'] });
 
@@ -402,6 +433,18 @@ describe('dashboard server', () => {
 
       const content = await response.text();
       expect(content.length).toBeGreaterThan(0);
+    });
+
+    it('supports HEAD requests for built assets', async () => {
+      await setupProject(tmpDir);
+
+      const server = await startDashboardServer(tmpDir);
+      servers.push(server);
+
+      const response = await fetch(`${server.url}/dashboard-client.js`, { method: 'HEAD' });
+      expect(response.status).toBe(200);
+      expect(response.headers.get('content-type')).toContain('text/javascript');
+      expect(await response.text()).toBe('');
     });
 
     it('serves the page with a module script tag pointing at the bundle', async () => {

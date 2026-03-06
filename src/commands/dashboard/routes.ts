@@ -3,7 +3,6 @@ import { readFile } from 'node:fs/promises';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { ToolTarget } from '../../scaffold/types.js';
 import {
   getEffectiveConfig,
   readConfig,
@@ -13,46 +12,39 @@ import {
   type ReadConfigResult,
   type SaveConfigResult,
 } from '../config-shared.js';
-import type {
-  ConfigMode,
-  ConfigSnapshot,
-  DashboardIssue,
-  DashboardStateResponse,
-  LocalOverrideSnapshot,
-  SaveRequest,
-  WorkflowMode,
+import {
+  CLIENT_ASSET_PATH,
+  CLIENT_CSS_ASSET_PATH,
+  type ConfigSnapshot,
+  type DashboardIssue,
+  type DashboardStateResponse,
+  type LocalOverrideSnapshot,
+  type SaveRequest,
+  type ToolTarget,
+  isConfigMode,
+  isToolTarget,
+  isWorkflowMode,
+  normalizeToolTargets,
+  uniqueToolTargets,
 } from './contracts.js';
-import { CLIENT_ASSET_PATH, CLIENT_CSS_ASSET_PATH } from './contracts.js';
 import { DASHBOARD_HTML } from './page.js';
 
 const DEFAULT_HOST = '127.0.0.1';
 const PACKAGE_ROOT = findPackageRoot(dirname(fileURLToPath(import.meta.url)));
+const DASHBOARD_ASSETS = [
+  {
+    path: CLIENT_ASSET_PATH,
+    contentType: 'text/javascript; charset=utf-8',
+    missingMessage: 'Client bundle not found. Run npm run build first.',
+  },
+  {
+    path: CLIENT_CSS_ASSET_PATH,
+    contentType: 'text/css; charset=utf-8',
+    missingMessage: 'Client CSS bundle not found. Run npm run build first.',
+  },
+] as const;
 
 type ReadConfigSuccess = Extract<ReadConfigResult, { ok: true }>;
-
-function isConfigMode(value: unknown): value is ConfigMode {
-  return value === 'simple' || value === 'detailed';
-}
-
-function isWorkflowMode(value: unknown): value is WorkflowMode {
-  return value === 'solo' || value === 'team';
-}
-
-function isToolTarget(value: unknown): value is ToolTarget {
-  return value === 'claude' || value === 'copilot' || value === 'opencode';
-}
-
-function uniqueTools(tools: ToolTarget[]): ToolTarget[] {
-  return [...new Set(tools)];
-}
-
-function normalizeTools(value: unknown): ToolTarget[] {
-  if (!Array.isArray(value)) {
-    return [];
-  }
-
-  return uniqueTools(value.filter(isToolTarget));
-}
 
 function parseToolTargets(value: unknown): { ok: true; tools: ToolTarget[] } | { ok: false; error: DashboardIssue } {
   if (!Array.isArray(value)) {
@@ -63,7 +55,7 @@ function parseToolTargets(value: unknown): { ok: true; tools: ToolTarget[] } | {
     return { ok: false, error: getRequestIssue('Choose only supported CLI tools.') };
   }
 
-  const tools = uniqueTools(value);
+  const tools = uniqueToolTargets(value);
   if (tools.length === 0) {
     return { ok: false, error: getRequestIssue('Choose at least one CLI tool.') };
   }
@@ -72,7 +64,7 @@ function parseToolTargets(value: unknown): { ok: true; tools: ToolTarget[] } | {
 }
 
 function getProjectSnapshot(manifest: ReadConfigSuccess['manifest']): ConfigSnapshot {
-  const tools = normalizeTools(manifest.tools);
+  const tools = normalizeToolTargets(manifest.tools);
 
   return {
     mode: isConfigMode(manifest.mode) ? manifest.mode : 'detailed',
@@ -85,14 +77,14 @@ function getLocalOverrideSnapshot(local: Record<string, unknown>): LocalOverride
   return {
     mode: isConfigMode(local.mode) ? local.mode : null,
     workflow: isWorkflowMode(local.workflow) ? local.workflow : null,
-    tools: Array.isArray(local.tools) ? normalizeTools(local.tools) : null,
+    tools: Array.isArray(local.tools) ? normalizeToolTargets(local.tools) : null,
   };
 }
 
 function getEffectiveSnapshot(manifest: ReadConfigSuccess['manifest'], local: Record<string, unknown>): ConfigSnapshot {
   const project = getProjectSnapshot(manifest);
   const effective = getEffectiveConfig(manifest, local);
-  const tools = normalizeTools(effective.tools);
+  const tools = normalizeToolTargets(effective.tools);
 
   return {
     mode: isConfigMode(effective.mode) ? effective.mode : project.mode,
@@ -264,18 +256,31 @@ async function handleSaveRequest(cwd: string, payload: unknown): Promise<{ statu
 }
 
 async function readDistAsset(assetPath: string): Promise<Buffer> {
-  const candidates = PACKAGE_ROOT
-    ? [resolve(PACKAGE_ROOT, 'dist', assetPath.replace(/^\//, ''))]
-    : [];
-
-  for (const candidate of candidates) {
-    try {
-      return await readFile(candidate);
-    } catch {
-      // try next candidate
-    }
+  if (!PACKAGE_ROOT) {
+    throw new Error(`Asset not found: ${assetPath}`);
   }
-  throw new Error(`Asset not found: ${assetPath}`);
+
+  return readFile(resolve(PACKAGE_ROOT, 'dist', assetPath.replace(/^\//, '')));
+}
+
+async function sendDashboardAsset(
+  res: ServerResponse,
+  asset: (typeof DASHBOARD_ASSETS)[number],
+): Promise<void> {
+  try {
+    const content = await readDistAsset(asset.path);
+    res.writeHead(200, {
+      'content-type': asset.contentType,
+      'cache-control': 'no-store',
+    });
+    res.end(content);
+  } catch {
+    sendJson(res, 404, { ok: false, error: getRequestIssue(asset.missingMessage, 'not-found') });
+  }
+}
+
+function getDashboardAsset(pathname: string): (typeof DASHBOARD_ASSETS)[number] | null {
+  return DASHBOARD_ASSETS.find((asset) => asset.path === pathname) ?? null;
 }
 
 function findPackageRoot(startDir: string): string | null {
@@ -298,33 +303,11 @@ function findPackageRoot(startDir: string): string | null {
 export function createDashboardRequestHandler(cwd: string) {
   return async (req: IncomingMessage, res: ServerResponse): Promise<void> => {
     const requestUrl = new URL(req.url ?? '/', `http://${req.headers.host ?? DEFAULT_HOST}`);
+    const asset = (req.method === 'GET' || req.method === 'HEAD') ? getDashboardAsset(requestUrl.pathname) : null;
 
     try {
-      if ((req.method === 'GET' || req.method === 'HEAD') && requestUrl.pathname === CLIENT_ASSET_PATH) {
-        try {
-          const content = await readDistAsset(CLIENT_ASSET_PATH);
-          res.writeHead(200, {
-            'content-type': 'text/javascript; charset=utf-8',
-            'cache-control': 'no-store',
-          });
-          res.end(content);
-        } catch {
-          sendJson(res, 404, { ok: false, error: getRequestIssue('Client bundle not found. Run npm run build first.', 'not-found') });
-        }
-        return;
-      }
-
-      if ((req.method === 'GET' || req.method === 'HEAD') && requestUrl.pathname === CLIENT_CSS_ASSET_PATH) {
-        try {
-          const content = await readDistAsset(CLIENT_CSS_ASSET_PATH);
-          res.writeHead(200, {
-            'content-type': 'text/css; charset=utf-8',
-            'cache-control': 'no-store',
-          });
-          res.end(content);
-        } catch {
-          sendJson(res, 404, { ok: false, error: getRequestIssue('Client CSS bundle not found. Run npm run build first.', 'not-found') });
-        }
+      if (asset) {
+        await sendDashboardAsset(res, asset);
         return;
       }
 

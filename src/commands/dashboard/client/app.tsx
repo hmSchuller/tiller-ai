@@ -1,27 +1,31 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
-import type { ConfigMode, DashboardState, DashboardStateResponse, ToolTarget, WorkflowMode } from '../contracts.js';
+import type { DashboardStateResponse } from '../contracts.js';
+import { isConfigMode, isConfigScope, isToolTarget, isWorkflowMode } from '../contracts.js';
 import {
-  DEFAULT_FORM_VALUES,
-  cloneFormValues,
-  getFormValuesFromState,
+  type DashboardStatus,
   getLocalRows,
   getSnapshotRows,
-  getStatusFromStateResponse,
   type FormValues,
   type PanelRow,
-  type Tone,
 } from './view-model.js';
+import {
+  applyLoadError,
+  applyLoadResponse,
+  applyNoToolsValidation,
+  applySaveError,
+  applySaveResponse,
+  applySaveStart,
+  createInitialAppState,
+  type DashboardAppState,
+  updateMode,
+  updateScope,
+  updateToolSelection,
+  updateWorkflow,
+} from './state.js';
 import { Hero } from './components/Hero.js';
 import { StatusBanner } from './components/StatusBanner.js';
 import { SnapshotCard } from './components/SnapshotCard.js';
 import { SettingsForm } from './components/SettingsForm.js';
-
-type AppState = {
-  dashState: DashboardState | null;
-  status: { message: string; tone: Tone } | null;
-  formDisabled: boolean;
-  form: FormValues;
-};
 
 async function readDashboardState(): Promise<DashboardStateResponse> {
   const response = await fetch('/api/config', { cache: 'no-store' });
@@ -30,7 +34,7 @@ async function readDashboardState(): Promise<DashboardStateResponse> {
 
 /** Pure presentational view — no hooks, safe to use with renderToStaticMarkup. */
 export type DashboardViewProps = {
-  status: { message: string; tone: Tone } | null;
+  status: DashboardStatus | null;
   formDisabled: boolean;
   form: FormValues;
   projectRows: PanelRow[];
@@ -81,12 +85,7 @@ export function DashboardView({
 }
 
 export function DashboardApp() {
-  const [appState, setAppState] = useState<AppState>(() => ({
-    dashState: null,
-    status: { message: 'Loading dashboard…', tone: 'info' },
-    formDisabled: true,
-    form: cloneFormValues(DEFAULT_FORM_VALUES),
-  }));
+  const [appState, setAppState] = useState<DashboardAppState>(createInitialAppState);
 
   useEffect(() => {
     let cancelled = false;
@@ -99,36 +98,13 @@ export function DashboardApp() {
           return;
         }
 
-        if (!payload.ok) {
-          setAppState((currentState) => ({
-            ...currentState,
-            dashState: null,
-            status: getStatusFromStateResponse(payload),
-            formDisabled: true,
-          }));
-          return;
-        }
-
-        setAppState((currentState) => ({
-          ...currentState,
-          dashState: payload.state,
-          status: getStatusFromStateResponse(payload),
-          formDisabled: false,
-          form: getFormValuesFromState(payload.state, currentState.form.scope),
-        }));
+        setAppState((currentState) => applyLoadResponse(currentState, payload));
       } catch (error) {
         if (cancelled) {
           return;
         }
 
-        setAppState((currentState) => ({
-          ...currentState,
-          status: {
-            message: error instanceof Error ? error.message : 'Failed to load the dashboard.',
-            tone: 'error',
-          },
-          formDisabled: true,
-        }));
+        setAppState((currentState) => applyLoadError(currentState, error));
       }
     };
 
@@ -143,18 +119,11 @@ export function DashboardApp() {
     event.preventDefault();
 
     if (appState.form.tools.length === 0) {
-      setAppState((currentState) => ({
-        ...currentState,
-        status: { message: 'Choose at least one CLI tool.', tone: 'error' },
-      }));
+      setAppState(applyNoToolsValidation);
       return;
     }
 
-    setAppState((currentState) => ({
-      ...currentState,
-      status: { message: 'Saving settings…', tone: 'info' },
-      formDisabled: true,
-    }));
+    setAppState(applySaveStart);
 
     try {
       const response = await fetch('/api/config', {
@@ -169,75 +138,46 @@ export function DashboardApp() {
       });
       const payload = (await response.json()) as DashboardStateResponse;
 
-      if (!payload.ok) {
-        setAppState((currentState) => ({
-          ...currentState,
-          status: getStatusFromStateResponse(payload),
-          formDisabled: currentState.dashState === null,
-        }));
-        return;
-      }
-
-      setAppState((currentState) => ({
-        ...currentState,
-        dashState: payload.state,
-        status: payload.localIssue
-          ? getStatusFromStateResponse(payload)
-          : { message: 'Settings saved.', tone: 'success' },
-        formDisabled: false,
-        form: getFormValuesFromState(payload.state, currentState.form.scope),
-      }));
+      setAppState((currentState) => applySaveResponse(currentState, payload));
     } catch (error) {
-      setAppState((currentState) => ({
-        ...currentState,
-        status: {
-          message:
-            error instanceof Error
-              ? error.message
-              : 'Failed to save settings. Try again while the local server is still running.',
-          tone: 'error',
-        },
-        formDisabled: currentState.dashState === null,
-      }));
+      setAppState((currentState) => applySaveError(currentState, error));
     }
   };
 
   const onScopeChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    setAppState((currentState) => ({
-      ...currentState,
-      form: { ...currentState.form, scope: event.target.value as FormValues['scope'] },
-    }));
+    const scope = event.target.value;
+    if (!isConfigScope(scope)) {
+      return;
+    }
+
+    setAppState((currentState) => updateScope(currentState, scope));
   };
 
   const onModeChange = (event: ChangeEvent<HTMLSelectElement>): void => {
-    setAppState((currentState) => ({
-      ...currentState,
-      form: { ...currentState.form, mode: event.target.value as ConfigMode },
-    }));
+    const mode = event.target.value;
+    if (!isConfigMode(mode)) {
+      return;
+    }
+
+    setAppState((currentState) => updateMode(currentState, mode));
   };
 
   const onWorkflowChange = (event: ChangeEvent<HTMLSelectElement>): void => {
-    setAppState((currentState) => ({
-      ...currentState,
-      form: { ...currentState.form, workflow: event.target.value as WorkflowMode },
-    }));
+    const workflow = event.target.value;
+    if (!isWorkflowMode(workflow)) {
+      return;
+    }
+
+    setAppState((currentState) => updateWorkflow(currentState, workflow));
   };
 
   const onToolChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    const tool = event.target.value as ToolTarget;
+    const tool = event.target.value;
+    if (!isToolTarget(tool)) {
+      return;
+    }
 
-    setAppState((currentState) => {
-      const tools = event.target.checked
-        ? currentState.form.tools.includes(tool)
-          ? currentState.form.tools
-          : [...currentState.form.tools, tool]
-        : currentState.form.tools.filter((currentTool) => currentTool !== tool);
-
-      return {
-        ...currentState,
-        form: { ...currentState.form, tools },
-      };
-    });
+    setAppState((currentState) => updateToolSelection(currentState, tool, event.target.checked));
   };
 
   const projectRows = appState.dashState ? getSnapshotRows(appState.dashState.project) : [];

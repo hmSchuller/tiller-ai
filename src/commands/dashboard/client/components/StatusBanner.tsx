@@ -1,7 +1,7 @@
-import type { Tone } from '../view-model.js';
+import type { DashboardStatus, Tone } from '../view-model.js';
 
 export type StatusBannerProps = {
-  status: { message: string; tone: Tone } | null;
+  status: DashboardStatus | null;
 };
 
 const TONE_ICONS: Record<Tone, string> = {
@@ -11,13 +11,21 @@ const TONE_ICONS: Record<Tone, string> = {
   error: '✕',
 };
 
+function getLiveRegionProps(tone: Tone) {
+  return tone === 'warn' || tone === 'error'
+    ? { role: 'alert' as const, 'aria-live': 'assertive' as const }
+    : { role: 'status' as const, 'aria-live': 'polite' as const };
+}
+
 export function StatusBanner({ status }: StatusBannerProps) {
   if (!status) {
-    return <div id="status" className="status-banner hidden" role="status" aria-live="polite" />;
+    return <div id="status" className="status-banner hidden" aria-hidden="true" />;
   }
 
+  const liveRegionProps = getLiveRegionProps(status.tone);
+
   return (
-    <div id="status" className={`status-banner ${status.tone}`} role="status" aria-live="polite">
+    <div id="status" className={`status-banner ${status.tone}`} aria-atomic="true" {...liveRegionProps}>
       <em className="status-icon" aria-hidden="true">{TONE_ICONS[status.tone]}</em>
       <span>{status.message}</span>
     </div>

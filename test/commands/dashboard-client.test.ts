@@ -9,12 +9,24 @@ import {
   getSnapshotRows,
   getStatusFromStateResponse,
 } from '../../src/commands/dashboard/client/view-model.js';
+import { SettingsForm } from '../../src/commands/dashboard/client/components/SettingsForm.js';
 import { StatusBanner } from '../../src/commands/dashboard/client/components/StatusBanner.js';
 import { SnapshotCard } from '../../src/commands/dashboard/client/components/SnapshotCard.js';
 import { Hero } from '../../src/commands/dashboard/client/components/Hero.js';
 import { buildCssVarBlock } from '../../src/commands/dashboard/client/theme.js';
 import type { DashboardViewProps } from '../../src/commands/dashboard/client/app.js';
 import { DashboardView } from '../../src/commands/dashboard/client/app.js';
+import {
+  applyLoadError,
+  applyLoadResponse,
+  applyNoToolsValidation,
+  applySaveError,
+  applySaveResponse,
+  applySaveStart,
+  createInitialAppState,
+  updateScope,
+  updateToolSelection,
+} from '../../src/commands/dashboard/client/state.js';
 
 // ── view-model pure logic ─────────────────────────────────────────────────────
 
@@ -36,6 +48,24 @@ describe('dashboard client view model', () => {
       tools: ['claude', 'copilot'],
     });
     expect(getStatusFromStateResponse(response)).toBeNull();
+  });
+
+  it('uses project values when the form is switched to project scope', () => {
+    const response: DashboardStateResponse = {
+      ok: true,
+      state: {
+        project: { mode: 'detailed', workflow: 'solo', tools: ['claude'] },
+        local: { mode: 'simple', workflow: 'team', tools: ['claude', 'copilot'] },
+        effective: { mode: 'simple', workflow: 'team', tools: ['claude', 'copilot'] },
+      },
+    };
+
+    expect(getFormValuesFromState(response.state, 'project')).toEqual({
+      scope: 'project',
+      mode: 'detailed',
+      workflow: 'solo',
+      tools: ['claude'],
+    });
   });
 
   it('surfaces local parse issues as a warning and formats panel rows from shared snapshots', () => {
@@ -86,6 +116,122 @@ describe('dashboard client view model', () => {
   });
 });
 
+describe('dashboard client state', () => {
+  it('hydrates the app state from a successful load response', () => {
+    const nextState = applyLoadResponse(createInitialAppState(), {
+      ok: true,
+      state: {
+        project: { mode: 'detailed', workflow: 'solo', tools: ['claude'] },
+        local: { mode: 'simple', workflow: null, tools: ['copilot'] },
+        effective: { mode: 'simple', workflow: 'solo', tools: ['copilot'] },
+      },
+    });
+
+    expect(nextState.formDisabled).toBe(false);
+    expect(nextState.dashState?.effective.tools).toEqual(['copilot']);
+    expect(nextState.form).toEqual({
+      scope: 'local',
+      mode: 'simple',
+      workflow: 'solo',
+      tools: ['copilot'],
+    });
+  });
+
+  it('disables the form on fatal load failures', () => {
+    const nextState = applyLoadResponse(createInitialAppState(), {
+      ok: false,
+      error: {
+        scope: 'project',
+        reason: 'missing',
+        message: 'No .tiller/tiller.json found. Is this a Tiller project?',
+      },
+    });
+
+    expect(nextState.dashState).toBeNull();
+    expect(nextState.formDisabled).toBe(true);
+    expect(nextState.status).toEqual({
+      message: 'No .tiller/tiller.json found. Is this a Tiller project?',
+      tone: 'error',
+    });
+  });
+
+  it('reports client-side empty-tool validation before save', () => {
+    const nextState = applyNoToolsValidation(createInitialAppState());
+    expect(nextState.status).toEqual({ message: 'Choose at least one CLI tool.', tone: 'error' });
+  });
+
+  it('tracks save success, warning, and fatal project failures', () => {
+    const loadedState = applyLoadResponse(createInitialAppState(), {
+      ok: true,
+      state: {
+        project: { mode: 'detailed', workflow: 'solo', tools: ['claude'] },
+        local: { mode: 'simple', workflow: null, tools: ['copilot'] },
+        effective: { mode: 'simple', workflow: 'solo', tools: ['copilot'] },
+      },
+    });
+    const savingState = applySaveStart(loadedState);
+
+    expect(savingState.status).toEqual({ message: 'Saving settings…', tone: 'info' });
+    expect(savingState.formDisabled).toBe(true);
+
+    const warnedState = applySaveResponse(loadedState, {
+      ok: true,
+      state: loadedState.dashState!,
+      localIssue: {
+        scope: 'local',
+        reason: 'parse-error',
+        message: 'Failed to parse .tiller/local.json. Falling back to project settings.',
+      },
+    });
+    expect(warnedState.status).toEqual({
+      message: 'Failed to parse .tiller/local.json. Falling back to project settings.',
+      tone: 'warn',
+    });
+    expect(warnedState.formDisabled).toBe(false);
+
+    const failedState = applySaveResponse(loadedState, {
+      ok: false,
+      error: {
+        scope: 'project',
+        reason: 'missing',
+        message: 'No .tiller/tiller.json found. Is this a Tiller project?',
+      },
+    });
+    expect(failedState.dashState).toBeNull();
+    expect(failedState.formDisabled).toBe(true);
+  });
+
+  it('supports scope switching and resilient save/load errors', () => {
+    const loadedState = applyLoadResponse(createInitialAppState(), {
+      ok: true,
+      state: {
+        project: { mode: 'detailed', workflow: 'solo', tools: ['claude'] },
+        local: { mode: 'simple', workflow: null, tools: ['copilot'] },
+        effective: { mode: 'simple', workflow: 'solo', tools: ['copilot'] },
+      },
+    });
+
+    const projectScopedState = updateScope(loadedState, 'project');
+    expect(projectScopedState.form).toEqual({
+      scope: 'project',
+      mode: 'detailed',
+      workflow: 'solo',
+      tools: ['claude'],
+    });
+
+    const updatedToolsState = updateToolSelection(projectScopedState, 'copilot', true);
+    expect(updatedToolsState.form.tools).toEqual(['claude', 'copilot']);
+
+    const loadErrorState = applyLoadError(loadedState, new Error('load failed'));
+    expect(loadErrorState.status).toEqual({ message: 'load failed', tone: 'error' });
+    expect(loadErrorState.formDisabled).toBe(true);
+
+    const saveErrorState = applySaveError(loadedState, new Error('save failed'));
+    expect(saveErrorState.status).toEqual({ message: 'save failed', tone: 'error' });
+    expect(saveErrorState.formDisabled).toBe(false);
+  });
+});
+
 // ── theme ─────────────────────────────────────────────────────────────────────
 
 describe('dashboard theme', () => {
@@ -119,7 +265,7 @@ describe('StatusBanner component', () => {
   it('renders a hidden placeholder when status is null', () => {
     const html = renderToStaticMarkup(createElement(StatusBanner, { status: null }));
     expect(html).toContain('status-banner hidden');
-    expect(html).toContain('role="status"');
+    expect(html).toContain('aria-hidden="true"');
   });
 
   it('renders info tone with correct class', () => {
@@ -127,6 +273,9 @@ describe('StatusBanner component', () => {
       createElement(StatusBanner, { status: { message: 'Loading dashboard…', tone: 'info' } }),
     );
     expect(html).toContain('status-banner info');
+    expect(html).toContain('role="status"');
+    expect(html).toContain('aria-live="polite"');
+    expect(html).toContain('aria-atomic="true"');
     expect(html).toContain('Loading dashboard');
   });
 
@@ -145,6 +294,8 @@ describe('StatusBanner component', () => {
       }),
     );
     expect(html).toContain('status-banner warn');
+    expect(html).toContain('role="alert"');
+    expect(html).toContain('aria-live="assertive"');
   });
 
   it('renders error tone', () => {
@@ -154,7 +305,30 @@ describe('StatusBanner component', () => {
       }),
     );
     expect(html).toContain('status-banner error');
+    expect(html).toContain('role="alert"');
     expect(html).toContain('No tiller.json found.');
+  });
+});
+
+describe('SettingsForm component', () => {
+  it('describes the scope and tools groups for assistive technology', () => {
+    const html = renderToStaticMarkup(
+      createElement(SettingsForm, {
+        form: { ...DEFAULT_FORM_VALUES, tools: ['claude'] },
+        formDisabled: false,
+        onSubmit: () => {},
+        onScopeChange: () => {},
+        onModeChange: () => {},
+        onWorkflowChange: () => {},
+        onToolChange: () => {},
+      }),
+    );
+
+    expect(html).toContain('aria-describedby="settings-form-hint"');
+    expect(html).toContain('id="settings-scope-hint"');
+    expect(html).toContain('Choose whether this save updates your personal override');
+    expect(html).toContain('id="settings-tool-hint"');
+    expect(html).toContain('keep their generated files in sync');
   });
 });
 
