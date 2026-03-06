@@ -10,12 +10,6 @@ set -euo pipefail
 # Read the tool input from stdin
 INPUT=$(cat)
 
-# Only run when inside a session (agent name must be set)
-AGENT_NAME="\${TILLER_AGENT_NAME:-}"
-if [ -z "$AGENT_NAME" ]; then
-  exit 0
-fi
-
 # Find the active session directory
 ACTIVE_SESSION_DIR=""
 for SESSION_DIR in .tiller/sessions/*/; do
@@ -30,6 +24,16 @@ for SESSION_DIR in .tiller/sessions/*/; do
 done
 
 if [ -z "$ACTIVE_SESSION_DIR" ]; then
+  exit 0
+fi
+
+# Read agent name from file (set by skill via: echo <name> > .tiller/sessions/<slug>/current-agent)
+AGENT_NAME_FILE="\${ACTIVE_SESSION_DIR}current-agent"
+if [ ! -f "$AGENT_NAME_FILE" ]; then
+  exit 0
+fi
+AGENT_NAME=$(cat "$AGENT_NAME_FILE")
+if [ -z "$AGENT_NAME" ]; then
   exit 0
 fi
 

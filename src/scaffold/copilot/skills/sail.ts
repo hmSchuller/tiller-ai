@@ -42,9 +42,9 @@ After branch routing (Step 2) determines the branch name, create or reuse a sess
      ts=$(date -u +%Y-%m-%dT%H:%M:%SZ)
      printf '{"id":"%s","branch":"%s","startedAt":"%s","status":"active","agents":[]}' "<slug>" "<branch>" "$ts" > .tiller/sessions/<slug>/session.json
      \`\`\`
-3. Set the \`TILLER_AGENT_NAME\` environment variable to \`sail-lead\` so hooks can identify this agent:
+3. Write your agent name to the session so hooks can identify you:
    \`\`\`bash
-   export TILLER_AGENT_NAME=sail-lead
+   echo "sail-lead" > .tiller/sessions/<slug>/current-agent
    \`\`\`
 4. Print: "Dashboard: http://localhost:19850 (run \`tiller-ai dashboard\` in another terminal to view session)"
 
@@ -215,8 +215,8 @@ The main agent is a **pure orchestrator**. It does NOT implement any code itself
    d['agents'].append({'name': name, 'type': 'fleet', 'status': 'active', 'startedAt': ts})
    json.dump(d, open(f, 'w'), indent=2)
    " ".tiller/sessions/<slug>/session.json" "$ts" "worker-<N>"
+   echo "worker-<N>" > .tiller/sessions/<slug>/current-agent
    \`\`\`
-2. Set \`TILLER_AGENT_NAME\` environment variable for each spawned agent so hooks can identify it
 
 ### Execution
 
