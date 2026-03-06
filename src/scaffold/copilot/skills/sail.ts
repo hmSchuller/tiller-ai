@@ -205,9 +205,16 @@ The main agent is a **pure orchestrator**. It does NOT implement any code itself
 
 ### Setup
 
-1. Register each worker agent in the session before spawning. For each agent, append to \`.tiller/sessions/<slug>/session.json\` agents array:
-   \`\`\`json
-   {"name":"worker-<N>","type":"fleet","status":"active","startedAt":"<ISO-timestamp>"}
+1. Register each worker agent in the session before spawning. For each agent, run:
+   \`\`\`bash
+   ts=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+   python3 -c "
+   import json, sys
+   f = sys.argv[1]; ts = sys.argv[2]; name = sys.argv[3]
+   d = json.load(open(f))
+   d['agents'].append({'name': name, 'type': 'fleet', 'status': 'active', 'startedAt': ts})
+   json.dump(d, open(f, 'w'), indent=2)
+   " ".tiller/sessions/<slug>/session.json" "$ts" "worker-<N>"
    \`\`\`
 2. Set \`TILLER_AGENT_NAME\` environment variable for each spawned agent so hooks can identify it
 
