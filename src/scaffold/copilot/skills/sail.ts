@@ -38,7 +38,9 @@ After branch routing (Step 2) determines the branch name, create or reuse a sess
    - **If it exists** (resuming a previous sail): read the existing session and continue. Do not overwrite it.
    - **If it does not exist**: create the session folder and metadata:
      \`\`\`bash
-     mkdir -p .tiller/sessions/<slug> && echo '{"id":"<slug>","branch":"<branch>","startedAt":"<ISO-timestamp>","status":"active","agents":[]}' > .tiller/sessions/<slug>/session.json
+     mkdir -p .tiller/sessions/<slug>
+     ts=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+     printf '{"id":"%s","branch":"%s","startedAt":"%s","status":"active","agents":[]}' "<slug>" "<branch>" "$ts" > .tiller/sessions/<slug>/session.json
      \`\`\`
 3. Set the \`TILLER_AGENT_NAME\` environment variable to \`sail-lead\` so hooks can identify this agent:
    \`\`\`bash
