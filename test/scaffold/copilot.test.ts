@@ -109,24 +109,34 @@ describe('generateCopilotHooksJson', () => {
     expect(parsed.version).toBe(1);
   });
 
-  it('has sessionStart hooks', () => {
+  it('has sessionStart hooks including session-log', () => {
     const parsed = JSON.parse(generateCopilotHooksJson(copilotOnlyConfig));
-    expect(parsed.hooks.sessionStart).toHaveLength(1);
+    expect(parsed.hooks.sessionStart).toHaveLength(2);
     expect(parsed.hooks.sessionStart[0].bash).toContain('session-resume.sh');
+    expect(parsed.hooks.sessionStart[1].bash).toContain('session-log.sh');
   });
 
-  it('has preToolUse hooks', () => {
+  it('has preToolUse hooks including session-log', () => {
     const parsed = JSON.parse(generateCopilotHooksJson(copilotOnlyConfig));
-    expect(parsed.hooks.preToolUse).toHaveLength(2);
+    expect(parsed.hooks.preToolUse).toHaveLength(3);
     expect(parsed.hooks.preToolUse[0].bash).toContain('secret-scan.sh');
     expect(parsed.hooks.preToolUse[1].bash).toContain('inbox-check.sh');
+    expect(parsed.hooks.preToolUse[2].bash).toContain('session-log.sh');
   });
 
-  it('has postToolUse hooks', () => {
+  it('has postToolUse hooks including session-log', () => {
     const parsed = JSON.parse(generateCopilotHooksJson(copilotOnlyConfig));
     expect(parsed.hooks.postToolUse).toHaveLength(2);
     expect(parsed.hooks.postToolUse[0].bash).toContain('post-write.sh');
     expect(parsed.hooks.postToolUse[1].bash).toContain('session-log.sh');
+  });
+
+  it('registers session-log on all 6 event types', () => {
+    const parsed = JSON.parse(generateCopilotHooksJson(copilotOnlyConfig));
+    for (const eventType of ['sessionStart', 'sessionEnd', 'userPromptSubmitted', 'preToolUse', 'postToolUse', 'errorOccurred']) {
+      const hooks = parsed.hooks[eventType] as Array<{ bash: string }>;
+      expect(hooks.some(h => h.bash.includes('session-log.sh')), `${eventType} should have session-log`).toBe(true);
+    }
   });
 
   it('does not have subagentStop (not supported by Copilot)', () => {

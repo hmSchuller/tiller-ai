@@ -1,6 +1,12 @@
 import type { ProjectConfig } from '../types.js';
 
 export function generateCopilotHooksJson(_config: ProjectConfig): string {
+  const sessionLog = {
+    type: 'command',
+    bash: './.github/hooks/session-log.sh',
+    comment: 'Log event to active session',
+  };
+
   const hooksConfig = {
     version: 1,
     hooks: {
@@ -10,6 +16,13 @@ export function generateCopilotHooksJson(_config: ProjectConfig): string {
           bash: './.github/hooks/session-resume.sh',
           comment: 'Inject branch and compass context on session start',
         },
+        sessionLog,
+      ],
+      sessionEnd: [
+        sessionLog,
+      ],
+      userPromptSubmitted: [
+        sessionLog,
       ],
       preToolUse: [
         {
@@ -22,6 +35,7 @@ export function generateCopilotHooksJson(_config: ProjectConfig): string {
           bash: './.github/hooks/inbox-check.sh',
           comment: 'Check agent inbox for undelivered messages',
         },
+        sessionLog,
       ],
       postToolUse: [
         {
@@ -29,14 +43,11 @@ export function generateCopilotHooksJson(_config: ProjectConfig): string {
           bash: './.github/hooks/post-write.sh',
           comment: 'Auto-format after file edits (works with formatters on PATH)',
         },
-        {
-          type: 'command',
-          bash: './.github/hooks/session-log.sh',
-          comment: 'Log tool usage to the active session',
-        },
+        sessionLog,
       ],
-      // Note: Copilot has no subagentStop event. Agent completion is tracked
-      // via explicit bash commands in the sail skill after each worker finishes.
+      errorOccurred: [
+        sessionLog,
+      ],
     },
   };
 

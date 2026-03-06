@@ -91,19 +91,39 @@ describe('generateSessionLogHook', () => {
     expect(result).toContain('INPUT=$(cat)');
   });
 
-  it('extracts toolName, toolArgs, and toolResult', () => {
+  it('handles postToolUse events (toolName + toolResult)', () => {
     const result = generateSessionLogHook(simpleConfig);
-    expect(result).toContain('toolName');
-    expect(result).toContain('toolArgs');
     expect(result).toContain('toolResult');
+    expect(result).toContain('TOOL_DONE');
   });
 
-  it('appends formatted log entry with timestamp', () => {
+  it('handles preToolUse events (toolName without toolResult)', () => {
     const result = generateSessionLogHook(simpleConfig);
-    expect(result).toContain('TOOL:');
-    expect(result).toContain('ARGS:');
-    expect(result).toContain('RESULT:');
+    expect(result).toContain('TOOL_START');
+  });
+
+  it('handles userPromptSubmitted events', () => {
+    const result = generateSessionLogHook(simpleConfig);
+    expect(result).toContain('USER_PROMPT');
+    expect(result).toContain("'prompt'");
+  });
+
+  it('handles errorOccurred events', () => {
+    const result = generateSessionLogHook(simpleConfig);
+    expect(result).toContain('ERROR');
+    expect(result).toContain("'error'");
+  });
+
+  it('handles sessionStart and sessionEnd events', () => {
+    const result = generateSessionLogHook(simpleConfig);
+    expect(result).toContain('SESSION_START');
+    expect(result).toContain('SESSION_END');
+  });
+
+  it('writes to per-agent log file', () => {
+    const result = generateSessionLogHook(simpleConfig);
     expect(result).toContain('.log.md');
+    expect(result).toContain('AGENT_NAME');
   });
 
   it('finds active session by checking session.json status', () => {
@@ -112,10 +132,10 @@ describe('generateSessionLogHook', () => {
     expect(result).toContain('"active"');
   });
 
-  it('exits silently when current-agent file is missing', () => {
+  it('defaults agent name to unknown when current-agent file is missing', () => {
     const result = generateSessionLogHook(simpleConfig);
     expect(result).toContain('current-agent');
-    expect(result).toContain('exit 0');
+    expect(result).toContain('AGENT_NAME="unknown"');
   });
 });
 
