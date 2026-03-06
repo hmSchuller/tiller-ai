@@ -155,8 +155,11 @@ export async function regenerateFiles(config: ProjectConfig, cwd: string, opts?:
 /**
  * Delete files that were managed by the old config but are no longer managed.
  */
-export async function deleteStaleFiles(oldManagedFiles: string[], newTools: import('./types.js').ToolTarget[], cwd: string): Promise<string[]> {
-  const newManagedFiles = getManagedFiles(newTools);
+export async function deleteStaleManagedFiles(
+  oldManagedFiles: string[],
+  newManagedFiles: string[],
+  cwd: string,
+): Promise<string[]> {
   const staleFiles = oldManagedFiles.filter(
     (f) => !newManagedFiles.includes(f) && f !== '.claude/CLAUDE.md'
   );
@@ -168,4 +171,11 @@ export async function deleteStaleFiles(oldManagedFiles: string[], newTools: impo
     }
   }
   return staleFiles;
+}
+
+/**
+ * Delete files that were managed by the old tool set but are no longer managed by the new tool set.
+ */
+export async function deleteStaleFiles(oldManagedFiles: string[], newTools: import('./types.js').ToolTarget[], cwd: string): Promise<string[]> {
+  return deleteStaleManagedFiles(oldManagedFiles, getManagedFiles(newTools), cwd);
 }

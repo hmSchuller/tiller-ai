@@ -65,6 +65,22 @@ describe('configCommand', () => {
     expect(prompts.cancel).toHaveBeenCalledWith(expect.stringContaining('.tiller/tiller.json'));
   });
 
+  it('exits with the generic read error if .tiller/tiller.json is corrupted', async () => {
+    await mkdir(join(tmpDir, '.tiller'), { recursive: true });
+    await writeFile(join(tmpDir, '.tiller/tiller.json'), '{ not valid json', 'utf-8');
+
+    const prompts = await import('@clack/prompts');
+    const exitSpy = vi.spyOn(process, 'exit').mockImplementation((() => {
+      throw new Error('process.exit called');
+    }) as never);
+
+    const { configCommand } = await import('../../src/commands/config.js');
+
+    await expect(configCommand()).rejects.toThrow('process.exit called');
+    expect(exitSpy).toHaveBeenCalledWith(1);
+    expect(prompts.cancel).toHaveBeenCalledWith('Failed to read .tiller/tiller.json.');
+  });
+
   it('writes mode and workflow to .tiller/local.json for local scope', async () => {
     await setupProject(tmpDir, { mode: 'detailed', workflow: 'solo' });
 
@@ -82,6 +98,30 @@ describe('configCommand', () => {
     const content = JSON.parse(await readFile(localPath, 'utf-8'));
     expect(content.mode).toBe('simple');
     expect(content.workflow).toBe('team');
+  });
+
+  it('continues and rewrites local.json when the existing local file is invalid', async () => {
+    await setupProject(tmpDir);
+    await writeFile(join(tmpDir, '.tiller/local.json'), '{ invalid json', 'utf-8');
+
+    const prompts = await import('@clack/prompts');
+    vi.mocked(prompts.select)
+      .mockResolvedValueOnce('simple')
+      .mockResolvedValueOnce('team')
+      .mockResolvedValueOnce('local');
+    vi.mocked(prompts.multiselect).mockResolvedValueOnce(['claude']);
+
+    const { configCommand } = await import('../../src/commands/config.js');
+    await configCommand();
+
+    const localPath = join(tmpDir, '.tiller/local.json');
+    const content = JSON.parse(await readFile(localPath, 'utf-8'));
+    expect(content).toMatchObject({
+      mode: 'simple',
+      workflow: 'team',
+      tools: ['claude'],
+    });
+    expect(prompts.outro).toHaveBeenCalledWith('Personal settings saved to .tiller/local.json (gitignored).');
   });
 
   it('merges with existing .tiller/local.json on local scope', async () => {

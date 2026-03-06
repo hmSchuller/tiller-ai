@@ -2,6 +2,7 @@ import { Command } from 'commander';
 import { initCommand } from './commands/init.js';
 import { upgradeCommand } from './commands/upgrade.js';
 import { configCommand } from './commands/config.js';
+import { dashboardCommand } from './commands/dashboard.js';
 import { TILLER_VERSION } from './scaffold/tiller-manifest.js';
 
 const program = new Command();
@@ -30,5 +31,12 @@ program
   .command('config')
   .description('Interactively update mode and workflow settings')
   .action(configCommand);
+
+program
+  .command('dashboard')
+  .description('Launch a local browser dashboard for configuration')
+  .action(async () => {
+    await dashboardCommand();
+  });
 
 program.parse();

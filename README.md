@@ -75,6 +75,7 @@ Switch at any time:
 
 ```bash
 npx tiller-ai config
+npx tiller-ai dashboard
 ```
 
 Per-dev override (gitignored, not scaffolded): create `.tiller/local.json` with `{ "mode": "simple", "workflow": "solo" }` to override shared settings locally.
@@ -118,10 +119,18 @@ npx tiller-ai upgrade --yes
 
 ### `npx tiller-ai config`
 
-Interactively update mode and workflow. Scope `local` writes to `.tiller/local.json`; scope `project` updates the shared `.tiller/tiller.json`.
+Interactively update mode, workflow, tool selection, and whether the change applies locally or to the shared project config.
 
 ```bash
 npx tiller-ai config
+```
+
+### `npx tiller-ai dashboard`
+
+Launch a temporary local web dashboard for the same configuration surface as `config`. It prints a localhost URL, opens it in your browser, shows project values, local overrides, and the effective config side by side, and keeps inline errors visible if reading or saving fails.
+
+```bash
+npx tiller-ai dashboard
 ```
 
 ## Scaffolded files
