@@ -34,14 +34,11 @@ After branch routing (Step 2) determines the branch name, create or reuse a sess
 1. Derive the session slug from the branch name by replacing \`/\` with \`-\` (e.g. \`feature/my-thing\` → \`feature-my-thing\`)
 2. Check if \`.tiller/sessions/<slug>/session.json\` already exists:
    - **If it exists** (resuming a previous sail): read the existing session and continue. Do not overwrite it.
-   - **If it does not exist**: create the session folder and metadata:
+   - **If it does not exist**: create the session folder and metadata (include sail-lead in agents):
      \`\`\`bash
-     mkdir -p .tiller/sessions/<slug> && echo '{"id":"<slug>","branch":"<branch>","startedAt":"<ISO-timestamp>","status":"active","agents":[]}' > .tiller/sessions/<slug>/session.json
+     mkdir -p .tiller/sessions/<slug> && echo '{"id":"<slug>","branch":"<branch>","startedAt":"<ISO-timestamp>","status":"active","agents":[{"name":"sail-lead","type":"lead","status":"active","startedAt":"<ISO-timestamp>"}]}' > .tiller/sessions/<slug>/session.json
+     echo "sail-lead" > .tiller/sessions/<slug>/current-agent
      \`\`\`
-3. Set the \`TILLER_AGENT_NAME\` environment variable to \`sail-lead\` so hooks can identify this agent:
-   \`\`\`bash
-   export TILLER_AGENT_NAME=sail-lead
-   \`\`\`
 4. Print: "Dashboard: http://localhost:19850 (run \`tiller-ai dashboard\` in another terminal to view session)"
 
 ## Step 1: Orient

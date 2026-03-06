@@ -40,12 +40,9 @@ After branch routing (Step 2) determines the branch name, create or reuse a sess
      \`\`\`bash
      mkdir -p .tiller/sessions/<slug>
      ts=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-     printf '{"id":"%s","branch":"%s","startedAt":"%s","status":"active","agents":[]}' "<slug>" "<branch>" "$ts" > .tiller/sessions/<slug>/session.json
+     printf '{"id":"%s","branch":"%s","startedAt":"%s","status":"active","agents":[{"name":"sail-lead","type":"lead","status":"active","startedAt":"%s"}]}' "<slug>" "<branch>" "$ts" "$ts" > .tiller/sessions/<slug>/session.json
+     echo "sail-lead" > .tiller/sessions/<slug>/current-agent
      \`\`\`
-3. Write your agent name to the session so hooks can identify you:
-   \`\`\`bash
-   echo "sail-lead" > .tiller/sessions/<slug>/current-agent
-   \`\`\`
 4. Print: "Dashboard: http://localhost:19850 (run \`tiller-ai dashboard\` in another terminal to view session)"
 
 ## Step 1: Orient
