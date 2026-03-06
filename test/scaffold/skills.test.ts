@@ -113,14 +113,15 @@ describe('generateSailSkill', () => {
     expect(result).toContain('[depends-on: N]');
   });
 
-  it('includes TeamCreate and TaskCreate for parallel execution', () => {
+  it('uses /fleet for parallel execution instead of TeamCreate', () => {
     const result = generateSailSkill(simpleConfig);
-    expect(result).toContain('TeamCreate');
-    expect(result).toContain('TaskCreate');
+    expect(result).not.toContain('TeamCreate');
+    expect(result).toContain('/fleet');
   });
 
-  it('includes SendMessage for worker coordination', () => {
-    expect(generateSailSkill(simpleConfig)).toContain('SendMessage');
+  it('does not use SendMessage for worker coordination', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).not.toContain('SendMessage');
   });
 
   it('includes Small tier for solo sequential execution', () => {
@@ -134,9 +135,9 @@ describe('generateSailSkill', () => {
     expect(result).toContain('Within-milestone split');
   });
 
-  it('lead agent owns commits in team mode', () => {
+  it('Commit incrementally in fleet tiers', () => {
     const result = generateSailSkill(simpleConfig);
-    expect(result).toContain('lead agent commits');
+    expect(result).toContain('Commit incrementally');
   });
 
   it('includes Step 4.5 code review with Quartermaster', () => {
@@ -275,9 +276,9 @@ describe('generateSailSkill', () => {
     expect(result).toContain('### Large tier');
   });
 
-  it('Medium tier includes parallel with lead participation', () => {
+  it('Medium tier uses /fleet for parallel execution', () => {
     const result = generateSailSkill(simpleConfig);
-    expect(result).toContain('Medium tier — parallel with lead participation');
+    expect(result).toContain('Medium tier — parallel with /fleet');
   });
 
   it('Large tier delegates all work — orchestrator does not implement', () => {
@@ -299,9 +300,10 @@ describe('generateSailSkill', () => {
     expect(result).toContain('Commit incrementally');
   });
 
-  it('Large tier uses addBlockedBy for dependency chains', () => {
+  it('Large tier uses /fleet for dependency-based execution', () => {
     const result = generateSailSkill(simpleConfig);
-    expect(result).toContain('addBlockedBy');
+    expect(result).toContain('/fleet');
+    expect(result).toContain('newly unblocked milestones');
   });
 
   it('execution rules reference Step 3.5 evaluation', () => {
@@ -372,6 +374,40 @@ describe('generateSailSkill', () => {
   it('Step 5 notes completion in compass.md', () => {
     const result = generateSailSkill(simpleConfig);
     expect(result).toContain('Sail complete — ready to /dock');
+  });
+
+  it('includes session folder creation instructions', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('.tiller/sessions/');
+    expect(result).toContain('session.json');
+    expect(result).toContain('mkdir -p .tiller/sessions/');
+  });
+
+  it('includes dashboard URL mention', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('Dashboard: http://localhost:19850');
+    expect(result).toContain('tiller-ai dashboard');
+  });
+
+  it('does not contain TeamCreate or TaskCreate for orchestration', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).not.toContain('TeamCreate');
+  });
+
+  it('includes TILLER_AGENT_NAME for agent registration', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('TILLER_AGENT_NAME');
+  });
+
+  it('registers agents in session.json before spawning', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('Register each worker agent in the session before spawning');
+  });
+
+  it('reuses existing session folder when resuming', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('resuming a previous sail');
+    expect(result).toContain('Do not overwrite');
   });
 });
 

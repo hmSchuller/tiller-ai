@@ -13,6 +13,13 @@ import {
   type SaveConfigResult,
 } from '../config-shared.js';
 import {
+  listSessions,
+  readInbox,
+  readLog,
+  readSession,
+  appendInboxMessage,
+} from '../../sessions/fs.js';
+import {
   CLIENT_ASSET_PATH,
   CLIENT_CSS_ASSET_PATH,
   type ConfigSnapshot,
@@ -20,6 +27,8 @@ import {
   type DashboardStateResponse,
   type LocalOverrideSnapshot,
   type SaveRequest,
+  type SessionSummary,
+  type SessionDetailResponse,
   type ToolTarget,
   isConfigMode,
   isToolTarget,
@@ -333,6 +342,77 @@ export function createDashboardRequestHandler(cwd: string) {
 
         const response = await handleSaveRequest(cwd, payload);
         sendJson(res, response.statusCode, response.body);
+        return;
+      }
+
+      if (req.method === 'GET' && requestUrl.pathname === '/api/sessions') {
+        const sessions = listSessions(cwd);
+        const summaries: SessionSummary[] = sessions.map((s) => ({
+          id: s.id,
+          branch: s.branch,
+          startedAt: s.startedAt,
+          status: s.status,
+          agentCount: s.agents.length,
+          activeAgentCount: s.agents.filter((a) => a.status === 'active').length,
+        }));
+        sendJson(res, 200, summaries);
+        return;
+      }
+
+      const sessionDetailMatch = req.method === 'GET' && requestUrl.pathname.match(/^\/api\/sessions\/([^/]+)$/);
+      if (sessionDetailMatch) {
+        const slug = decodeURIComponent(sessionDetailMatch[1]);
+        const session = readSession(cwd, slug);
+        if (!session) {
+          sendJson(res, 404, { error: 'Session not found' });
+          return;
+        }
+
+        const detail: SessionDetailResponse = {
+          id: session.id,
+          branch: session.branch,
+          startedAt: session.startedAt,
+          status: session.status,
+          agents: session.agents.map((a) => ({
+            name: a.name,
+            type: a.type,
+            status: a.status,
+            startedAt: a.startedAt,
+            completedAt: a.completedAt,
+            log: readLog(cwd, slug, a.name),
+            inbox: readInbox(cwd, slug, a.name),
+          })),
+        };
+        sendJson(res, 200, detail);
+        return;
+      }
+
+      const inboxPostMatch = req.method === 'POST' && requestUrl.pathname.match(/^\/api\/sessions\/([^/]+)\/inbox\/([^/]+)$/);
+      if (inboxPostMatch) {
+        const slug = decodeURIComponent(inboxPostMatch[1]);
+        const agentName = decodeURIComponent(inboxPostMatch[2]);
+        const session = readSession(cwd, slug);
+        if (!session) {
+          sendJson(res, 404, { error: 'Session not found' });
+          return;
+        }
+
+        let payload: unknown;
+        try {
+          payload = await readRequestBody(req);
+        } catch (error) {
+          const message = error instanceof Error ? error.message : 'Failed to read request body.';
+          sendJson(res, 400, { ok: false, error: getRequestIssue(message) });
+          return;
+        }
+
+        const body = payload as Record<string, unknown>;
+        appendInboxMessage(cwd, slug, agentName, {
+          timestamp: new Date().toISOString(),
+          from: 'user',
+          content: String(body.content ?? ''),
+        });
+        sendJson(res, 200, { ok: true });
         return;
       }
 

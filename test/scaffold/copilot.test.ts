@@ -117,14 +117,22 @@ describe('generateCopilotHooksJson', () => {
 
   it('has preToolUse hooks', () => {
     const parsed = JSON.parse(generateCopilotHooksJson(copilotOnlyConfig));
-    expect(parsed.hooks.preToolUse).toHaveLength(1);
+    expect(parsed.hooks.preToolUse).toHaveLength(2);
     expect(parsed.hooks.preToolUse[0].bash).toContain('secret-scan.sh');
+    expect(parsed.hooks.preToolUse[1].bash).toContain('inbox-check.sh');
   });
 
   it('has postToolUse hooks', () => {
     const parsed = JSON.parse(generateCopilotHooksJson(copilotOnlyConfig));
-    expect(parsed.hooks.postToolUse).toHaveLength(1);
+    expect(parsed.hooks.postToolUse).toHaveLength(2);
     expect(parsed.hooks.postToolUse[0].bash).toContain('post-write.sh');
+    expect(parsed.hooks.postToolUse[1].bash).toContain('session-log.sh');
+  });
+
+  it('has subagentStop hooks', () => {
+    const parsed = JSON.parse(generateCopilotHooksJson(copilotOnlyConfig));
+    expect(parsed.hooks.subagentStop).toHaveLength(1);
+    expect(parsed.hooks.subagentStop[0].bash).toContain('agent-complete.sh');
   });
 
   it('does not include plan-context hook', () => {
