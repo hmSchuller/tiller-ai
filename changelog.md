@@ -3,6 +3,7 @@
 > Shared project history. Updated by /sail, /anchor, and /dock. Committed and shared.
 
 ## Done
+- [2026-03-06] docked feature/agent-inbox-session-dashboard
 - [2026-03-06] feat: dashboard Sessions tab with live agent view, inbox messaging, and 3s polling
 - [2026-03-06] feat: session hooks — postToolUse logging, preToolUse inbox-check (smart deny-with-message), subagentStop completion
 - [2026-03-06] feat: sail skill /fleet integration — replace TeamCreate/TaskCreate with native /fleet parallel execution
