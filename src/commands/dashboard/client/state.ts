@@ -1,4 +1,4 @@
-import type { ConfigScope, DashboardState, DashboardStateResponse, ToolTarget } from '../contracts.js';
+import type { ConfigScope, DashboardState, DashboardStateResponse, SessionDetailResponse, SessionSummary, ToolTarget } from '../contracts.js';
 import {
   DEFAULT_FORM_VALUES,
   cloneFormValues,
@@ -17,6 +17,9 @@ export type DashboardAppState = {
   formDisabled: boolean;
   form: FormValues;
   activeTab: DashboardTab;
+  sessions: SessionSummary[];
+  selectedSession: SessionDetailResponse | null;
+  sessionsLoading: boolean;
 };
 
 function getErrorMessage(error: unknown, fallback: string): string {
@@ -30,6 +33,32 @@ export function createInitialAppState(): DashboardAppState {
     formDisabled: true,
     form: cloneFormValues(DEFAULT_FORM_VALUES),
     activeTab: 'config',
+    sessions: [],
+    selectedSession: null,
+    sessionsLoading: false,
+  };
+}
+
+export function setSessions(currentState: DashboardAppState, sessions: SessionSummary[]): DashboardAppState {
+  return {
+    ...currentState,
+    sessions,
+    sessionsLoading: false,
+  };
+}
+
+export function selectSession(currentState: DashboardAppState, session: SessionDetailResponse): DashboardAppState {
+  return {
+    ...currentState,
+    selectedSession: session,
+    sessionsLoading: false,
+  };
+}
+
+export function clearSelectedSession(currentState: DashboardAppState): DashboardAppState {
+  return {
+    ...currentState,
+    selectedSession: null,
   };
 }
 

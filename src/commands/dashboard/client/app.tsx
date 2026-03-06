@@ -1,5 +1,5 @@
-import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
-import type { DashboardStateResponse } from '../contracts.js';
+import { useEffect, useState, useRef, useCallback, type ChangeEvent, type FormEvent } from 'react';
+import type { DashboardStateResponse, SessionSummary, SessionDetailResponse } from '../contracts.js';
 import { isConfigMode, isConfigScope, isToolTarget, isWorkflowMode } from '../contracts.js';
 import {
   type DashboardStatus,
@@ -15,9 +15,12 @@ import {
   applySaveError,
   applySaveResponse,
   applySaveStart,
+  clearSelectedSession,
   createInitialAppState,
   type DashboardAppState,
   type DashboardTab,
+  selectSession,
+  setSessions,
   switchTab,
   updateMode,
   updateScope,
@@ -29,6 +32,8 @@ import { StatusBanner } from './components/StatusBanner.js';
 import { SnapshotCard } from './components/SnapshotCard.js';
 import { SettingsForm } from './components/SettingsForm.js';
 import { TabBar } from './components/TabBar.js';
+import { SessionList } from './components/SessionList.js';
+import { SessionDetail } from './components/SessionDetail.js';
 
 async function readDashboardState(): Promise<DashboardStateResponse> {
   const response = await fetch('/api/config', { cache: 'no-store' });
@@ -44,12 +49,18 @@ export type DashboardViewProps = {
   localRows: PanelRow[];
   effectiveRows: PanelRow[];
   activeTab: DashboardTab;
+  sessions: SessionSummary[];
+  selectedSession: SessionDetailResponse | null;
+  sessionsLoading: boolean;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void | Promise<void>;
   onScopeChange: (event: ChangeEvent<HTMLInputElement>) => void;
   onModeChange: (event: ChangeEvent<HTMLSelectElement>) => void;
   onWorkflowChange: (event: ChangeEvent<HTMLSelectElement>) => void;
   onToolChange: (event: ChangeEvent<HTMLInputElement>) => void;
   onTabChange: (id: string) => void;
+  onSelectSession: (slug: string) => void;
+  onBackToSessions: () => void;
+  onSendMessage: (agentName: string, content: string) => void;
 };
 
 const DASHBOARD_TABS = [
@@ -65,12 +76,18 @@ export function DashboardView({
   localRows,
   effectiveRows,
   activeTab,
+  sessions,
+  selectedSession,
+  sessionsLoading,
   onSubmit,
   onScopeChange,
   onModeChange,
   onWorkflowChange,
   onToolChange,
   onTabChange,
+  onSelectSession,
+  onBackToSessions,
+  onSendMessage,
 }: DashboardViewProps) {
   return (
     <main className="shell">
@@ -94,8 +111,12 @@ export function DashboardView({
             <SnapshotCard title="Effective config" items={effectiveRows} />
           </section>
         </div>
+      ) : sessionsLoading && sessions.length === 0 && !selectedSession ? (
+        <div className="empty-state">Loading sessions…</div>
+      ) : selectedSession ? (
+        <SessionDetail session={selectedSession} onBack={onBackToSessions} onSendMessage={onSendMessage} />
       ) : (
-        <div className="sessions-placeholder">Sessions view coming soon...</div>
+        <SessionList sessions={sessions} onSelectSession={onSelectSession} />
       )}
     </main>
   );
@@ -103,6 +124,69 @@ export function DashboardView({
 
 export function DashboardApp() {
   const [appState, setAppState] = useState<DashboardAppState>(createInitialAppState);
+  const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const activeTabRef = useRef<DashboardTab>(appState.activeTab);
+  const selectedSessionRef = useRef<string | null>(null);
+
+  // Keep refs in sync with state
+  activeTabRef.current = appState.activeTab;
+  selectedSessionRef.current = appState.selectedSession?.id ?? null;
+
+  const fetchSessions = useCallback(async (): Promise<void> => {
+    try {
+      const response = await fetch('/api/sessions', { cache: 'no-store' });
+      const sessions = (await response.json()) as SessionSummary[];
+      setAppState((current) => setSessions(current, sessions));
+    } catch {
+      // Silently ignore polling errors
+    }
+  }, []);
+
+  const fetchSessionDetail = useCallback(async (slug: string): Promise<void> => {
+    try {
+      const response = await fetch(`/api/sessions/${encodeURIComponent(slug)}`, { cache: 'no-store' });
+      const detail = (await response.json()) as SessionDetailResponse;
+      setAppState((current) => selectSession(current, detail));
+    } catch {
+      // Silently ignore polling errors
+    }
+  }, []);
+
+  const pollCurrentView = useCallback(async (): Promise<void> => {
+    if (activeTabRef.current !== 'sessions') return;
+
+    const selectedSlug = selectedSessionRef.current;
+    if (selectedSlug) {
+      await fetchSessionDetail(selectedSlug);
+    } else {
+      await fetchSessions();
+    }
+  }, [fetchSessions, fetchSessionDetail]);
+
+  // Polling lifecycle for sessions tab
+  useEffect(() => {
+    if (appState.activeTab !== 'sessions') {
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current);
+        pollIntervalRef.current = null;
+      }
+      return;
+    }
+
+    // Fetch immediately when switching to sessions tab
+    void pollCurrentView();
+
+    pollIntervalRef.current = setInterval(() => {
+      void pollCurrentView();
+    }, 3000);
+
+    return () => {
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current);
+        pollIntervalRef.current = null;
+      }
+    };
+  }, [appState.activeTab, appState.selectedSession?.id, pollCurrentView]);
 
   useEffect(() => {
     let cancelled = false;
@@ -201,6 +285,32 @@ export function DashboardApp() {
     setAppState((currentState) => switchTab(currentState, id as DashboardTab));
   };
 
+  const onSelectSession = (slug: string): void => {
+    setAppState((current) => ({ ...current, sessionsLoading: true }));
+    void fetchSessionDetail(slug);
+  };
+
+  const onBackToSessions = (): void => {
+    setAppState((current) => clearSelectedSession(current));
+  };
+
+  const onSendMessage = async (agentName: string, content: string): Promise<void> => {
+    const sessionId = appState.selectedSession?.id;
+    if (!sessionId) return;
+
+    try {
+      await fetch(`/api/sessions/${encodeURIComponent(sessionId)}/inbox/${encodeURIComponent(agentName)}`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ content }),
+      });
+      // Re-fetch session detail to see the message
+      await fetchSessionDetail(sessionId);
+    } catch {
+      // Silently ignore send errors
+    }
+  };
+
   const projectRows = appState.dashState ? getSnapshotRows(appState.dashState.project) : [];
   const localRows = appState.dashState ? getLocalRows(appState.dashState.local) : [];
   const effectiveRows = appState.dashState ? getSnapshotRows(appState.dashState.effective) : [];
@@ -214,12 +324,18 @@ export function DashboardApp() {
       localRows={localRows}
       effectiveRows={effectiveRows}
       activeTab={appState.activeTab}
+      sessions={appState.sessions}
+      selectedSession={appState.selectedSession}
+      sessionsLoading={appState.sessionsLoading}
       onSubmit={handleSubmit}
       onScopeChange={onScopeChange}
       onModeChange={onModeChange}
       onWorkflowChange={onWorkflowChange}
       onToolChange={onToolChange}
       onTabChange={onTabChange}
+      onSelectSession={onSelectSession}
+      onBackToSessions={onBackToSessions}
+      onSendMessage={onSendMessage}
     />
   );
 }
