@@ -5,6 +5,9 @@ import { generatePostWriteHook } from './hooks/post-write.js';
 import { generateSecretScanHook } from './hooks/secret-scan.js';
 import { generateSessionResumeHook } from './hooks/session-resume.js';
 import { generatePlanContextHook } from './hooks/plan-context.js';
+import { generateSessionLogHook } from './hooks/session-log.js';
+import { generateInboxCheckHook } from './hooks/inbox-check.js';
+import { generateAgentCompleteHook } from './hooks/agent-complete.js';
 import { generateSetupSkill } from './skills/setup.js';
 import { generateSailSkill } from './skills/sail.js';
 import { generateAnchorSkill } from './skills/anchor.js';
@@ -127,6 +130,9 @@ export async function regenerateFiles(config: ProjectConfig, cwd: string, opts?:
     await writeFile(resolve(cwd, '.github/hooks/post-write.sh'), generatePostWriteHook(config));
     await writeFile(resolve(cwd, '.github/hooks/secret-scan.sh'), generateSecretScanHook(config));
     await writeFile(resolve(cwd, '.github/hooks/session-resume.sh'), generateSessionResumeHook(config));
+    await writeFile(resolve(cwd, '.github/hooks/session-log.sh'), generateSessionLogHook(config));
+    await writeFile(resolve(cwd, '.github/hooks/inbox-check.sh'), generateInboxCheckHook(config));
+    await writeFile(resolve(cwd, '.github/hooks/agent-complete.sh'), generateAgentCompleteHook(config));
   }
 
   if (!opts?.skipManifest) {
