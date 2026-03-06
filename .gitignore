@@ -29,3 +29,4 @@ npm-debug.log*
 # Tiller — local-only files
 .tiller/local.json
 .tiller/compass.md
+.github
