@@ -234,7 +234,7 @@ describe('configCommand', () => {
     expect(exitSpy).toHaveBeenCalledWith(0);
   });
 
-  it('saves tools to local.json', async () => {
+  it('saves tools to local.json without modifying tiller.json', async () => {
     await setupProject(tmpDir);
 
     const prompts = await import('@clack/prompts');
@@ -250,6 +250,10 @@ describe('configCommand', () => {
     const localPath = join(tmpDir, '.tiller/local.json');
     const content = JSON.parse(await readFile(localPath, 'utf-8'));
     expect(content.tools).toEqual(['claude', 'copilot']);
+
+    // tiller.json should NOT have been modified — tools stay as project default
+    const manifest = JSON.parse(await readFile(join(tmpDir, '.tiller/tiller.json'), 'utf-8'));
+    expect(manifest.tools).toEqual(['claude']);
   });
 
   it('saves tools to tiller.json for project scope', async () => {

@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { writeFile } from '../utils/fs.js';
-import { generateTillerManifest, getManagedFiles, TILLER_VERSION, type TillerManifest } from '../scaffold/tiller-manifest.js';
+import { generateTillerManifest, TILLER_VERSION, type TillerManifest } from '../scaffold/tiller-manifest.js';
 import type { ProjectConfig, ToolTarget } from '../scaffold/types.js';
 import { regenerateFiles, deleteStaleFiles } from '../scaffold/regenerate.js';
 
@@ -160,17 +160,16 @@ export async function configCommand(): Promise<void> {
     const updated = { ...local, mode: newMode, workflow: newWorkflow, tools: newTools };
     try {
       if (toolsChanged) {
-        const effectiveTools = newTools;
         const config: ProjectConfig = {
           projectName: '',
           description: '',
           runCommand: manifest.runCommand,
           mode: newMode,
           workflow: newWorkflow,
-          tools: effectiveTools,
+          tools: newTools,
         };
-        await deleteStaleFiles(manifest.managedFiles ?? [], effectiveTools, process.cwd());
-        await regenerateFiles(config, process.cwd());
+        await deleteStaleFiles(manifest.managedFiles ?? [], newTools, process.cwd());
+        await regenerateFiles(config, process.cwd(), { skipManifest: true });
       }
       await writeFile(localPath, JSON.stringify(updated, null, 2));
       s.stop('Done!');

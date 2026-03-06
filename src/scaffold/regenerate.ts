@@ -39,7 +39,7 @@ import type { ProjectConfig } from './types.js';
  * Write all tool-specific managed files, update the manifest, and clean up gitignore.
  * Shared by upgrade and config commands.
  */
-export async function regenerateFiles(config: ProjectConfig, cwd: string): Promise<void> {
+export async function regenerateFiles(config: ProjectConfig, cwd: string, opts?: { skipManifest?: boolean }): Promise<void> {
   const tools = config.tools ?? ['claude'];
 
   await writeFile(resolve(cwd, '.tiller/TILLER.md'), generateTillerMd(config));
@@ -128,7 +128,9 @@ export async function regenerateFiles(config: ProjectConfig, cwd: string): Promi
     await writeFile(resolve(cwd, '.github/hooks/session-resume.sh'), generateSessionResumeHook(config));
   }
 
-  await writeFile(resolve(cwd, '.tiller/tiller.json'), generateTillerManifest(config, TILLER_VERSION));
+  if (!opts?.skipManifest) {
+    await writeFile(resolve(cwd, '.tiller/tiller.json'), generateTillerManifest(config, TILLER_VERSION));
+  }
 
   // Ensure all tiller gitignore entries are present
   const gitignorePath = resolve(cwd, '.gitignore');
