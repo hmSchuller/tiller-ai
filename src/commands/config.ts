@@ -1,10 +1,11 @@
-import { intro, outro, spinner, select, isCancel, cancel } from '@clack/prompts';
+import { intro, outro, spinner, select, multiselect, isCancel, cancel } from '@clack/prompts';
 import { readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { writeFile } from '../utils/fs.js';
-import { generateTillerManifest, TILLER_VERSION, type TillerManifest } from '../scaffold/tiller-manifest.js';
+import { generateTillerManifest, getManagedFiles, TILLER_VERSION, type TillerManifest } from '../scaffold/tiller-manifest.js';
 import type { ProjectConfig, ToolTarget } from '../scaffold/types.js';
+import { regenerateFiles, deleteStaleFiles } from '../scaffold/regenerate.js';
 
 export async function configCommand(): Promise<void> {
   intro('tiller-ai config — update mode and workflow');
@@ -66,6 +67,23 @@ export async function configCommand(): Promise<void> {
     process.exit(0);
   }
 
+  const currentTools: ToolTarget[] = (local.tools as ToolTarget[] | undefined) ?? manifest.tools ?? ['claude'];
+
+  const toolsAnswer = await multiselect({
+    message: 'CLI tools',
+    initialValues: currentTools,
+    options: [
+      { value: 'claude', label: 'Claude Code' },
+      { value: 'copilot', label: 'GitHub Copilot' },
+      { value: 'opencode', label: 'OpenCode' },
+    ],
+    required: true,
+  });
+
+  if (isCancel(toolsAnswer)) {
+    process.exit(0);
+  }
+
   const scopeAnswer = await select({
     message: 'Who should this apply to?',
     options: [
@@ -80,38 +98,55 @@ export async function configCommand(): Promise<void> {
 
   const newMode = modeAnswer as 'simple' | 'detailed';
   const newWorkflow = workflowAnswer as 'solo' | 'team';
+  const newTools = toolsAnswer as ToolTarget[];
   const isProjectScope = scopeAnswer === 'project';
+
+  const arraysEqual = (a: string[], b: string[]) =>
+    a.length === b.length && [...a].sort().every((v, i) => v === [...b].sort()[i]);
 
   // Check for no-op
   if (isProjectScope) {
-    if (manifest.mode === newMode && (manifest.workflow ?? 'solo') === newWorkflow) {
+    const oldTools: ToolTarget[] = manifest.tools ?? ['claude'];
+    if (manifest.mode === newMode && (manifest.workflow ?? 'solo') === newWorkflow && arraysEqual(oldTools, newTools)) {
       outro('No changes — project settings already match.');
       return;
     }
   } else {
-    if ((local.mode as string | undefined) === newMode && (local.workflow as string | undefined) === newWorkflow) {
+    const oldLocalTools = local.tools as ToolTarget[] | undefined;
+    if (
+      (local.mode as string | undefined) === newMode &&
+      (local.workflow as string | undefined) === newWorkflow &&
+      oldLocalTools !== undefined && arraysEqual(oldLocalTools, newTools)
+    ) {
       outro('No changes — local settings already match.');
       return;
     }
   }
+
+  const oldManagedTools: ToolTarget[] = manifest.tools ?? ['claude'];
+  const toolsChanged = !arraysEqual(oldManagedTools, newTools);
 
   const s = spinner();
 
   if (isProjectScope) {
     s.start('Updating project settings...');
 
-    const tools: ToolTarget[] = manifest.tools ?? ['claude'];
     const config: ProjectConfig = {
       projectName: '',
       description: '',
       runCommand: manifest.runCommand,
       mode: newMode,
       workflow: newWorkflow,
-      tools,
+      tools: newTools,
     };
 
     try {
-      await writeFile(manifestPath, generateTillerManifest(config, TILLER_VERSION));
+      if (toolsChanged) {
+        await deleteStaleFiles(manifest.managedFiles ?? [], newTools, process.cwd());
+        await regenerateFiles(config, process.cwd());
+      } else {
+        await writeFile(manifestPath, generateTillerManifest(config, TILLER_VERSION));
+      }
       s.stop('Done!');
     } catch (err) {
       s.stop('Failed.');
@@ -122,8 +157,21 @@ export async function configCommand(): Promise<void> {
   } else {
     s.start('Saving personal settings...');
 
-    const updated = { ...local, mode: newMode, workflow: newWorkflow };
+    const updated = { ...local, mode: newMode, workflow: newWorkflow, tools: newTools };
     try {
+      if (toolsChanged) {
+        const effectiveTools = newTools;
+        const config: ProjectConfig = {
+          projectName: '',
+          description: '',
+          runCommand: manifest.runCommand,
+          mode: newMode,
+          workflow: newWorkflow,
+          tools: effectiveTools,
+        };
+        await deleteStaleFiles(manifest.managedFiles ?? [], effectiveTools, process.cwd());
+        await regenerateFiles(config, process.cwd());
+      }
       await writeFile(localPath, JSON.stringify(updated, null, 2));
       s.stop('Done!');
     } catch (err) {
