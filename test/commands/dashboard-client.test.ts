@@ -1,7 +1,7 @@
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
-import type { DashboardStateResponse } from '../../src/commands/dashboard/contracts.js';
+import type { DashboardStateResponse, SessionSummary, SessionDetailResponse } from '../../src/commands/dashboard/contracts.js';
 import {
   DEFAULT_FORM_VALUES,
   getFormValuesFromState,
@@ -16,6 +16,9 @@ import { Hero } from '../../src/commands/dashboard/client/components/Hero.js';
 import { buildCssVarBlock } from '../../src/commands/dashboard/client/theme.js';
 import type { DashboardViewProps } from '../../src/commands/dashboard/client/app.js';
 import { DashboardView } from '../../src/commands/dashboard/client/app.js';
+import { TabBar } from '../../src/commands/dashboard/client/components/TabBar.js';
+import { SessionList } from '../../src/commands/dashboard/client/components/SessionList.js';
+import { SessionDetail } from '../../src/commands/dashboard/client/components/SessionDetail.js';
 import {
   applyLoadError,
   applyLoadResponse,
@@ -23,7 +26,11 @@ import {
   applySaveError,
   applySaveResponse,
   applySaveStart,
+  clearSelectedSession,
   createInitialAppState,
+  selectSession,
+  setSessions,
+  switchTab,
   updateScope,
   updateToolSelection,
 } from '../../src/commands/dashboard/client/state.js';
@@ -230,6 +237,17 @@ describe('dashboard client state', () => {
     expect(saveErrorState.status).toEqual({ message: 'save failed', tone: 'error' });
     expect(saveErrorState.formDisabled).toBe(false);
   });
+
+  it('defaults activeTab to config and switches via switchTab', () => {
+    const initial = createInitialAppState();
+    expect(initial.activeTab).toBe('config');
+
+    const switched = switchTab(initial, 'sessions');
+    expect(switched.activeTab).toBe('sessions');
+
+    const switchedBack = switchTab(switched, 'config');
+    expect(switchedBack.activeTab).toBe('config');
+  });
 });
 
 // ── theme ─────────────────────────────────────────────────────────────────────
@@ -358,6 +376,47 @@ describe('SnapshotCard component', () => {
   });
 });
 
+describe('TabBar component', () => {
+  const tabs = [
+    { id: 'config', label: 'Config' },
+    { id: 'sessions', label: 'Sessions' },
+  ];
+
+  it('renders all tabs with correct labels', () => {
+    const html = renderToStaticMarkup(
+      createElement(TabBar, { tabs, activeTab: 'config', onTabChange: () => {} }),
+    );
+    expect(html).toContain('Config');
+    expect(html).toContain('Sessions');
+    expect(html).toContain('role="tablist"');
+  });
+
+  it('marks the active tab with aria-selected true', () => {
+    const html = renderToStaticMarkup(
+      createElement(TabBar, { tabs, activeTab: 'config', onTabChange: () => {} }),
+    );
+    expect(html).toContain('aria-selected="true"');
+    expect(html).toContain('aria-selected="false"');
+  });
+
+  it('applies active class only to the selected tab', () => {
+    const html = renderToStaticMarkup(
+      createElement(TabBar, { tabs, activeTab: 'sessions', onTabChange: () => {} }),
+    );
+    // The sessions tab should have the active class
+    expect(html).toContain('tab-button active');
+  });
+
+  it('renders each tab with role="tab"', () => {
+    const html = renderToStaticMarkup(
+      createElement(TabBar, { tabs, activeTab: 'config', onTabChange: () => {} }),
+    );
+    // Two tab roles expected
+    const tabRoleCount = (html.match(/role="tab"/g) || []).length;
+    expect(tabRoleCount).toBe(2);
+  });
+});
+
 // ── DashboardView (presentational root) ──────────────────────────────────────
 
 function makeViewProps(
@@ -371,11 +430,19 @@ function makeViewProps(
     projectRows: [{ label: 'Mode', value: 'detailed' }],
     localRows: [],
     effectiveRows: [{ label: 'Mode', value: 'detailed' }],
+    activeTab: 'config',
+    sessions: [],
+    selectedSession: null,
+    sessionsLoading: false,
     onSubmit: noop,
     onScopeChange: noop,
     onModeChange: noop,
     onWorkflowChange: noop,
     onToolChange: noop,
+    onTabChange: noop,
+    onSelectSession: noop,
+    onBackToSessions: noop,
+    onSendMessage: noop,
     ...overrides,
   };
 }
@@ -477,5 +544,244 @@ describe('DashboardView component', () => {
     const html = renderToStaticMarkup(createElement(DashboardView, makeViewProps()));
     expect(html).toContain('config-form');
     expect(html).toContain('Save settings');
+  });
+
+  it('renders the tab bar with Config and Sessions tabs', () => {
+    const html = renderToStaticMarkup(createElement(DashboardView, makeViewProps()));
+    expect(html).toContain('role="tablist"');
+    expect(html).toContain('Config');
+    expect(html).toContain('Sessions');
+  });
+
+  it('shows config content when activeTab is config', () => {
+    const html = renderToStaticMarkup(
+      createElement(DashboardView, makeViewProps({ activeTab: 'config' })),
+    );
+    expect(html).toContain('panel-grid');
+    expect(html).not.toContain('session-list');
+  });
+
+  it('shows session list empty state when activeTab is sessions with no sessions', () => {
+    const html = renderToStaticMarkup(
+      createElement(DashboardView, makeViewProps({ activeTab: 'sessions', sessions: [] })),
+    );
+    expect(html).toContain('empty-state');
+    expect(html).toContain('No sessions yet');
+    expect(html).not.toContain('panel-grid');
+  });
+
+  it('shows session list with cards when activeTab is sessions with data', () => {
+    const sessions: SessionSummary[] = [
+      { id: 'feature-auth', branch: 'feature/auth', startedAt: '2024-01-15T10:00:00Z', status: 'active', agentCount: 2, activeAgentCount: 1 },
+    ];
+    const html = renderToStaticMarkup(
+      createElement(DashboardView, makeViewProps({ activeTab: 'sessions', sessions })),
+    );
+    expect(html).toContain('feature/auth');
+    expect(html).toContain('session-card');
+    expect(html).toContain('status-badge');
+    expect(html).not.toContain('panel-grid');
+  });
+
+  it('shows session detail when a session is selected', () => {
+    const selectedSession: SessionDetailResponse = {
+      id: 'feature-auth',
+      branch: 'feature/auth',
+      startedAt: '2024-01-15T10:00:00Z',
+      status: 'active',
+      agents: [
+        {
+          name: 'scout',
+          type: 'specialist',
+          status: 'active',
+          startedAt: '2024-01-15T10:01:00Z',
+          log: '',
+          inbox: [],
+        },
+      ],
+    };
+    const html = renderToStaticMarkup(
+      createElement(DashboardView, makeViewProps({ activeTab: 'sessions', selectedSession })),
+    );
+    expect(html).toContain('feature/auth');
+    expect(html).toContain('← Back');
+    expect(html).toContain('scout');
+    expect(html).not.toContain('panel-grid');
+  });
+});
+
+// ── SessionList component ────────────────────────────────────────────────────
+
+describe('SessionList component', () => {
+  const mockSessions: SessionSummary[] = [
+    {
+      id: 'feature-auth',
+      branch: 'feature/auth',
+      startedAt: '2024-01-15T10:00:00Z',
+      status: 'active',
+      agentCount: 3,
+      activeAgentCount: 2,
+    },
+    {
+      id: 'feature-docs',
+      branch: 'feature/docs',
+      startedAt: '2024-01-14T08:00:00Z',
+      status: 'completed',
+      agentCount: 1,
+      activeAgentCount: 0,
+    },
+  ];
+
+  it('renders session cards from mock data', () => {
+    const html = renderToStaticMarkup(
+      createElement(SessionList, { sessions: mockSessions, onSelectSession: () => {} }),
+    );
+    expect(html).toContain('feature/auth');
+    expect(html).toContain('feature/docs');
+    expect(html).toContain('session-card');
+    expect(html).toContain('3 agents');
+    expect(html).toContain('(2 active)');
+    expect(html).toContain('1 agent');
+  });
+
+  it('renders active and completed status badges', () => {
+    const html = renderToStaticMarkup(
+      createElement(SessionList, { sessions: mockSessions, onSelectSession: () => {} }),
+    );
+    expect(html).toContain('status-badge active');
+    expect(html).toContain('status-badge completed');
+  });
+
+  it('shows empty state when no sessions', () => {
+    const html = renderToStaticMarkup(
+      createElement(SessionList, { sessions: [], onSelectSession: () => {} }),
+    );
+    expect(html).toContain('empty-state');
+    expect(html).toContain('No sessions yet. Start a /sail to create one.');
+    expect(html).not.toContain('session-card');
+  });
+});
+
+// ── SessionDetail component ──────────────────────────────────────────────────
+
+describe('SessionDetail component', () => {
+  const mockSession: SessionDetailResponse = {
+    id: 'feature-auth',
+    branch: 'feature/auth',
+    startedAt: '2024-01-15T10:00:00Z',
+    status: 'active',
+    agents: [
+      {
+        name: 'scout',
+        type: 'specialist',
+        status: 'active',
+        startedAt: '2024-01-15T10:01:00Z',
+        log: 'Investigating auth patterns…\nFound 3 files.',
+        inbox: [
+          { timestamp: '2024-01-15T10:02:00Z', from: 'orchestrator', content: 'Check OAuth flow', delivered: true },
+          { timestamp: '2024-01-15T10:03:00Z', from: 'user', content: 'Focus on JWT', delivered: false },
+        ],
+      },
+      {
+        name: 'bosun',
+        type: 'fleet',
+        status: 'completed',
+        startedAt: '2024-01-15T10:00:30Z',
+        completedAt: '2024-01-15T10:05:00Z',
+        log: 'Tech debt scan complete.',
+        inbox: [],
+      },
+    ],
+  };
+
+  it('renders agents with status badges', () => {
+    const html = renderToStaticMarkup(
+      createElement(SessionDetail, { session: mockSession, onBack: () => {}, onSendMessage: () => {} }),
+    );
+    expect(html).toContain('scout');
+    expect(html).toContain('bosun');
+    expect(html).toContain('status-badge active');
+    expect(html).toContain('status-badge completed');
+    expect(html).toContain('agent-type-badge');
+    expect(html).toContain('Specialist');
+    expect(html).toContain('Fleet');
+  });
+
+  it('renders back button and branch name', () => {
+    const html = renderToStaticMarkup(
+      createElement(SessionDetail, { session: mockSession, onBack: () => {}, onSendMessage: () => {} }),
+    );
+    expect(html).toContain('← Back');
+    expect(html).toContain('back-button');
+    expect(html).toContain('feature/auth');
+    expect(html).toContain('session-detail-branch');
+  });
+
+  it('renders the session status badge', () => {
+    const html = renderToStaticMarkup(
+      createElement(SessionDetail, { session: mockSession, onBack: () => {}, onSendMessage: () => {} }),
+    );
+    // The session header should show the active status
+    expect(html).toContain('session-detail-meta');
+  });
+});
+
+// ── Session state functions ──────────────────────────────────────────────────
+
+describe('session state functions', () => {
+  const mockSessions: SessionSummary[] = [
+    {
+      id: 'feature-auth',
+      branch: 'feature/auth',
+      startedAt: '2024-01-15T10:00:00Z',
+      status: 'active',
+      agentCount: 2,
+      activeAgentCount: 1,
+    },
+  ];
+
+  const mockSessionDetail: SessionDetailResponse = {
+    id: 'feature-auth',
+    branch: 'feature/auth',
+    startedAt: '2024-01-15T10:00:00Z',
+    status: 'active',
+    agents: [
+      {
+        name: 'scout',
+        type: 'specialist',
+        status: 'active',
+        startedAt: '2024-01-15T10:01:00Z',
+        log: 'Working…',
+        inbox: [],
+      },
+    ],
+  };
+
+  it('setSessions updates the session list and clears loading', () => {
+    const initial = createInitialAppState();
+    const updated = setSessions(initial, mockSessions);
+    expect(updated.sessions).toEqual(mockSessions);
+    expect(updated.sessionsLoading).toBe(false);
+  });
+
+  it('selectSession sets the selected session detail', () => {
+    const initial = createInitialAppState();
+    const updated = selectSession(initial, mockSessionDetail);
+    expect(updated.selectedSession).toEqual(mockSessionDetail);
+    expect(updated.sessionsLoading).toBe(false);
+  });
+
+  it('clearSelectedSession returns to the session list', () => {
+    const withSession = selectSession(createInitialAppState(), mockSessionDetail);
+    expect(withSession.selectedSession).not.toBeNull();
+    const cleared = clearSelectedSession(withSession);
+    expect(cleared.selectedSession).toBeNull();
+  });
+
+  it('initial state has empty sessions and no selected session', () => {
+    const initial = createInitialAppState();
+    expect(initial.sessions).toEqual([]);
+    expect(initial.selectedSession).toBeNull();
+    expect(initial.sessionsLoading).toBe(false);
   });
 });

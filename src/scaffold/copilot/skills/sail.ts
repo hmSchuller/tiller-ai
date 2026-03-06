@@ -13,7 +13,7 @@ Use this skill to contribute anything: new features, bug fixes, or incremental t
 
 **All user interaction uses \`AskUserQuestion\` only. No chat prompts, no \`EnterPlanMode\`. One continuous prompt.**
 
-## Step 0: Set up progress tracking
+## Step 0: Set up progress tracking and session
 
 Create all tasks upfront using \`TaskCreate\` so the user sees a visible checklist:
 
@@ -28,6 +28,23 @@ Create all tasks upfront using \`TaskCreate\` so the user sees a visible checkli
 9. "Complete" (Step 5)
 
 Save the returned task IDs for later \`TaskUpdate\` calls. Proceed immediately — do not wait for user input.
+
+### Session creation
+
+After branch routing (Step 2) determines the branch name, create or reuse a session folder for this sail:
+
+1. Derive the session slug from the branch name by replacing \`/\` with \`-\` (e.g. \`feature/my-thing\` → \`feature-my-thing\`)
+2. Check if \`.tiller/sessions/<slug>/session.json\` already exists:
+   - **If it exists** (resuming a previous sail): read the existing session and continue. Do not overwrite it.
+   - **If it does not exist**: create the session folder and metadata:
+     \`\`\`bash
+     mkdir -p .tiller/sessions/<slug> && echo '{"id":"<slug>","branch":"<branch>","startedAt":"<ISO-timestamp>","status":"active","agents":[]}' > .tiller/sessions/<slug>/session.json
+     \`\`\`
+3. Set the \`TILLER_AGENT_NAME\` environment variable to \`sail-lead\` so hooks can identify this agent:
+   \`\`\`bash
+   export TILLER_AGENT_NAME=sail-lead
+   \`\`\`
+4. Print: "Dashboard: http://localhost:19850 (run \`tiller-ai dashboard\` in another terminal to view session)"
 
 ## Step 1: Orient
 
@@ -186,24 +203,23 @@ The main agent is a **pure orchestrator**. It does NOT implement any code itself
 
 ### Setup
 
-1. Use \`TeamCreate\` to create a team named after the feature branch
-2. Use \`TaskCreate\` for ALL milestones, setting \`addBlockedBy\` to establish dependency chains matching the \`[depends-on: N]\` tags
-3. For each currently unblocked milestone, spawn a worker agent via the \`Task\` tool with \`team_name\` set. Provide each worker: milestone description, full context, branch name, files in scope, verify command (\`${config.runCommand}\`), and these instructions:
-   - Implement only the files in your milestone scope
-   - Run \`${config.runCommand}\` before reporting done — fix any failures
-   - Do NOT commit — the orchestrator commits
-   - Report done via \`SendMessage\` to the lead with a summary of changes
+1. Register each worker agent in the session before spawning. For each agent, append to \`.tiller/sessions/<slug>/session.json\` agents array:
+   \`\`\`json
+   {"name":"worker-<N>","type":"fleet","status":"active","startedAt":"<ISO-timestamp>"}
+   \`\`\`
+2. Set \`TILLER_AGENT_NAME\` environment variable for each spawned agent so hooks can identify it
 
-### Coordination
+### Execution
 
-4. Monitor progress via \`TaskList\` — do NOT implement any code yourself
-5. When a worker completes: review the changes, run \`${config.runCommand}\`, fix integration issues if needed
-6. Commit incrementally: \`git add -A && git commit -m "<milestone description>"\`
-7. Add entry to \`changelog.md\` Done section. Amend: \`git commit --amend --no-edit\`
-8. **detailed only:** Update \`.tiller/compass.md\` to check off the milestone. Amend: \`git commit --amend --no-edit\`
-9. Mark the task completed via \`TaskUpdate\`, then spawn workers for any newly unblocked milestones
-10. Repeat until all milestones are done
-11. Shut down the team via \`SendMessage\` with \`type: "shutdown_request"\`
+3. Group all currently unblocked milestones and use \`/fleet implement milestones: <list>\` to execute them in parallel
+4. For sequential milestones (those with dependencies), execute them one by one using the Task tool after their dependencies complete
+5. Do NOT implement any code yourself — delegate everything
+6. When a worker completes: review the changes, run \`${config.runCommand}\`, fix integration issues if needed
+7. Commit incrementally: \`git add -A && git commit -m "<milestone description>"\`
+8. Add entry to \`changelog.md\` Done section. Amend: \`git commit --amend --no-edit\`
+9. **detailed only:** Update \`.tiller/compass.md\` to check off the milestone. Amend: \`git commit --amend --no-edit\`
+10. Mark the task completed via \`TaskUpdate\`, then use \`/fleet\` again for any newly unblocked milestones
+11. Repeat until all milestones are done
 
 ## Step 4.5: Code Review
 

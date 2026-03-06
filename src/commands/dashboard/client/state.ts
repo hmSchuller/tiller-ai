@@ -1,4 +1,4 @@
-import type { ConfigScope, DashboardState, DashboardStateResponse, ToolTarget } from '../contracts.js';
+import type { ConfigScope, DashboardState, DashboardStateResponse, SessionDetailResponse, SessionSummary, ToolTarget } from '../contracts.js';
 import {
   DEFAULT_FORM_VALUES,
   cloneFormValues,
@@ -9,11 +9,17 @@ import {
   type FormValues,
 } from './view-model.js';
 
+export type DashboardTab = 'config' | 'sessions';
+
 export type DashboardAppState = {
   dashState: DashboardState | null;
   status: DashboardStatus | null;
   formDisabled: boolean;
   form: FormValues;
+  activeTab: DashboardTab;
+  sessions: SessionSummary[];
+  selectedSession: SessionDetailResponse | null;
+  sessionsLoading: boolean;
 };
 
 function getErrorMessage(error: unknown, fallback: string): string {
@@ -26,6 +32,40 @@ export function createInitialAppState(): DashboardAppState {
     status: { message: 'Loading dashboard…', tone: 'info' },
     formDisabled: true,
     form: cloneFormValues(DEFAULT_FORM_VALUES),
+    activeTab: 'config',
+    sessions: [],
+    selectedSession: null,
+    sessionsLoading: false,
+  };
+}
+
+export function setSessions(currentState: DashboardAppState, sessions: SessionSummary[]): DashboardAppState {
+  return {
+    ...currentState,
+    sessions,
+    sessionsLoading: false,
+  };
+}
+
+export function selectSession(currentState: DashboardAppState, session: SessionDetailResponse): DashboardAppState {
+  return {
+    ...currentState,
+    selectedSession: session,
+    sessionsLoading: false,
+  };
+}
+
+export function clearSelectedSession(currentState: DashboardAppState): DashboardAppState {
+  return {
+    ...currentState,
+    selectedSession: null,
+  };
+}
+
+export function switchTab(currentState: DashboardAppState, tab: DashboardTab): DashboardAppState {
+  return {
+    ...currentState,
+    activeTab: tab,
   };
 }
 

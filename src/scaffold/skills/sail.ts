@@ -11,7 +11,7 @@ description: Start or continue work — features, fixes, and tasks.
 
 Use this skill to contribute anything: new features, bug fixes, or incremental tasks on an existing branch. It handles branch routing automatically so you can focus on the work.
 
-## Step 0: Set up progress tracking
+## Step 0: Set up progress tracking and session
 
 Create all tasks upfront using \`TaskCreate\` so the user sees a visible checklist:
 
@@ -26,6 +26,23 @@ Create all tasks upfront using \`TaskCreate\` so the user sees a visible checkli
 9. "Complete" (Step 5)
 
 Save the returned task IDs for later \`TaskUpdate\` calls. Proceed immediately — do not wait for user input.
+
+### Session creation
+
+After branch routing (Step 2) determines the branch name, create or reuse a session folder for this sail:
+
+1. Derive the session slug from the branch name by replacing \`/\` with \`-\` (e.g. \`feature/my-thing\` → \`feature-my-thing\`)
+2. Check if \`.tiller/sessions/<slug>/session.json\` already exists:
+   - **If it exists** (resuming a previous sail): read the existing session and continue. Do not overwrite it.
+   - **If it does not exist**: create the session folder and metadata:
+     \`\`\`bash
+     mkdir -p .tiller/sessions/<slug> && echo '{"id":"<slug>","branch":"<branch>","startedAt":"<ISO-timestamp>","status":"active","agents":[]}' > .tiller/sessions/<slug>/session.json
+     \`\`\`
+3. Set the \`TILLER_AGENT_NAME\` environment variable to \`sail-lead\` so hooks can identify this agent:
+   \`\`\`bash
+   export TILLER_AGENT_NAME=sail-lead
+   \`\`\`
+4. Print: "Dashboard: http://localhost:19850 (run \`tiller-ai dashboard\` in another terminal to view session)"
 
 ## Step 1: Orient
 
@@ -214,57 +231,49 @@ All milestones run one by one, no agent spawning:
 7. **detailed only:** Update \`.tiller/compass.md\` to check off this milestone. Amend: \`git commit --amend --no-edit\`
 8. **simple:** Say: "Saved: <what changed>". **detailed:** Report: "Saved: <description> (X/N)"
 
-### Medium tier — parallel with lead participation
+### Medium tier — parallel with /fleet
 
-Use agent teams to parallelize independent work while the lead also implements:
+Use \`/fleet\` to execute independent milestones in parallel:
 
 **Setup:**
-1. Use \`TeamCreate\` to create a team named after the feature branch (e.g. \`feature-x\`)
-2. For each independent milestone, use \`TaskCreate\` to create a task with the milestone description and full context (branch name, files involved, verify command: \`${config.runCommand}\`)
-3. For each independent milestone, spawn a \`general-purpose\` agent via the \`Task\` tool with \`team_name\` set. Provide each agent its task description and these instructions:
-   - Work on branch \`<feature-branch>\` (already checked out — do not switch branches)
-   - Implement only the files in your milestone scope
-   - Run \`${config.runCommand}\` before reporting done — fix any failures
-   - Do NOT commit — the lead agent commits
-   - Report done via \`SendMessage\` to the lead with a summary of what you changed
+1. Register each worker agent in the session before spawning. For each agent, append to \`.tiller/sessions/<slug>/session.json\` agents array:
+   \`\`\`json
+   {"name":"worker-<N>","type":"fleet","status":"active","startedAt":"<ISO-timestamp>"}
+   \`\`\`
+2. Set \`TILLER_AGENT_NAME\` environment variable for each spawned agent so hooks can identify it
 
-**Coordination:**
-4. While workers run, the lead agent handles any sequential milestones that are unblocked
-5. Use \`TaskList\` to monitor progress
-6. When a worker sends a completion message, update \`TaskUpdate\` to mark it completed
-7. Once all independent milestones are done, shut down the team via \`SendMessage\` with \`type: "shutdown_request"\`
-8. Run \`${config.runCommand}\` once across all changes — fix any failures as lead
-9. \`git add -A && git commit -m "<feature>: parallel milestones <list>"\`
-10. Update \`changelog.md\`. Amend: \`git commit --amend --no-edit\`
+**Execution:**
+3. Use \`/fleet implement milestones: <list of independent milestones>\` to execute independent milestones in parallel
+4. While fleet workers run, the lead agent handles any sequential milestones that are unblocked
+5. When each milestone completes, run \`${config.runCommand}\` to verify
+6. Commit incrementally: \`git add -A && git commit -m "<milestone description>"\`
+7. Add entry to \`changelog.md\` Done section. Amend: \`git commit --amend --no-edit\`
 
 **Then continue** with any remaining sequential milestones using the Small tier loop above.
 
-### Large tier — orchestrator mode
+### Large tier — orchestrator mode with /fleet
 
 The main agent becomes a pure orchestrator. It does NOT implement any code itself — all implementation is delegated to spawned agents.
 
 **Setup:**
-1. Use \`TeamCreate\` to create a team named after the feature branch
-2. Use \`TaskCreate\` for ALL milestones, setting \`addBlockedBy\` to establish dependency chains matching the \`[depends-on: N]\` tags
-3. For each currently unblocked milestone, spawn a worker agent via the \`Task\` tool with \`team_name\` set, selecting the model based on milestone complexity:
+1. Register each worker agent in the session before spawning. For each agent, append to \`.tiller/sessions/<slug>/session.json\` agents array:
+   \`\`\`json
+   {"name":"worker-<N>","type":"fleet","status":"active","startedAt":"<ISO-timestamp>"}
+   \`\`\`
+2. Set \`TILLER_AGENT_NAME\` environment variable for each spawned agent so hooks can identify it
+
+**Execution:**
+3. Group all currently unblocked milestones and use \`/fleet implement milestones: <list>\` to execute them in parallel, selecting the model based on milestone complexity:
    - **haiku**: simple, mechanical milestones (rename, move files, update imports, boilerplate)
    - **sonnet**: moderate implementation (new functions, test writing, standard feature work)
    - **opus**: complex or architectural work (design decisions, cross-cutting changes, tricky logic)
-4. Provide each worker: milestone description, full context, branch name, files in scope, verify command (\`${config.runCommand}\`), and these instructions:
-   - Implement only the files in your milestone scope
-   - Run \`${config.runCommand}\` before reporting done — fix any failures
-   - Do NOT commit — the orchestrator commits
-   - Report done via \`SendMessage\` to the lead with a summary of changes
-
-**Coordination:**
-5. Monitor progress via \`TaskList\` — do NOT implement any code yourself
-6. When a worker completes: review the changes, run \`${config.runCommand}\`, fix integration issues if needed
-7. Commit incrementally: \`git add -A && git commit -m "<milestone description>"\`
-8. Add entry to \`changelog.md\` Done section. Amend: \`git commit --amend --no-edit\`
-9. **detailed only:** Update \`.tiller/compass.md\` to check off the milestone. Amend: \`git commit --amend --no-edit\`
-10. Mark the task completed via \`TaskUpdate\`, then spawn workers for any newly unblocked milestones (using the same model selection rules)
-11. Repeat until all milestones are done
-12. Shut down the team via \`SendMessage\` with \`type: "shutdown_request"\`
+4. Do NOT implement any code yourself — delegate everything
+5. When a worker completes: review the changes, run \`${config.runCommand}\`, fix integration issues if needed
+6. Commit incrementally: \`git add -A && git commit -m "<milestone description>"\`
+7. Add entry to \`changelog.md\` Done section. Amend: \`git commit --amend --no-edit\`
+8. **detailed only:** Update \`.tiller/compass.md\` to check off the milestone. Amend: \`git commit --amend --no-edit\`
+9. Mark the task completed via \`TaskUpdate\`, then use \`/fleet\` again for any newly unblocked milestones (using the same model selection rules)
+10. Repeat until all milestones are done
 
 ## Step 4.5: Code Review
 
@@ -295,8 +304,8 @@ After all milestones are built and committed, **detailed only:** check off the T
 
 For a large milestone where implementation and tests are clearly separable, the lead can spawn a single worker agent to write tests while it implements:
 - Lead implements the feature code
-- Worker (spawned via \`Task\` tool, no team needed) writes the tests in parallel
-- Worker reports back via \`SendMessage\` when done
+- Worker (spawned via \`Task\` tool) writes the tests in parallel
+- Register the worker in \`.tiller/sessions/<slug>/session.json\` before spawning and set \`TILLER_AGENT_NAME\`
 - Lead reviews, runs \`${config.runCommand}\`, commits
 
 \`TaskUpdate\` → mark "Code review" as \`completed\`.

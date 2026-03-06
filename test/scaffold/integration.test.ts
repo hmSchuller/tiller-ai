@@ -90,6 +90,11 @@ describe('scaffold integration', () => {
     expect(content).toContain('.tiller/local.json');
   });
 
+  it('.gitignore excludes .tiller/sessions/', async () => {
+    const content = await read('.gitignore');
+    expect(content).toContain('.tiller/sessions/');
+  });
+
   it('creates .gitignore', async () => {
     expect(await exists('.gitignore')).toBe(true);
   });

@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { generateTillerManifest, TILLER_VERSION } from '../../src/scaffold/tiller-manifest.js';
 import type { ToolTarget } from '../../src/scaffold/types.js';
 import { dashboardCommand, startDashboardServer } from '../../src/commands/dashboard.js';
+import { createSession, registerAgent } from '../../src/sessions/fs.js';
 
 async function setupProject(
   tmpDir: string,
@@ -368,6 +369,200 @@ describe('dashboard server', () => {
         effective: { mode: 'detailed', workflow: 'solo', tools: ['claude'] },
       },
     });
+  });
+
+  it('GET /api/sessions returns an empty array when no sessions exist', async () => {
+    await setupProject(tmpDir);
+
+    const server = await startDashboardServer(tmpDir);
+    servers.push(server);
+
+    const response = await fetch(`${server.url}/api/sessions`);
+    const payload = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(payload).toEqual([]);
+  });
+
+  it('GET /api/sessions returns session summaries after creating a session', async () => {
+    await setupProject(tmpDir);
+    const session = createSession(tmpDir, 'feature/auth');
+    registerAgent(tmpDir, session.id, {
+      name: 'quartermaster',
+      type: 'fleet',
+      status: 'active',
+      startedAt: new Date().toISOString(),
+    });
+    registerAgent(tmpDir, session.id, {
+      name: 'bosun',
+      type: 'specialist',
+      status: 'completed',
+      startedAt: new Date().toISOString(),
+      completedAt: new Date().toISOString(),
+    });
+
+    const server = await startDashboardServer(tmpDir);
+    servers.push(server);
+
+    const response = await fetch(`${server.url}/api/sessions`);
+    const payload = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(payload).toHaveLength(1);
+    expect(payload[0]).toMatchObject({
+      id: session.id,
+      branch: 'feature/auth',
+      status: 'active',
+      agentCount: 2,
+      activeAgentCount: 1,
+    });
+  });
+
+  it('GET /api/sessions/:slug returns session detail with agents', async () => {
+    await setupProject(tmpDir);
+    const session = createSession(tmpDir, 'feature/detail');
+    registerAgent(tmpDir, session.id, {
+      name: 'scout',
+      type: 'ephemeral',
+      status: 'active',
+      startedAt: new Date().toISOString(),
+    });
+
+    const server = await startDashboardServer(tmpDir);
+    servers.push(server);
+
+    const response = await fetch(`${server.url}/api/sessions/${session.id}`);
+    const payload = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(payload).toMatchObject({
+      id: session.id,
+      branch: 'feature/detail',
+      status: 'active',
+      agents: [
+        {
+          name: 'scout',
+          type: 'ephemeral',
+          status: 'active',
+          log: '',
+          inbox: [],
+        },
+      ],
+    });
+  });
+
+  it('GET /api/sessions/:slug returns 404 for a missing session', async () => {
+    await setupProject(tmpDir);
+
+    const server = await startDashboardServer(tmpDir);
+    servers.push(server);
+
+    const response = await fetch(`${server.url}/api/sessions/nonexistent`);
+    const payload = await response.json();
+
+    expect(response.status).toBe(404);
+    expect(payload).toEqual({ error: 'Session not found' });
+  });
+
+  it('POST /api/sessions/:slug/inbox/:agent sends a message', async () => {
+    await setupProject(tmpDir);
+    const session = createSession(tmpDir, 'feature/inbox');
+    registerAgent(tmpDir, session.id, {
+      name: 'quartermaster',
+      type: 'fleet',
+      status: 'active',
+      startedAt: new Date().toISOString(),
+    });
+
+    const server = await startDashboardServer(tmpDir);
+    servers.push(server);
+
+    const response = await fetch(`${server.url}/api/sessions/${session.id}/inbox/quartermaster`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ content: 'Hello agent' }),
+    });
+    const payload = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(payload).toEqual({ ok: true });
+
+    const detailResponse = await fetch(`${server.url}/api/sessions/${session.id}`);
+    const detail = await detailResponse.json();
+    const agent = detail.agents.find((a: { name: string }) => a.name === 'quartermaster');
+    expect(agent.inbox).toHaveLength(1);
+    expect(agent.inbox[0]).toMatchObject({
+      from: 'user',
+      content: 'Hello agent',
+      delivered: false,
+    });
+  });
+
+  it('POST /api/sessions/:slug/inbox/:agent returns 404 for a missing session', async () => {
+    await setupProject(tmpDir);
+
+    const server = await startDashboardServer(tmpDir);
+    servers.push(server);
+
+    const response = await fetch(`${server.url}/api/sessions/nonexistent/inbox/quartermaster`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ content: 'Hello' }),
+    });
+    const payload = await response.json();
+
+    expect(response.status).toBe(404);
+    expect(payload).toEqual({ error: 'Session not found' });
+  });
+
+  it('POST /api/sessions/:slug/inbox/:agent returns 404 for unregistered agent', async () => {
+    await setupProject(tmpDir);
+    createSession(tmpDir, 'feature/auth');
+
+    const server = await startDashboardServer(tmpDir);
+    servers.push(server);
+
+    const response = await fetch(`${server.url}/api/sessions/feature-auth/inbox/unknown-agent`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ content: 'Hello' }),
+    });
+    const payload = await response.json();
+
+    expect(response.status).toBe(404);
+    expect(payload).toEqual({ error: 'Agent not found' });
+  });
+
+  it('rejects path traversal in session slug', async () => {
+    await setupProject(tmpDir);
+
+    const server = await startDashboardServer(tmpDir);
+    servers.push(server);
+
+    const response = await fetch(`${server.url}/api/sessions/${encodeURIComponent('../../evil')}`, {
+      method: 'GET',
+    });
+
+    expect(response.status).toBe(400);
+  });
+
+  it('rejects path traversal in agent name for inbox POST', async () => {
+    await setupProject(tmpDir);
+    createSession(tmpDir, 'feature/auth');
+
+    const server = await startDashboardServer(tmpDir);
+    servers.push(server);
+
+    const response = await fetch(
+      `${server.url}/api/sessions/feature-auth/inbox/${encodeURIComponent('../../evil')}`,
+      {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ content: 'Hello' }),
+      },
+    );
+
+    expect(response.status).toBe(400);
   });
 
   it('keeps the server available when automatic browser opening fails', async () => {
