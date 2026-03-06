@@ -1,45 +1,46 @@
 import { intro, outro, spinner, select, multiselect, isCancel, cancel } from '@clack/prompts';
-import { readFile } from 'node:fs/promises';
-import { existsSync } from 'node:fs';
-import { resolve } from 'node:path';
-import { writeFile } from '../utils/fs.js';
-import { generateTillerManifest, TILLER_VERSION, type TillerManifest } from '../scaffold/tiller-manifest.js';
-import type { ProjectConfig, ToolTarget } from '../scaffold/types.js';
-import { regenerateFiles, deleteStaleFiles } from '../scaffold/regenerate.js';
+import type { ToolTarget } from '../scaffold/types.js';
+import {
+  readConfig,
+  getEffectiveConfig,
+  isProjectNoOp,
+  isLocalNoOp,
+  saveProjectConfig,
+  saveLocalConfig,
+  type ReadConfigResult,
+  type SaveConfigResult,
+} from './config-shared.js';
+
+function getReadFailureMessage(result: Extract<ReadConfigResult, { ok: false }>): string {
+  if (result.reason === 'missing') {
+    return 'No .tiller/tiller.json found. Is this a Tiller project?';
+  }
+
+  return 'Failed to read .tiller/tiller.json.';
+}
+
+function toSaveError(result: Extract<SaveConfigResult, { ok: false }>): Error {
+  const message =
+    result.reason === 'write-failed'
+      ? `Failed to save ${result.scope} settings.`
+      : `Failed to update ${result.scope} managed files.`;
+
+  return new Error(message, { cause: result.cause });
+}
 
 export async function configCommand(): Promise<void> {
   intro('tiller-ai config — update mode and workflow');
 
-  const manifestPath = resolve(process.cwd(), '.tiller/tiller.json');
+  const cwd = process.cwd();
+  const readResult = await readConfig(cwd);
 
-  if (!existsSync(manifestPath)) {
-    cancel('No .tiller/tiller.json found. Is this a Tiller project?');
+  if (!readResult.ok) {
+    cancel(getReadFailureMessage(readResult));
     process.exit(1);
   }
 
-  let manifest: TillerManifest;
-  try {
-    const raw = await readFile(manifestPath, 'utf-8');
-    manifest = JSON.parse(raw);
-  } catch {
-    cancel('Failed to read .tiller/tiller.json.');
-    process.exit(1);
-  }
-
-  const localPath = resolve(process.cwd(), '.tiller/local.json');
-  let local: Record<string, unknown> = {};
-  if (existsSync(localPath)) {
-    try {
-      const raw = await readFile(localPath, 'utf-8');
-      local = JSON.parse(raw);
-    } catch {
-      // ignore
-    }
-  }
-
-  // Effective current values (local overrides project)
-  const currentMode = (local.mode as 'simple' | 'detailed' | undefined) ?? manifest.mode ?? 'detailed';
-  const currentWorkflow = (local.workflow as 'solo' | 'team' | undefined) ?? manifest.workflow ?? 'solo';
+  const { manifest, local } = readResult;
+  const { mode: currentMode, workflow: currentWorkflow, tools: currentTools } = getEffectiveConfig(manifest, local);
 
   const modeAnswer = await select({
     message: 'Mode',
@@ -66,8 +67,6 @@ export async function configCommand(): Promise<void> {
   if (isCancel(workflowAnswer)) {
     process.exit(0);
   }
-
-  const currentTools: ToolTarget[] = (local.tools as ToolTarget[] | undefined) ?? manifest.tools ?? ['claude'];
 
   const toolsAnswer = await multiselect({
     message: 'CLI tools',
@@ -101,83 +100,37 @@ export async function configCommand(): Promise<void> {
   const newTools = toolsAnswer as ToolTarget[];
   const isProjectScope = scopeAnswer === 'project';
 
-  const arraysEqual = (a: string[], b: string[]) =>
-    a.length === b.length && [...a].sort().every((v, i) => v === [...b].sort()[i]);
-
-  // Check for no-op
   if (isProjectScope) {
-    const oldTools: ToolTarget[] = manifest.tools ?? ['claude'];
-    if (manifest.mode === newMode && (manifest.workflow ?? 'solo') === newWorkflow && arraysEqual(oldTools, newTools)) {
+    if (isProjectNoOp(manifest, newMode, newWorkflow, newTools)) {
       outro('No changes — project settings already match.');
       return;
     }
   } else {
-    const oldLocalTools = local.tools as ToolTarget[] | undefined;
-    if (
-      (local.mode as string | undefined) === newMode &&
-      (local.workflow as string | undefined) === newWorkflow &&
-      oldLocalTools !== undefined && arraysEqual(oldLocalTools, newTools)
-    ) {
+    if (isLocalNoOp(local, newMode, newWorkflow, newTools)) {
       outro('No changes — local settings already match.');
       return;
     }
   }
 
-  const oldManagedTools: ToolTarget[] = manifest.tools ?? ['claude'];
-  const toolsChanged = !arraysEqual(oldManagedTools, newTools);
-
   const s = spinner();
 
   if (isProjectScope) {
     s.start('Updating project settings...');
-
-    const config: ProjectConfig = {
-      projectName: '',
-      description: '',
-      runCommand: manifest.runCommand,
-      mode: newMode,
-      workflow: newWorkflow,
-      tools: newTools,
-    };
-
-    try {
-      if (toolsChanged) {
-        await deleteStaleFiles(manifest.managedFiles ?? [], newTools, process.cwd());
-        await regenerateFiles(config, process.cwd());
-      } else {
-        await writeFile(manifestPath, generateTillerManifest(config, TILLER_VERSION));
-      }
-      s.stop('Done!');
-    } catch (err) {
+    const result = await saveProjectConfig(manifest, newMode, newWorkflow, newTools, cwd);
+    if (!result.ok) {
       s.stop('Failed.');
-      throw err;
+      throw toSaveError(result);
     }
-
+    s.stop('Done!');
     outro('Project settings updated. Commit .tiller/tiller.json to share with the team.');
   } else {
     s.start('Saving personal settings...');
-
-    const updated = { ...local, mode: newMode, workflow: newWorkflow, tools: newTools };
-    try {
-      if (toolsChanged) {
-        const config: ProjectConfig = {
-          projectName: '',
-          description: '',
-          runCommand: manifest.runCommand,
-          mode: newMode,
-          workflow: newWorkflow,
-          tools: newTools,
-        };
-        await deleteStaleFiles(manifest.managedFiles ?? [], newTools, process.cwd());
-        await regenerateFiles(config, process.cwd(), { skipManifest: true });
-      }
-      await writeFile(localPath, JSON.stringify(updated, null, 2));
-      s.stop('Done!');
-    } catch (err) {
+    const result = await saveLocalConfig(manifest, local, newMode, newWorkflow, newTools, cwd);
+    if (!result.ok) {
       s.stop('Failed.');
-      throw err;
+      throw toSaveError(result);
     }
-
+    s.stop('Done!');
     outro('Personal settings saved to .tiller/local.json (gitignored).');
   }
 }

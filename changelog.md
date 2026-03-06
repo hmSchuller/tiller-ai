@@ -3,6 +3,11 @@
 > Shared project history. Updated by /sail, /anchor, and /dock. Committed and shared.
 
 ## Done
+- [2026-03-06] harden dashboard state and accessibility
+- [2026-03-06] redesign dashboard with React components, naval theming, and bundled styles
+- [2026-03-06] add React dashboard client bundling to the CLI build
+- [2026-03-06] refactor dashboard backend into modular server, routes, contracts, and page modules
+- [2026-03-06] add local dashboard command for interactive config management
 - [2026-03-06] docked feature/copilot-underway-orchestrate-medium-large
 - [2026-03-06] add copilot-specific sail skill — always-orchestrate with context conservation
 - [2026-03-06] docked feature/config-cli-selection
