@@ -1,9 +1,9 @@
-import type { ProjectConfig } from '../types.js';
+import type { ProjectConfig } from "../types.js";
 
 export function generateRepairHullSkill(config: ProjectConfig): string {
   return `---
 name: repair-hull
-description: Interactive tech debt fix — pick an item from tech-backlog.md and fix it via Bosun. Usage: /repair-hull [item description]
+description: Interactive tech debt fix — pick an item from tech-backlog.md and fix it via Bosun.
 ---
 
 # /repair-hull — On-demand tech debt fix

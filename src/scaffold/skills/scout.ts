@@ -1,9 +1,9 @@
-import type { ProjectConfig } from '../types.js';
+import type { ProjectConfig } from "../types.js";
 
 export function generateScoutSkill(_config: ProjectConfig): string {
   return `---
 name: scout
-description: Investigate a feature or area and produce a structured ticket. Usage: /scout [feature or area to investigate]
+description: Investigate a feature or area and produce a structured ticket.
 ---
 
 # /scout — Pre-work investigation

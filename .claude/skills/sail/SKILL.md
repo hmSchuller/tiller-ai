@@ -1,6 +1,6 @@
 ---
 name: sail
-description: Start or continue work — features, fixes, and tasks. Usage: /sail [description]
+description: Start or continue work — features, fixes, and tasks.
 ---
 
 # /sail — Start or continue work

@@ -13,18 +13,24 @@ vi.mock('@clack/prompts', async (importOriginal) => {
     cancel: vi.fn(),
     spinner: vi.fn(() => ({ start: vi.fn(), stop: vi.fn() })),
     select: vi.fn(),
+    multiselect: vi.fn(),
     isCancel: vi.fn((val) => val === Symbol.for('clack/cancel')),
   };
 });
 
+import type { ToolTarget } from '../../src/scaffold/types.js';
+import { existsSync } from 'node:fs';
+import { getManagedFiles } from '../../src/scaffold/tiller-manifest.js';
+
 async function setupProject(
   tmpDir: string,
-  opts: { mode?: 'simple' | 'detailed'; workflow?: 'solo' | 'team' } = {},
+  opts: { mode?: 'simple' | 'detailed'; workflow?: 'solo' | 'team'; tools?: ToolTarget[] } = {},
 ) {
   const mode = opts.mode ?? 'detailed';
   const workflow = opts.workflow ?? 'solo';
+  const tools = opts.tools ?? ['claude'];
   await mkdir(join(tmpDir, '.tiller'), { recursive: true });
-  const config = { projectName: 'test-proj', description: 'desc', runCommand: 'npm test', mode, workflow };
+  const config = { projectName: 'test-proj', description: 'desc', runCommand: 'npm test', mode, workflow, tools };
   await writeFile(join(tmpDir, '.tiller/tiller.json'), generateTillerManifest(config, TILLER_VERSION), 'utf-8');
 }
 
@@ -67,6 +73,7 @@ describe('configCommand', () => {
       .mockResolvedValueOnce('simple')   // mode
       .mockResolvedValueOnce('team')     // workflow
       .mockResolvedValueOnce('local');   // scope
+    vi.mocked(prompts.multiselect).mockResolvedValueOnce(['claude']);
 
     const { configCommand } = await import('../../src/commands/config.js');
     await configCommand();
@@ -87,6 +94,7 @@ describe('configCommand', () => {
       .mockResolvedValueOnce('simple')
       .mockResolvedValueOnce('team')
       .mockResolvedValueOnce('local');
+    vi.mocked(prompts.multiselect).mockResolvedValueOnce(['claude']);
 
     const { configCommand } = await import('../../src/commands/config.js');
     await configCommand();
@@ -105,6 +113,7 @@ describe('configCommand', () => {
       .mockResolvedValueOnce('simple')
       .mockResolvedValueOnce('team')
       .mockResolvedValueOnce('project');
+    vi.mocked(prompts.multiselect).mockResolvedValueOnce(['claude']);
 
     const { configCommand } = await import('../../src/commands/config.js');
     await configCommand();
@@ -117,13 +126,14 @@ describe('configCommand', () => {
   it('shows no-op message when local values already match', async () => {
     await setupProject(tmpDir);
     const localPath = join(tmpDir, '.tiller/local.json');
-    await writeFile(localPath, JSON.stringify({ mode: 'simple', workflow: 'team' }, null, 2), 'utf-8');
+    await writeFile(localPath, JSON.stringify({ mode: 'simple', workflow: 'team', tools: ['claude'] }, null, 2), 'utf-8');
 
     const prompts = await import('@clack/prompts');
     vi.mocked(prompts.select)
       .mockResolvedValueOnce('simple')
       .mockResolvedValueOnce('team')
       .mockResolvedValueOnce('local');
+    vi.mocked(prompts.multiselect).mockResolvedValueOnce(['claude']);
 
     const { configCommand } = await import('../../src/commands/config.js');
     await configCommand();
@@ -139,6 +149,7 @@ describe('configCommand', () => {
       .mockResolvedValueOnce('simple')
       .mockResolvedValueOnce('team')
       .mockResolvedValueOnce('project');
+    vi.mocked(prompts.multiselect).mockResolvedValueOnce(['claude']);
 
     const { configCommand } = await import('../../src/commands/config.js');
     await configCommand();
@@ -182,15 +193,15 @@ describe('configCommand', () => {
     expect(exitSpy).toHaveBeenCalledWith(0);
   });
 
-  it('exits on Ctrl+C at scope prompt', async () => {
+  it('exits on Ctrl+C at tools prompt', async () => {
     await setupProject(tmpDir);
 
     const prompts = await import('@clack/prompts');
     const cancelSymbol = Symbol.for('clack/cancel');
     vi.mocked(prompts.select)
       .mockResolvedValueOnce('simple')
-      .mockResolvedValueOnce('team')
-      .mockResolvedValueOnce(cancelSymbol as unknown as string);
+      .mockResolvedValueOnce('team');
+    vi.mocked(prompts.multiselect).mockResolvedValueOnce(cancelSymbol as unknown as string[]);
     vi.mocked(prompts.isCancel).mockImplementation((val) => val === cancelSymbol);
 
     const exitSpy = vi.spyOn(process, 'exit').mockImplementation((() => {
@@ -200,5 +211,105 @@ describe('configCommand', () => {
     const { configCommand } = await import('../../src/commands/config.js');
     await expect(configCommand()).rejects.toThrow('process.exit called');
     expect(exitSpy).toHaveBeenCalledWith(0);
+  });
+
+  it('exits on Ctrl+C at scope prompt', async () => {
+    await setupProject(tmpDir);
+
+    const prompts = await import('@clack/prompts');
+    const cancelSymbol = Symbol.for('clack/cancel');
+    vi.mocked(prompts.select)
+      .mockResolvedValueOnce('simple')
+      .mockResolvedValueOnce('team')
+      .mockResolvedValueOnce(cancelSymbol as unknown as string);
+    vi.mocked(prompts.multiselect).mockResolvedValueOnce(['claude']);
+    vi.mocked(prompts.isCancel).mockImplementation((val) => val === cancelSymbol);
+
+    const exitSpy = vi.spyOn(process, 'exit').mockImplementation((() => {
+      throw new Error('process.exit called');
+    }) as never);
+
+    const { configCommand } = await import('../../src/commands/config.js');
+    await expect(configCommand()).rejects.toThrow('process.exit called');
+    expect(exitSpy).toHaveBeenCalledWith(0);
+  });
+
+  it('saves tools to local.json without modifying tiller.json', async () => {
+    await setupProject(tmpDir);
+
+    const prompts = await import('@clack/prompts');
+    vi.mocked(prompts.select)
+      .mockResolvedValueOnce('detailed')
+      .mockResolvedValueOnce('solo')
+      .mockResolvedValueOnce('local');
+    vi.mocked(prompts.multiselect).mockResolvedValueOnce(['claude', 'copilot']);
+
+    const { configCommand } = await import('../../src/commands/config.js');
+    await configCommand();
+
+    const localPath = join(tmpDir, '.tiller/local.json');
+    const content = JSON.parse(await readFile(localPath, 'utf-8'));
+    expect(content.tools).toEqual(['claude', 'copilot']);
+
+    // tiller.json should NOT have been modified — tools stay as project default
+    const manifest = JSON.parse(await readFile(join(tmpDir, '.tiller/tiller.json'), 'utf-8'));
+    expect(manifest.tools).toEqual(['claude']);
+  });
+
+  it('saves tools to tiller.json for project scope', async () => {
+    await setupProject(tmpDir);
+
+    const prompts = await import('@clack/prompts');
+    vi.mocked(prompts.select)
+      .mockResolvedValueOnce('detailed')
+      .mockResolvedValueOnce('solo')
+      .mockResolvedValueOnce('project');
+    vi.mocked(prompts.multiselect).mockResolvedValueOnce(['claude', 'opencode']);
+
+    const { configCommand } = await import('../../src/commands/config.js');
+    await configCommand();
+
+    const manifest = JSON.parse(await readFile(join(tmpDir, '.tiller/tiller.json'), 'utf-8'));
+    expect(manifest.tools).toEqual(['claude', 'opencode']);
+  });
+
+  it('regenerates files when tools change (project scope)', async () => {
+    await setupProject(tmpDir);
+
+    const prompts = await import('@clack/prompts');
+    vi.mocked(prompts.select)
+      .mockResolvedValueOnce('detailed')
+      .mockResolvedValueOnce('solo')
+      .mockResolvedValueOnce('project');
+    vi.mocked(prompts.multiselect).mockResolvedValueOnce(['claude', 'copilot']);
+
+    const { configCommand } = await import('../../src/commands/config.js');
+    await configCommand();
+
+    // Copilot files should now exist
+    expect(existsSync(join(tmpDir, '.github/copilot-instructions.md'))).toBe(true);
+    // Claude files should still exist
+    expect(existsSync(join(tmpDir, '.claude/settings.json'))).toBe(true);
+  });
+
+  it('deletes stale files when tool is removed (project scope)', async () => {
+    // Start with claude + copilot
+    await setupProject(tmpDir, { tools: ['claude', 'copilot'] });
+    // Write a copilot file so we can check it gets deleted
+    await mkdir(join(tmpDir, '.github'), { recursive: true });
+    await writeFile(join(tmpDir, '.github/copilot-instructions.md'), 'test', 'utf-8');
+
+    const prompts = await import('@clack/prompts');
+    vi.mocked(prompts.select)
+      .mockResolvedValueOnce('detailed')
+      .mockResolvedValueOnce('solo')
+      .mockResolvedValueOnce('project');
+    vi.mocked(prompts.multiselect).mockResolvedValueOnce(['claude']); // remove copilot
+
+    const { configCommand } = await import('../../src/commands/config.js');
+    await configCommand();
+
+    // Copilot file should be deleted
+    expect(existsSync(join(tmpDir, '.github/copilot-instructions.md'))).toBe(false);
   });
 });
