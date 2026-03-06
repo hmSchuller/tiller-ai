@@ -39,6 +39,7 @@ import { generateCopilotBosunAgent } from './copilot/agents/bosun.js';
 import { generateCopilotCaptainAgent } from './copilot/agents/captain.js';
 import { generateCopilotCartographerAgent } from './copilot/agents/cartographer.js';
 import { generateCopilotHooksJson } from './copilot/hooks-json.js';
+import { generateCopilotSailSkill } from './copilot/skills/sail.js';
 
 export async function scaffold(config: ProjectConfig, targetDir: string): Promise<void> {
   const p = (rel: string) => join(targetDir, rel);
@@ -137,7 +138,7 @@ export async function scaffold(config: ProjectConfig, targetDir: string): Promis
 
     // Skills (same SKILL.md format as Claude)
     await writeFile(p('.github/skills/setup/SKILL.md'), generateSetupSkill(config));
-    await writeFile(p('.github/skills/sail/SKILL.md'), generateSailSkill(config));
+    await writeFile(p('.github/skills/sail/SKILL.md'), generateCopilotSailSkill(config));
     await writeFile(p('.github/skills/anchor/SKILL.md'), generateAnchorSkill(config));
     await writeFile(p('.github/skills/recap/SKILL.md'), generateRecapSkill(config));
     await writeFile(p('.github/skills/dock/SKILL.md'), generateDockSkill(config));

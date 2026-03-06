@@ -5,6 +5,7 @@ import { generateCopilotBosunAgent } from '../../src/scaffold/copilot/agents/bos
 import { generateCopilotCaptainAgent } from '../../src/scaffold/copilot/agents/captain.js';
 import { generateCopilotCartographerAgent } from '../../src/scaffold/copilot/agents/cartographer.js';
 import { generateCopilotHooksJson } from '../../src/scaffold/copilot/hooks-json.js';
+import { generateCopilotSailSkill } from '../../src/scaffold/copilot/skills/sail.js';
 import { simpleConfig, copilotOnlyConfig } from '../helpers/fixtures.js';
 
 describe('generateCopilotInstructions', () => {
@@ -138,5 +139,56 @@ describe('generateCopilotHooksJson', () => {
         expect(hook.type).toBe('command');
       }
     }
+  });
+});
+
+describe('generateCopilotSailSkill', () => {
+  it('has sail name in frontmatter', () => {
+    const result = generateCopilotSailSkill(simpleConfig);
+    expect(result).toContain('name: sail');
+  });
+
+  it('uses AskUserQuestion for all user interaction', () => {
+    const result = generateCopilotSailSkill(simpleConfig);
+    expect(result).toContain('AskUserQuestion');
+    expect(result).toContain('No chat prompts, no `EnterPlanMode`');
+  });
+
+  it('always orchestrates — no scope tiers', () => {
+    const result = generateCopilotSailSkill(simpleConfig);
+    expect(result).not.toContain('Small tier');
+    expect(result).not.toContain('Medium tier');
+    expect(result).not.toContain('Large tier');
+    expect(result).toContain('ALWAYS ORCHESTRATE');
+  });
+
+  it('delegates requirements to sub-agent', () => {
+    const result = generateCopilotSailSkill(simpleConfig);
+    expect(result).toContain('Requirements Interview — DELEGATED');
+    expect(result).toContain('requirements interviewer');
+  });
+
+  it('delegates planning to sub-agent', () => {
+    const result = generateCopilotSailSkill(simpleConfig);
+    expect(result).toContain('Plan milestones — DELEGATED');
+    expect(result).toContain('planning agent');
+  });
+
+  it('has dock/new-sail loop in Step 5', () => {
+    const result = generateCopilotSailSkill(simpleConfig);
+    expect(result).toContain('"Dock"');
+    expect(result).toContain('"Start new sail"');
+    expect(result).toContain('loop back to **Step 2**');
+  });
+
+  it('interpolates runCommand', () => {
+    const result = generateCopilotSailSkill(simpleConfig);
+    expect(result).toContain('npm test');
+  });
+
+  it('main agent never writes code', () => {
+    const result = generateCopilotSailSkill(simpleConfig);
+    expect(result).toContain('does NOT implement any code itself');
+    expect(result).toContain('pure orchestrator');
   });
 });
