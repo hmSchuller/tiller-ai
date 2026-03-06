@@ -35,13 +35,8 @@ export function generateCopilotHooksJson(_config: ProjectConfig): string {
           comment: 'Log tool usage to the active session',
         },
       ],
-      subagentStop: [
-        {
-          type: 'command',
-          bash: './.github/hooks/agent-complete.sh',
-          comment: 'Mark agent as completed in session',
-        },
-      ],
+      // Note: Copilot has no subagentStop event. Agent completion is tracked
+      // via explicit bash commands in the sail skill after each worker finishes.
     },
   };
 

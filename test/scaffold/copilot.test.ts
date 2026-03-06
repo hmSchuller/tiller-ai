@@ -129,10 +129,9 @@ describe('generateCopilotHooksJson', () => {
     expect(parsed.hooks.postToolUse[1].bash).toContain('session-log.sh');
   });
 
-  it('has subagentStop hooks', () => {
+  it('does not have subagentStop (not supported by Copilot)', () => {
     const parsed = JSON.parse(generateCopilotHooksJson(copilotOnlyConfig));
-    expect(parsed.hooks.subagentStop).toHaveLength(1);
-    expect(parsed.hooks.subagentStop[0].bash).toContain('agent-complete.sh');
+    expect(parsed.hooks.subagentStop).toBeUndefined();
   });
 
   it('does not include plan-context hook', () => {

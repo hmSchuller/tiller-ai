@@ -14,7 +14,7 @@ import { generateSessionResumeHook } from './hooks/session-resume.js';
 import { generatePlanContextHook } from './hooks/plan-context.js';
 import { generateSessionLogHook } from './hooks/session-log.js';
 import { generateInboxCheckHook } from './hooks/inbox-check.js';
-import { generateAgentCompleteHook } from './hooks/agent-complete.js';
+
 import { generateSailSkill } from './skills/sail.js';
 import { generateAnchorSkill } from './skills/anchor.js';
 import { generateRecapSkill } from './skills/recap.js';
@@ -162,7 +162,6 @@ export async function scaffold(config: ProjectConfig, targetDir: string): Promis
     await writeFile(p('.github/hooks/session-resume.sh'), generateSessionResumeHook(config));
     await writeFile(p('.github/hooks/session-log.sh'), generateSessionLogHook(config));
     await writeFile(p('.github/hooks/inbox-check.sh'), generateInboxCheckHook(config));
-    await writeFile(p('.github/hooks/agent-complete.sh'), generateAgentCompleteHook(config));
   }
 
   // Shared tracking files (compass and local.json are gitignored inside .tiller/)

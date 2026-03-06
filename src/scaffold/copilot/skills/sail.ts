@@ -223,7 +223,20 @@ The main agent is a **pure orchestrator**. It does NOT implement any code itself
 3. Group all currently unblocked milestones and use \`/fleet implement milestones: <list>\` to execute them in parallel
 4. For sequential milestones (those with dependencies), execute them one by one using the Task tool after their dependencies complete
 5. Do NOT implement any code yourself — delegate everything
-6. When a worker completes: review the changes, run \`${config.runCommand}\`, fix integration issues if needed
+6. When a worker completes: mark it as completed in the session, then review the changes and run \`${config.runCommand}\`:
+   \`\`\`bash
+   python3 -c "
+   import json, sys
+   f = sys.argv[1]; name = sys.argv[2]
+   d = json.load(open(f))
+   for a in d.get('agents', []):
+       if a.get('name') == name:
+           a['status'] = 'completed'
+   json.dump(d, open(f, 'w'), indent=2)
+   " ".tiller/sessions/<slug>/session.json" "worker-<N>"
+   echo "sail-lead" > .tiller/sessions/<slug>/current-agent
+   \`\`\`
+   Then fix integration issues if needed
 7. Commit incrementally: \`git add -A && git commit -m "<milestone description>"\`
 8. Add entry to \`changelog.md\` Done section. Amend: \`git commit --amend --no-edit\`
 9. **detailed only:** Update \`.tiller/compass.md\` to check off the milestone. Amend: \`git commit --amend --no-edit\`

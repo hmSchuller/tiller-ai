@@ -112,9 +112,9 @@ describe('generateSessionLogHook', () => {
     expect(result).toContain('"active"');
   });
 
-  it('exits silently when TILLER_AGENT_NAME is not set', () => {
+  it('exits silently when current-agent file is missing', () => {
     const result = generateSessionLogHook(simpleConfig);
-    expect(result).toContain('TILLER_AGENT_NAME');
+    expect(result).toContain('current-agent');
     expect(result).toContain('exit 0');
   });
 });
@@ -149,10 +149,9 @@ describe('generateInboxCheckHook', () => {
     expect(result).toContain('delivered: true');
   });
 
-  it('exits silently when TILLER_AGENT_NAME is not set', () => {
+  it('exits silently when current-agent file is missing', () => {
     const result = generateInboxCheckHook(simpleConfig);
-    expect(result).toContain('TILLER_AGENT_NAME');
-    // First check for agent name should lead to exit 0
+    expect(result).toContain('current-agent');
     expect(result).toContain('exit 0');
   });
 
@@ -180,9 +179,9 @@ describe('generateAgentCompleteHook', () => {
     expect(result).toContain('session.json');
   });
 
-  it('exits silently when TILLER_AGENT_NAME is not set', () => {
+  it('exits silently when current-agent file is missing', () => {
     const result = generateAgentCompleteHook(simpleConfig);
-    expect(result).toContain('TILLER_AGENT_NAME');
+    expect(result).toContain('current-agent');
     expect(result).toContain('exit 0');
   });
 
