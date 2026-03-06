@@ -1,6 +1,6 @@
 ---
 name: scout
-description: Investigate a feature or area and produce a structured ticket. Usage: /scout [feature or area to investigate]
+description: Investigate a feature or area and produce a structured ticket.
 ---
 
 # /scout — Pre-work investigation
