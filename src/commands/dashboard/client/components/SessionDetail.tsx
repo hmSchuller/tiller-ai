@@ -15,6 +15,32 @@ function formatTime(iso: string): string {
   }
 }
 
+function formatRelativeTime(iso: string): string {
+  try {
+    const diff = Date.now() - new Date(iso).getTime();
+    const minutes = Math.floor(diff / 60000);
+    if (minutes < 1) return 'just now';
+    if (minutes < 60) return `${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    return `${days}d ago`;
+  } catch {
+    return '';
+  }
+}
+
+function sortAgents(agents: AgentDetailResponse[]): AgentDetailResponse[] {
+  const statusOrder: Record<string, number> = { active: 0, failed: 1, completed: 2 };
+  return [...agents].sort((a, b) => {
+    const orderDiff = (statusOrder[a.status] ?? 99) - (statusOrder[b.status] ?? 99);
+    if (orderDiff !== 0) return orderDiff;
+    return new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime();
+  });
+}
+
+const MESSAGE_MAX_LENGTH = 280;
+
 const TYPE_LABELS: Record<AgentDetailResponse['type'], string> = {
   fleet: 'Fleet',
   specialist: 'Specialist',
@@ -28,8 +54,19 @@ function AgentCard({
   agent: AgentDetailResponse;
   onSendMessage: (agentName: string, content: string) => void;
 }) {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(agent.status === 'active');
   const [message, setMessage] = useState('');
+  const [expandedMessages, setExpandedMessages] = useState<Set<number>>(new Set());
+  const [showLog, setShowLog] = useState(false);
+
+  const toggleMessageExpand = (index: number) => {
+    setExpandedMessages((prev) => {
+      const next = new Set(prev);
+      if (next.has(index)) next.delete(index);
+      else next.add(index);
+      return next;
+    });
+  };
 
   const handleSend = () => {
     const trimmed = message.trim();
@@ -39,7 +76,7 @@ function AgentCard({
   };
 
   return (
-    <article className="agent-card card">
+    <article className={`agent-card card agent-card-${agent.status}`}>
       <button
         className="agent-card-header"
         onClick={() => setExpanded((prev) => !prev)}
@@ -52,19 +89,18 @@ function AgentCard({
         </span>
       </button>
 
+      {!expanded && agent.completedAt && (
+        <div className="agent-completed-summary">
+          Completed {formatRelativeTime(agent.completedAt)}
+        </div>
+      )}
+
       {expanded && (
         <div className="agent-detail-body">
           <div className="agent-meta">
             <span>Started: {formatTime(agent.startedAt)}</span>
             {agent.completedAt && <span>Completed: {formatTime(agent.completedAt)}</span>}
           </div>
-
-          {agent.log && (
-            <div className="agent-log-section">
-              <h4 className="agent-section-title">Log</h4>
-              <pre className="agent-log">{agent.log}</pre>
-            </div>
-          )}
 
           <div className="inbox-section">
             <h4 className="agent-section-title">Inbox</h4>
@@ -75,7 +111,25 @@ function AgentCard({
                 {agent.inbox.map((msg, index) => (
                   <div key={`${msg.timestamp}-${index}`} className="inbox-message">
                     <span className={`inbox-from-badge ${msg.from}`}>{msg.from}</span>
-                    <span className="inbox-content">{msg.content}</span>
+                    <span className="inbox-content">
+                      {msg.content.length > MESSAGE_MAX_LENGTH && !expandedMessages.has(index) ? (
+                        <>
+                          {msg.content.slice(0, MESSAGE_MAX_LENGTH)}…{' '}
+                          <button className="show-more-btn" type="button" onClick={() => toggleMessageExpand(index)}>
+                            show more
+                          </button>
+                        </>
+                      ) : msg.content.length > MESSAGE_MAX_LENGTH && expandedMessages.has(index) ? (
+                        <>
+                          {msg.content}{' '}
+                          <button className="show-more-btn" type="button" onClick={() => toggleMessageExpand(index)}>
+                            show less
+                          </button>
+                        </>
+                      ) : (
+                        msg.content
+                      )}
+                    </span>
                     <span className="inbox-time">{formatTime(msg.timestamp)}</span>
                   </div>
                 ))}
@@ -100,6 +154,19 @@ function AgentCard({
               </div>
             )}
           </div>
+
+          {agent.log && (
+            <div className="agent-log-section">
+              <button
+                className="log-toggle"
+                type="button"
+                onClick={() => setShowLog((prev) => !prev)}
+              >
+                {showLog ? '▾ Hide log' : '▸ Show log'}
+              </button>
+              {showLog && <pre className="agent-log">{agent.log}</pre>}
+            </div>
+          )}
         </div>
       )}
     </article>
@@ -126,7 +193,7 @@ export function SessionDetail({ session, onBack, onSendMessage }: SessionDetailP
         {session.agents.length === 0 ? (
           <div className="empty-state">No agents in this session.</div>
         ) : (
-          session.agents.map((agent) => (
+          sortAgents(session.agents).map((agent) => (
             <AgentCard key={agent.name} agent={agent} onSendMessage={onSendMessage} />
           ))
         )}

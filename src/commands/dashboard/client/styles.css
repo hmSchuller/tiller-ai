@@ -526,6 +526,12 @@ input:disabled,
   background: var(--color-success-bg);
   border: 1px solid var(--color-success-border);
   color: var(--color-success-text);
+  animation: pulse-active 2s ease-in-out infinite;
+}
+
+@keyframes pulse-active {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
 }
 
 .status-badge.completed {
@@ -593,11 +599,34 @@ input:disabled,
 
 .agent-list {
   display: grid;
-  gap: var(--space-3);
+  gap: var(--space-4);
 }
 
 .agent-card {
   overflow: hidden;
+}
+
+.agent-card-active {
+  border-left: 3px solid var(--color-accent);
+}
+
+.agent-card-completed {
+  opacity: 0.7;
+  transition: opacity 0.15s ease;
+}
+
+.agent-card-completed:hover {
+  opacity: 0.85;
+}
+
+.agent-card-failed {
+  border-left: 3px solid var(--color-error-text);
+}
+
+.agent-list .empty-state {
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-inset);
 }
 
 .agent-card-header {
@@ -617,6 +646,13 @@ input:disabled,
 
 .agent-card-header:hover .agent-name {
   color: var(--color-accent);
+}
+
+.agent-completed-summary {
+  padding: var(--space-2) 0 0;
+  font-size: 0.82rem;
+  color: var(--color-text-subtle);
+  font-style: italic;
 }
 
 .agent-name {
@@ -660,6 +696,8 @@ input:disabled,
 
 .agent-detail-body {
   margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
   display: grid;
   gap: var(--space-4);
 }
@@ -696,6 +734,27 @@ input:disabled,
   color: var(--color-text-muted);
   white-space: pre-wrap;
   word-break: break-all;
+}
+
+.log-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  padding: var(--space-2) var(--space-3);
+  font: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+
+.log-toggle:hover {
+  background: var(--color-surface-inset);
+  border-color: var(--color-accent);
+  color: var(--color-text);
 }
 
 /* ── Inbox ─────────────────────────────────────────────────────── */
@@ -747,6 +806,22 @@ input:disabled,
 
 .inbox-content {
   flex: 1;
+  color: var(--color-text);
+}
+
+.show-more-btn {
+  background: none;
+  border: none;
+  color: var(--color-accent);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.82rem;
+  padding: 0;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+}
+
+.show-more-btn:hover {
   color: var(--color-text);
 }
 
