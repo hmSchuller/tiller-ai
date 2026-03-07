@@ -9,24 +9,24 @@ import { generateCopilotSailSkill } from '../../src/scaffold/copilot/skills/sail
 import { simpleConfig, copilotOnlyConfig } from '../helpers/fixtures.js';
 
 describe('generateCopilotInstructions', () => {
-  it('includes protocol enforcement', () => {
-    expect(generateCopilotInstructions(simpleConfig)).toContain('Protocol enforcement');
+  it('includes code quality section', () => {
+    expect(generateCopilotInstructions(simpleConfig)).toContain('Code quality');
   });
 
-  it('includes development loop', () => {
-    expect(generateCopilotInstructions(simpleConfig)).toContain('Development loop');
+  it('includes testing section', () => {
+    expect(generateCopilotInstructions(simpleConfig)).toContain('Testing');
   });
 
   it('includes both modes', () => {
     const result = generateCopilotInstructions(simpleConfig);
-    expect(result).toContain('### simple');
-    expect(result).toContain('### detailed');
+    expect(result).toContain('**simple**');
+    expect(result).toContain('**detailed**');
   });
 
   it('includes both workflows', () => {
     const result = generateCopilotInstructions(simpleConfig);
-    expect(result).toContain('### solo');
-    expect(result).toContain('### team');
+    expect(result).toContain('**solo**');
+    expect(result).toContain('**team**');
   });
 });
 
