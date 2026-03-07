@@ -54,14 +54,14 @@ agent = '$AGENT_NAME'
 if 'toolName' in data and 'toolResult' in data:
     # postToolUse
     tool = data['toolName']
-    args = str(data.get('toolArgs', {}))[:200]
+    args = str(data.get('toolArgs', {}))[:500]
     result = data.get('toolResult', {})
     if isinstance(result, dict):
         rtype = result.get('resultType', 'unknown')
         text = result.get('textResultForLlm', '')
-        summary = text[:200].replace('\\n', ' ') if text else rtype
+        summary = text[:2000].replace('\\n', ' ') if text else rtype
     else:
-        summary = str(result)[:200]
+        summary = str(result)[:2000]
     print(f'[{ts}] [{agent}] TOOL_DONE  {tool}')
     print(f'  args: {args}')
     print(f'  result: {summary}')
@@ -69,20 +69,20 @@ if 'toolName' in data and 'toolResult' in data:
 elif 'toolName' in data:
     # preToolUse
     tool = data['toolName']
-    args = str(data.get('toolArgs', {}))[:200]
+    args = str(data.get('toolArgs', {}))[:500]
     print(f'[{ts}] [{agent}] TOOL_START {tool}')
     print(f'  args: {args}')
 
 elif 'prompt' in data:
     # userPromptSubmitted
-    prompt = data['prompt'][:300].replace('\\n', ' ')
+    prompt = data['prompt'][:1000].replace('\\n', ' ')
     print(f'[{ts}] [{agent}] USER_PROMPT')
     print(f'  {prompt}')
 
 elif 'error' in data:
     # errorOccurred
     err = data.get('error', {})
-    msg = err.get('message', str(err))[:300]
+    msg = err.get('message', str(err))[:1000]
     name = err.get('name', 'Error')
     print(f'[{ts}] [{agent}] ERROR {name}')
     print(f'  {msg}')
@@ -95,7 +95,7 @@ elif 'reason' in data:
 elif 'initialPrompt' in data or 'source' in data:
     # sessionStart
     source = data.get('source', 'unknown')
-    prompt = data.get('initialPrompt', '')[:200].replace('\\n', ' ')
+    prompt = data.get('initialPrompt', '')[:1000].replace('\\n', ' ')
     print(f'[{ts}] [{agent}] SESSION_START source={source}')
     if prompt:
         print(f'  {prompt}')

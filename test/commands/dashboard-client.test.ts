@@ -751,6 +751,39 @@ describe('SessionDetail component', () => {
     expect(activeIdx).toBeLessThan(completedIdx);
   });
 
+  it('pins sail-lead agent to the top regardless of status', () => {
+    const session: SessionDetailResponse = {
+      id: 'test-lead',
+      branch: 'feature/test-lead',
+      startedAt: '2024-01-15T10:00:00Z',
+      status: 'active',
+      agents: [
+        {
+          name: 'worker-1',
+          type: 'fleet',
+          status: 'active',
+          startedAt: '2024-01-15T10:02:00Z',
+          log: '',
+          inbox: [],
+        },
+        {
+          name: 'sail-lead',
+          type: 'fleet',
+          status: 'active',
+          startedAt: '2024-01-15T10:00:00Z',
+          log: '',
+          inbox: [],
+        },
+      ],
+    };
+    const html = renderToStaticMarkup(
+      createElement(SessionDetail, { session, onBack: () => {}, onSendMessage: () => {} }),
+    );
+    const leadIdx = html.indexOf('sail-lead');
+    const workerIdx = html.indexOf('worker-1');
+    expect(leadIdx).toBeLessThan(workerIdx);
+  });
+
   it('shows a completed summary for collapsed completed agents', () => {
     const html = renderToStaticMarkup(
       createElement(SessionDetail, { session: mockSession, onBack: () => {}, onSendMessage: () => {} }),

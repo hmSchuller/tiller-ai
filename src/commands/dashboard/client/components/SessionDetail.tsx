@@ -33,6 +33,9 @@ function formatRelativeTime(iso: string): string {
 function sortAgents(agents: AgentDetailResponse[]): AgentDetailResponse[] {
   const statusOrder: Record<string, number> = { active: 0, failed: 1, completed: 2 };
   return [...agents].sort((a, b) => {
+    const aLead = a.name === 'sail-lead' ? 0 : 1;
+    const bLead = b.name === 'sail-lead' ? 0 : 1;
+    if (aLead !== bLead) return aLead - bLead;
     const orderDiff = (statusOrder[a.status] ?? 99) - (statusOrder[b.status] ?? 99);
     if (orderDiff !== 0) return orderDiff;
     return new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime();
@@ -109,7 +112,7 @@ function AgentCard({
             ) : (
               <div className="inbox-messages">
                 {agent.inbox.map((msg, index) => (
-                  <div key={`${msg.timestamp}-${index}`} className="inbox-message">
+                  <div key={`${msg.timestamp}-${index}`} className={`inbox-message ${msg.delivered ? 'delivered' : 'unread'}`}>
                     <span className={`inbox-from-badge ${msg.from}`}>{msg.from}</span>
                     <span className="inbox-content">
                       {msg.content.length > MESSAGE_MAX_LENGTH && !expandedMessages.has(index) ? (
@@ -130,6 +133,7 @@ function AgentCard({
                         msg.content
                       )}
                     </span>
+                    <span className="inbox-status">{msg.delivered ? '✓' : '●'}</span>
                     <span className="inbox-time">{formatTime(msg.timestamp)}</span>
                   </div>
                 ))}

@@ -825,6 +825,24 @@ input:disabled,
   color: var(--color-text);
 }
 
+.inbox-message.unread {
+  border-left: 2px solid var(--color-accent);
+}
+
+.inbox-status {
+  flex-shrink: 0;
+  font-size: 0.72rem;
+  line-height: 1;
+}
+
+.inbox-message.delivered .inbox-status {
+  color: var(--color-success-text);
+}
+
+.inbox-message.unread .inbox-status {
+  color: var(--color-accent);
+}
+
 .inbox-time {
   flex-shrink: 0;
   font-size: 0.75rem;
