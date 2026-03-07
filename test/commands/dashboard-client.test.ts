@@ -443,6 +443,7 @@ function makeViewProps(
     onSelectSession: noop,
     onBackToSessions: noop,
     onSendMessage: noop,
+    onDeleteMessage: noop,
     ...overrides,
   };
 }
@@ -696,7 +697,7 @@ describe('SessionDetail component', () => {
 
   it('renders agents with status badges', () => {
     const html = renderToStaticMarkup(
-      createElement(SessionDetail, { session: mockSession, onBack: () => {}, onSendMessage: () => {} }),
+      createElement(SessionDetail, { session: mockSession, onBack: () => {}, onSendMessage: () => {}, onDeleteMessage: () => {} }),
     );
     expect(html).toContain('scout');
     expect(html).toContain('bosun');
@@ -709,7 +710,7 @@ describe('SessionDetail component', () => {
 
   it('renders back button and branch name', () => {
     const html = renderToStaticMarkup(
-      createElement(SessionDetail, { session: mockSession, onBack: () => {}, onSendMessage: () => {} }),
+      createElement(SessionDetail, { session: mockSession, onBack: () => {}, onSendMessage: () => {}, onDeleteMessage: () => {} }),
     );
     expect(html).toContain('← Back');
     expect(html).toContain('back-button');
@@ -744,7 +745,7 @@ describe('SessionDetail component', () => {
       ],
     };
     const html = renderToStaticMarkup(
-      createElement(SessionDetail, { session, onBack: () => {}, onSendMessage: () => {} }),
+      createElement(SessionDetail, { session, onBack: () => {}, onSendMessage: () => {}, onDeleteMessage: () => {} }),
     );
     const activeIdx = html.indexOf('active-agent');
     const completedIdx = html.indexOf('completed-agent');
@@ -777,7 +778,7 @@ describe('SessionDetail component', () => {
       ],
     };
     const html = renderToStaticMarkup(
-      createElement(SessionDetail, { session, onBack: () => {}, onSendMessage: () => {} }),
+      createElement(SessionDetail, { session, onBack: () => {}, onSendMessage: () => {}, onDeleteMessage: () => {} }),
     );
     const leadIdx = html.indexOf('sail-lead');
     const workerIdx = html.indexOf('worker-1');
@@ -786,14 +787,14 @@ describe('SessionDetail component', () => {
 
   it('shows a completed summary for collapsed completed agents', () => {
     const html = renderToStaticMarkup(
-      createElement(SessionDetail, { session: mockSession, onBack: () => {}, onSendMessage: () => {} }),
+      createElement(SessionDetail, { session: mockSession, onBack: () => {}, onSendMessage: () => {}, onDeleteMessage: () => {} }),
     );
     expect(html).toContain('agent-completed-summary');
   });
 
   it('renders the session status badge', () => {
     const html = renderToStaticMarkup(
-      createElement(SessionDetail, { session: mockSession, onBack: () => {}, onSendMessage: () => {} }),
+      createElement(SessionDetail, { session: mockSession, onBack: () => {}, onSendMessage: () => {}, onDeleteMessage: () => {} }),
     );
     // The session header should show the active status
     expect(html).toContain('session-detail-meta');
@@ -801,7 +802,7 @@ describe('SessionDetail component', () => {
 
   it('renders inbox section before log section in expanded agents', () => {
     const html = renderToStaticMarkup(
-      createElement(SessionDetail, { session: mockSession, onBack: () => {}, onSendMessage: () => {} }),
+      createElement(SessionDetail, { session: mockSession, onBack: () => {}, onSendMessage: () => {}, onDeleteMessage: () => {} }),
     );
     // Active agent (scout) is auto-expanded (M1), so inbox and log toggle should be present
     // Inbox should come before log toggle in the HTML
@@ -815,7 +816,7 @@ describe('SessionDetail component', () => {
 
   it('hides log content by default behind a toggle', () => {
     const html = renderToStaticMarkup(
-      createElement(SessionDetail, { session: mockSession, onBack: () => {}, onSendMessage: () => {} }),
+      createElement(SessionDetail, { session: mockSession, onBack: () => {}, onSendMessage: () => {}, onDeleteMessage: () => {} }),
     );
     // The log toggle button should be present
     expect(html).toContain('log-toggle');
@@ -842,7 +843,7 @@ describe('SessionDetail component', () => {
       }],
     };
     const html = renderToStaticMarkup(
-      createElement(SessionDetail, { session, onBack: () => {}, onSendMessage: () => {} }),
+      createElement(SessionDetail, { session, onBack: () => {}, onSendMessage: () => {}, onDeleteMessage: () => {} }),
     );
     expect(html).toContain('show more');
     expect(html).not.toContain(longMessage);
@@ -857,7 +858,7 @@ describe('SessionDetail component', () => {
       agents: [],
     };
     const html = renderToStaticMarkup(
-      createElement(SessionDetail, { session: emptySession, onBack: () => {}, onSendMessage: () => {} }),
+      createElement(SessionDetail, { session: emptySession, onBack: () => {}, onSendMessage: () => {}, onDeleteMessage: () => {} }),
     );
     expect(html).toContain('No agents in this session');
     expect(html).toContain('empty-state');
@@ -865,10 +866,41 @@ describe('SessionDetail component', () => {
 
   it('applies status-based CSS classes to agent cards', () => {
     const html = renderToStaticMarkup(
-      createElement(SessionDetail, { session: mockSession, onBack: () => {}, onSendMessage: () => {} }),
+      createElement(SessionDetail, { session: mockSession, onBack: () => {}, onSendMessage: () => {}, onDeleteMessage: () => {} }),
     );
     expect(html).toContain('agent-card-active');
     expect(html).toContain('agent-card-completed');
+  });
+
+  it('shows a delete button for undelivered messages', () => {
+    const html = renderToStaticMarkup(
+      createElement(SessionDetail, { session: mockSession, onBack: () => {}, onSendMessage: () => {}, onDeleteMessage: () => {} }),
+    );
+    // The mockSession has an undelivered message from 'user' ("Focus on JWT")
+    expect(html).toContain('delete-message-btn');
+  });
+
+  it('does not show a delete button for delivered messages', () => {
+    const session: SessionDetailResponse = {
+      id: 'test-delivered',
+      branch: 'feature/delivered',
+      startedAt: '2024-01-15T10:00:00Z',
+      status: 'active',
+      agents: [{
+        name: 'worker',
+        type: 'fleet',
+        status: 'active',
+        startedAt: '2024-01-15T10:00:00Z',
+        log: '',
+        inbox: [
+          { timestamp: '2024-01-15T10:01:00Z', from: 'orchestrator', content: 'All delivered', delivered: true },
+        ],
+      }],
+    };
+    const html = renderToStaticMarkup(
+      createElement(SessionDetail, { session, onBack: () => {}, onSendMessage: () => {}, onDeleteMessage: () => {} }),
+    );
+    expect(html).not.toContain('delete-message-btn');
   });
 });
 

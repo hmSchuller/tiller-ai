@@ -901,3 +901,25 @@ input:disabled,
 .send-button:active {
   transform: translateY(0);
 }
+
+/* ── Delete message button ─────────────────────────────────────── */
+
+.delete-message-btn {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--color-text-subtle);
+  cursor: pointer;
+  font-size: 0.78rem;
+  padding: 0 var(--space-1);
+  opacity: 0;
+  transition: opacity 0.12s ease, color 0.12s ease;
+}
+
+.inbox-message:hover .delete-message-btn {
+  opacity: 1;
+}
+
+.delete-message-btn:hover {
+  color: var(--color-error-text);
+}

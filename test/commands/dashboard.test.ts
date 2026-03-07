@@ -565,6 +565,75 @@ describe('dashboard server', () => {
     expect(response.status).toBe(400);
   });
 
+  it('DELETE /api/sessions/:slug/inbox/:agent/:index deletes an undelivered message', async () => {
+    await setupProject(tmpDir);
+    const session = createSession(tmpDir, 'feature/delete-msg');
+    registerAgent(tmpDir, session.id, {
+      name: 'quartermaster',
+      type: 'fleet',
+      status: 'active',
+      startedAt: new Date().toISOString(),
+    });
+
+    const server = await startDashboardServer(tmpDir);
+    servers.push(server);
+
+    // Send a message first
+    await fetch(`${server.url}/api/sessions/${session.id}/inbox/quartermaster`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ content: 'To be deleted' }),
+    });
+
+    const response = await fetch(`${server.url}/api/sessions/${session.id}/inbox/quartermaster/0`, {
+      method: 'DELETE',
+    });
+    const payload = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(payload).toEqual({ ok: true });
+
+    // Verify message was removed
+    const detailResponse = await fetch(`${server.url}/api/sessions/${session.id}`);
+    const detail = await detailResponse.json();
+    const agent = detail.agents.find((a: { name: string }) => a.name === 'quartermaster');
+    expect(agent.inbox).toHaveLength(0);
+  });
+
+  it('DELETE /api/sessions/:slug/inbox/:agent/:index rejects path traversal in slug', async () => {
+    await setupProject(tmpDir);
+
+    const server = await startDashboardServer(tmpDir);
+    servers.push(server);
+
+    const response = await fetch(
+      `${server.url}/api/sessions/${encodeURIComponent('../../evil')}/inbox/qm/0`,
+      { method: 'DELETE' },
+    );
+
+    expect(response.status).toBe(400);
+  });
+
+  it('DELETE /api/sessions/:slug/inbox/:agent/:index returns 400 for invalid index', async () => {
+    await setupProject(tmpDir);
+    const session = createSession(tmpDir, 'feature/bad-index');
+    registerAgent(tmpDir, session.id, {
+      name: 'quartermaster',
+      type: 'fleet',
+      status: 'active',
+      startedAt: new Date().toISOString(),
+    });
+
+    const server = await startDashboardServer(tmpDir);
+    servers.push(server);
+
+    const response = await fetch(`${server.url}/api/sessions/${session.id}/inbox/quartermaster/99`, {
+      method: 'DELETE',
+    });
+
+    expect(response.status).toBe(400);
+  });
+
   it('keeps the server available when automatic browser opening fails', async () => {
     await setupProject(tmpDir);
     const openBrowser = vi.fn().mockRejectedValue(new Error('no browser'));

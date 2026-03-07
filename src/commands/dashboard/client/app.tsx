@@ -61,6 +61,7 @@ export type DashboardViewProps = {
   onSelectSession: (slug: string) => void;
   onBackToSessions: () => void;
   onSendMessage: (agentName: string, content: string) => void;
+  onDeleteMessage: (agentName: string, messageIndex: number) => void;
 };
 
 const DASHBOARD_TABS = [
@@ -88,6 +89,7 @@ export function DashboardView({
   onSelectSession,
   onBackToSessions,
   onSendMessage,
+  onDeleteMessage,
 }: DashboardViewProps) {
   return (
     <main className="shell">
@@ -114,7 +116,7 @@ export function DashboardView({
       ) : sessionsLoading && sessions.length === 0 && !selectedSession ? (
         <div className="empty-state">Loading sessions…</div>
       ) : selectedSession ? (
-        <SessionDetail session={selectedSession} onBack={onBackToSessions} onSendMessage={onSendMessage} />
+        <SessionDetail session={selectedSession} onBack={onBackToSessions} onSendMessage={onSendMessage} onDeleteMessage={onDeleteMessage} />
       ) : (
         <SessionList sessions={sessions} onSelectSession={onSelectSession} />
       )}
@@ -311,6 +313,21 @@ export function DashboardApp() {
     }
   };
 
+  const onDeleteMessage = async (agentName: string, messageIndex: number): Promise<void> => {
+    const sessionId = appState.selectedSession?.id;
+    if (!sessionId) return;
+
+    try {
+      await fetch(
+        `/api/sessions/${encodeURIComponent(sessionId)}/inbox/${encodeURIComponent(agentName)}/${messageIndex}`,
+        { method: 'DELETE' },
+      );
+      await fetchSessionDetail(sessionId);
+    } catch {
+      // Silently ignore delete errors
+    }
+  };
+
   const projectRows = appState.dashState ? getSnapshotRows(appState.dashState.project) : [];
   const localRows = appState.dashState ? getLocalRows(appState.dashState.local) : [];
   const effectiveRows = appState.dashState ? getSnapshotRows(appState.dashState.effective) : [];
@@ -336,6 +353,7 @@ export function DashboardApp() {
       onSelectSession={onSelectSession}
       onBackToSessions={onBackToSessions}
       onSendMessage={onSendMessage}
+      onDeleteMessage={onDeleteMessage}
     />
   );
 }

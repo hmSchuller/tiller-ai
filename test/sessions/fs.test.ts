@@ -16,6 +16,7 @@ import {
   readInbox,
   getUndeliveredMessages,
   markMessagesDelivered,
+  deleteInboxMessage,
 } from '../../src/sessions/fs.js';
 import type { AgentRecord } from '../../src/sessions/types.js';
 
@@ -263,6 +264,60 @@ describe('sessions/fs', () => {
 
       it('is a no-op for missing inbox', () => {
         expect(() => markMessagesDelivered(tmpDir, 'feature-inbox-test', 'nonexistent')).not.toThrow();
+      });
+    });
+
+    describe('deleteInboxMessage', () => {
+      it('deletes an undelivered message by index', () => {
+        appendInboxMessage(tmpDir, 'feature-inbox-test', 'qm', {
+          timestamp: '2026-03-06T18:30:00Z',
+          from: 'orchestrator',
+          content: 'Message 1',
+        });
+
+        appendInboxMessage(tmpDir, 'feature-inbox-test', 'qm', {
+          timestamp: '2026-03-06T18:35:00Z',
+          from: 'user',
+          content: 'Message 2',
+        });
+
+        deleteInboxMessage(tmpDir, 'feature-inbox-test', 'qm', 0);
+
+        const messages = readInbox(tmpDir, 'feature-inbox-test', 'qm');
+        expect(messages).toHaveLength(1);
+        expect(messages[0].content).toBe('Message 2');
+      });
+
+      it('throws when trying to delete a delivered message', () => {
+        appendInboxMessage(tmpDir, 'feature-inbox-test', 'qm', {
+          timestamp: '2026-03-06T18:30:00Z',
+          from: 'orchestrator',
+          content: 'Delivered msg',
+        });
+
+        markMessagesDelivered(tmpDir, 'feature-inbox-test', 'qm');
+
+        expect(() => deleteInboxMessage(tmpDir, 'feature-inbox-test', 'qm', 0)).toThrow(
+          'Cannot delete delivered message',
+        );
+      });
+
+      it('throws for an out-of-bounds index', () => {
+        appendInboxMessage(tmpDir, 'feature-inbox-test', 'qm', {
+          timestamp: '2026-03-06T18:30:00Z',
+          from: 'user',
+          content: 'Only message',
+        });
+
+        expect(() => deleteInboxMessage(tmpDir, 'feature-inbox-test', 'qm', 5)).toThrow(
+          'Invalid message index',
+        );
+      });
+
+      it('throws for a non-existent inbox file', () => {
+        expect(() => deleteInboxMessage(tmpDir, 'feature-inbox-test', 'nonexistent', 0)).toThrow(
+          'Inbox not found',
+        );
       });
     });
 

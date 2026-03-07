@@ -171,6 +171,28 @@ export function getUndeliveredMessages(
   return readInbox(projectRoot, slug, agentName).filter((m) => !m.delivered);
 }
 
+export function deleteInboxMessage(
+  projectRoot: string,
+  slug: string,
+  agentName: string,
+  messageIndex: number,
+): void {
+  const dir = sessionDir(projectRoot, slug);
+  const inboxPath = join(dir, `${agentName}.inbox.md`);
+  if (!existsSync(inboxPath)) {
+    throw new Error('Inbox not found');
+  }
+  const messages = parseInbox(readFileSync(inboxPath, 'utf-8'));
+  if (messageIndex < 0 || messageIndex >= messages.length) {
+    throw new Error('Invalid message index');
+  }
+  if (messages[messageIndex].delivered) {
+    throw new Error('Cannot delete delivered message');
+  }
+  messages.splice(messageIndex, 1);
+  writeFileSync(inboxPath, serializeInbox(messages), 'utf-8');
+}
+
 export function markMessagesDelivered(
   projectRoot: string,
   slug: string,

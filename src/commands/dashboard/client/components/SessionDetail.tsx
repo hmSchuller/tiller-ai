@@ -5,6 +5,7 @@ export type SessionDetailProps = {
   session: SessionDetailResponse;
   onBack: () => void;
   onSendMessage: (agentName: string, content: string) => void;
+  onDeleteMessage: (agentName: string, messageIndex: number) => void;
 };
 
 function formatTime(iso: string): string {
@@ -53,9 +54,11 @@ const TYPE_LABELS: Record<AgentDetailResponse['type'], string> = {
 function AgentCard({
   agent,
   onSendMessage,
+  onDeleteMessage,
 }: {
   agent: AgentDetailResponse;
   onSendMessage: (agentName: string, content: string) => void;
+  onDeleteMessage: (agentName: string, messageIndex: number) => void;
 }) {
   const [expanded, setExpanded] = useState(agent.status === 'active');
   const [message, setMessage] = useState('');
@@ -135,6 +138,16 @@ function AgentCard({
                     </span>
                     <span className="inbox-status">{msg.delivered ? '✓' : '●'}</span>
                     <span className="inbox-time">{formatTime(msg.timestamp)}</span>
+                    {!msg.delivered && (
+                      <button
+                        className="delete-message-btn"
+                        type="button"
+                        onClick={() => onDeleteMessage(agent.name, index)}
+                        title="Delete message"
+                      >
+                        ✕
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>
@@ -177,7 +190,7 @@ function AgentCard({
   );
 }
 
-export function SessionDetail({ session, onBack, onSendMessage }: SessionDetailProps) {
+export function SessionDetail({ session, onBack, onSendMessage, onDeleteMessage }: SessionDetailProps) {
   return (
     <div className="session-detail">
       <div className="session-detail-header">
@@ -198,7 +211,7 @@ export function SessionDetail({ session, onBack, onSendMessage }: SessionDetailP
           <div className="empty-state">No agents in this session.</div>
         ) : (
           sortAgents(session.agents).map((agent) => (
-            <AgentCard key={agent.name} agent={agent} onSendMessage={onSendMessage} />
+            <AgentCard key={agent.name} agent={agent} onSendMessage={onSendMessage} onDeleteMessage={onDeleteMessage} />
           ))
         )}
       </div>

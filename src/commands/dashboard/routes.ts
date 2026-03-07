@@ -18,6 +18,7 @@ import {
   readLog,
   readSession,
   appendInboxMessage,
+  deleteInboxMessage,
 } from '../../sessions/fs.js';
 import {
   CLIENT_ASSET_PATH,
@@ -428,6 +429,41 @@ export function createDashboardRequestHandler(cwd: string) {
           content: String(body.content ?? ''),
         });
         sendJson(res, 200, { ok: true });
+        return;
+      }
+
+      const inboxDeleteMatch = req.method === 'DELETE' && requestUrl.pathname.match(/^\/api\/sessions\/([^/]+)\/inbox\/([^/]+)\/(\d+)$/);
+      if (inboxDeleteMatch) {
+        const slug = decodeURIComponent(inboxDeleteMatch[1]);
+        const agentName = decodeURIComponent(inboxDeleteMatch[2]);
+        const messageIndex = parseInt(inboxDeleteMatch[3], 10);
+
+        if (slug.includes('..')) {
+          sendJson(res, 400, { ok: false, error: getRequestIssue('Invalid path segment.') });
+          return;
+        }
+
+        if (agentName.includes('..') || agentName.includes('/')) {
+          sendJson(res, 400, { ok: false, error: getRequestIssue('Invalid agent name.') });
+          return;
+        }
+
+        if (!Number.isFinite(messageIndex) || messageIndex < 0) {
+          sendJson(res, 400, { ok: false, error: getRequestIssue('Invalid message index.') });
+          return;
+        }
+
+        try {
+          deleteInboxMessage(cwd, slug, agentName, messageIndex);
+          sendJson(res, 200, { ok: true });
+        } catch (err) {
+          const message = err instanceof Error ? err.message : 'Failed to delete message.';
+          if (message === 'Inbox not found') {
+            sendJson(res, 404, { ok: false, error: getRequestIssue(message, 'not-found') });
+          } else {
+            sendJson(res, 400, { ok: false, error: getRequestIssue(message) });
+          }
+        }
         return;
       }
 
