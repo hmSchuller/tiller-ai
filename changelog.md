@@ -3,6 +3,10 @@
 > Shared project history. Updated by /sail, /anchor, and /dock. Committed and shared.
 
 ## Done
+- [2026-03-07] docked prototype/inter-agent-comm
+- [2026-03-07] feat: polish session detail UI — sorted agents, messaging-first layout, log toggle, delivery indicators
+- [2026-03-07] feat: delete unread inbox messages from dashboard
+- [2026-03-07] fix: increase session log truncation limits, pin sail-lead to top, fix scaffold tests
 - [2026-03-06] docked feature/agent-inbox-session-dashboard
 - [2026-03-06] feat: dashboard Sessions tab with live agent view, inbox messaging, and 3s polling
 - [2026-03-06] feat: session hooks — postToolUse logging, preToolUse inbox-check (smart deny-with-message), subagentStop completion
