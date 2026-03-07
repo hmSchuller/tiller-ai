@@ -20,6 +20,8 @@ export type TillerManifest = {
 
 const SHARED_MANAGED_FILES = [
   '.tiller/TILLER.md',
+  '.tiller/bin/register-agent.py',
+  '.tiller/bin/complete-agent.py',
 ];
 
 const CLAUDE_MANAGED_FILES = [

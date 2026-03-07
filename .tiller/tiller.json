@@ -8,6 +8,8 @@
   ],
   "managedFiles": [
     ".tiller/TILLER.md",
+    ".tiller/bin/register-agent.py",
+    ".tiller/bin/complete-agent.py",
     ".github/copilot-instructions.md",
     ".github/skills/setup/SKILL.md",
     ".github/skills/sail/SKILL.md",

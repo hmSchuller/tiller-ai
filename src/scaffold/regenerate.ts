@@ -37,6 +37,7 @@ import { generateCopilotHooksJson } from './copilot/hooks-json.js';
 import { generateCopilotSailSkill } from './copilot/skills/sail.js';
 import { generateTillerManifest, getManagedFiles, TILLER_VERSION } from './tiller-manifest.js';
 import { TILLER_GITIGNORE_ENTRIES } from './gitignore.js';
+import { generateRegisterAgentScript, generateCompleteAgentScript } from './bin/register-agent.js';
 import type { ProjectConfig } from './types.js';
 
 /**
@@ -47,6 +48,8 @@ export async function regenerateFiles(config: ProjectConfig, cwd: string, opts?:
   const tools = config.tools ?? ['claude'];
 
   await writeFile(resolve(cwd, '.tiller/TILLER.md'), generateTillerMd(config));
+  await writeFile(resolve(cwd, '.tiller/bin/register-agent.py'), generateRegisterAgentScript());
+  await writeFile(resolve(cwd, '.tiller/bin/complete-agent.py'), generateCompleteAgentScript());
 
   // Claude Code files
   if (tools.includes('claude')) {
