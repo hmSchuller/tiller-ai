@@ -8,7 +8,7 @@ export async function ensureDir(dirPath: string): Promise<void> {
 export async function writeFile(filePath: string, content: string): Promise<void> {
   await ensureDir(dirname(filePath));
   await fsWriteFile(filePath, content, 'utf-8');
-  if (extname(filePath) === '.sh') {
+  if (['.sh', '.py'].includes(extname(filePath))) {
     await chmod(filePath, 0o755);
   }
 }

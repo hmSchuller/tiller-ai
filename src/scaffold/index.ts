@@ -43,6 +43,7 @@ import { generateCopilotCaptainAgent } from './copilot/agents/captain.js';
 import { generateCopilotCartographerAgent } from './copilot/agents/cartographer.js';
 import { generateCopilotHooksJson } from './copilot/hooks-json.js';
 import { generateCopilotSailSkill } from './copilot/skills/sail.js';
+import { generateRegisterAgentScript, generateCompleteAgentScript } from './bin/register-agent.js';
 
 export async function scaffold(config: ProjectConfig, targetDir: string): Promise<void> {
   const p = (rel: string) => join(targetDir, rel);
@@ -163,6 +164,10 @@ export async function scaffold(config: ProjectConfig, targetDir: string): Promis
     await writeFile(p('.github/hooks/session-log.sh'), generateSessionLogHook(config));
     await writeFile(p('.github/hooks/inbox-check.sh'), generateInboxCheckHook(config));
   }
+
+  // Tiller bin scripts (approved once by the user, referenced by skills)
+  await writeFile(p('.tiller/bin/register-agent.py'), generateRegisterAgentScript());
+  await writeFile(p('.tiller/bin/complete-agent.py'), generateCompleteAgentScript());
 
   // Shared tracking files (compass and local.json are gitignored inside .tiller/)
   await writeFile(p('tech-backlog.md'), generateTechBacklog(config));

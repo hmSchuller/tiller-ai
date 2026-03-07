@@ -17,13 +17,7 @@ Use this skill to contribute anything: new features, bug fixes, or incremental t
 
 \`\`\`bash
 ts=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-python3 -c "
-import json, sys
-f = sys.argv[1]; ts = sys.argv[2]; name = sys.argv[3]; atype = sys.argv[4]
-d = json.load(open(f))
-d['agents'].append({'name': name, 'type': atype, 'status': 'active', 'startedAt': ts})
-json.dump(d, open(f, 'w'), indent=2)
-" ".tiller/sessions/<slug>/session.json" "$ts" "<agent-name>" "<agent-type>"
+python3 .tiller/bin/register-agent.py ".tiller/sessions/<slug>/session.json" "$ts" "<agent-name>" "<agent-type>"
 echo "<agent-name>" > .tiller/sessions/<slug>/current-agent
 \`\`\`
 
@@ -32,15 +26,7 @@ Use descriptive names and types: e.g. \`"interviewer" "requirements"\`, \`"plann
 After a sub-agent completes, mark it completed and restore the lead agent:
 
 \`\`\`bash
-python3 -c "
-import json, sys
-f = sys.argv[1]; name = sys.argv[2]
-d = json.load(open(f))
-for a in d.get('agents', []):
-    if a.get('name') == name:
-        a['status'] = 'completed'
-json.dump(d, open(f, 'w'), indent=2)
-" ".tiller/sessions/<slug>/session.json" "<agent-name>"
+python3 .tiller/bin/complete-agent.py ".tiller/sessions/<slug>/session.json" "<agent-name>"
 echo "sail-lead" > .tiller/sessions/<slug>/current-agent
 \`\`\`
 
