@@ -13,6 +13,14 @@ import {
   type SaveConfigResult,
 } from '../config-shared.js';
 import {
+  listSessions,
+  readInbox,
+  readLog,
+  readSession,
+  appendInboxMessage,
+  deleteInboxMessage,
+} from '../../sessions/fs.js';
+import {
   CLIENT_ASSET_PATH,
   CLIENT_CSS_ASSET_PATH,
   type ConfigSnapshot,
@@ -20,6 +28,8 @@ import {
   type DashboardStateResponse,
   type LocalOverrideSnapshot,
   type SaveRequest,
+  type SessionSummary,
+  type SessionDetailResponse,
   type ToolTarget,
   isConfigMode,
   isToolTarget,
@@ -333,6 +343,127 @@ export function createDashboardRequestHandler(cwd: string) {
 
         const response = await handleSaveRequest(cwd, payload);
         sendJson(res, response.statusCode, response.body);
+        return;
+      }
+
+      if (req.method === 'GET' && requestUrl.pathname === '/api/sessions') {
+        const sessions = listSessions(cwd);
+        const summaries: SessionSummary[] = sessions.map((s) => ({
+          id: s.id,
+          branch: s.branch,
+          startedAt: s.startedAt,
+          status: s.status,
+          agentCount: s.agents.length,
+          activeAgentCount: s.agents.filter((a) => a.status === 'active').length,
+        }));
+        sendJson(res, 200, summaries);
+        return;
+      }
+
+      const sessionDetailMatch = req.method === 'GET' && requestUrl.pathname.match(/^\/api\/sessions\/([^/]+)$/);
+      if (sessionDetailMatch) {
+        const slug = decodeURIComponent(sessionDetailMatch[1]);
+        if (slug.includes('..')) {
+          sendJson(res, 400, { ok: false, error: getRequestIssue('Invalid path segment.') });
+          return;
+        }
+        const session = readSession(cwd, slug);
+        if (!session) {
+          sendJson(res, 404, { error: 'Session not found' });
+          return;
+        }
+
+        const detail: SessionDetailResponse = {
+          id: session.id,
+          branch: session.branch,
+          startedAt: session.startedAt,
+          status: session.status,
+          agents: session.agents.map((a) => ({
+            name: a.name,
+            type: a.type,
+            status: a.status,
+            startedAt: a.startedAt,
+            completedAt: a.completedAt,
+            log: readLog(cwd, slug, a.name),
+            inbox: readInbox(cwd, slug, a.name),
+          })),
+        };
+        sendJson(res, 200, detail);
+        return;
+      }
+
+      const inboxPostMatch = req.method === 'POST' && requestUrl.pathname.match(/^\/api\/sessions\/([^/]+)\/inbox\/([^/]+)$/);
+      if (inboxPostMatch) {
+        const slug = decodeURIComponent(inboxPostMatch[1]);
+        const agentName = decodeURIComponent(inboxPostMatch[2]);
+
+        if (slug.includes('..') || agentName.includes('..')) {
+          sendJson(res, 400, { ok: false, error: getRequestIssue('Invalid path segment.') });
+          return;
+        }
+
+        const session = readSession(cwd, slug);
+        if (!session) {
+          sendJson(res, 404, { error: 'Session not found' });
+          return;
+        }
+
+        if (!session.agents.some((a) => a.name === agentName)) {
+          sendJson(res, 404, { error: 'Agent not found' });
+          return;
+        }
+
+        let payload: unknown;
+        try {
+          payload = await readRequestBody(req);
+        } catch (error) {
+          const message = error instanceof Error ? error.message : 'Failed to read request body.';
+          sendJson(res, 400, { ok: false, error: getRequestIssue(message) });
+          return;
+        }
+
+        const body = payload as Record<string, unknown>;
+        appendInboxMessage(cwd, slug, agentName, {
+          timestamp: new Date().toISOString(),
+          from: 'user',
+          content: String(body.content ?? ''),
+        });
+        sendJson(res, 200, { ok: true });
+        return;
+      }
+
+      const inboxDeleteMatch = req.method === 'DELETE' && requestUrl.pathname.match(/^\/api\/sessions\/([^/]+)\/inbox\/([^/]+)\/(\d+)$/);
+      if (inboxDeleteMatch) {
+        const slug = decodeURIComponent(inboxDeleteMatch[1]);
+        const agentName = decodeURIComponent(inboxDeleteMatch[2]);
+        const messageIndex = parseInt(inboxDeleteMatch[3], 10);
+
+        if (slug.includes('..')) {
+          sendJson(res, 400, { ok: false, error: getRequestIssue('Invalid path segment.') });
+          return;
+        }
+
+        if (agentName.includes('..') || agentName.includes('/')) {
+          sendJson(res, 400, { ok: false, error: getRequestIssue('Invalid agent name.') });
+          return;
+        }
+
+        if (!Number.isFinite(messageIndex) || messageIndex < 0) {
+          sendJson(res, 400, { ok: false, error: getRequestIssue('Invalid message index.') });
+          return;
+        }
+
+        try {
+          deleteInboxMessage(cwd, slug, agentName, messageIndex);
+          sendJson(res, 200, { ok: true });
+        } catch (err) {
+          const message = err instanceof Error ? err.message : 'Failed to delete message.';
+          if (message === 'Inbox not found') {
+            sendJson(res, 404, { ok: false, error: getRequestIssue(message, 'not-found') });
+          } else {
+            sendJson(res, 400, { ok: false, error: getRequestIssue(message) });
+          }
+        }
         return;
       }
 

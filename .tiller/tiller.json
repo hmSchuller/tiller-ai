@@ -4,28 +4,12 @@
   "workflow": "solo",
   "runCommand": "npm test",
   "tools": [
-    "claude",
     "copilot"
   ],
   "managedFiles": [
     ".tiller/TILLER.md",
-    ".claude/settings.json",
-    ".claude/hooks/post-write.sh",
-    ".claude/hooks/secret-scan.sh",
-    ".claude/hooks/session-resume.sh",
-    ".claude/hooks/plan-context.sh",
-    ".claude/skills/setup/SKILL.md",
-    ".claude/skills/sail/SKILL.md",
-    ".claude/skills/anchor/SKILL.md",
-    ".claude/skills/recap/SKILL.md",
-    ".claude/skills/dock/SKILL.md",
-    ".claude/skills/tech-debt/SKILL.md",
-    ".claude/skills/scout/SKILL.md",
-    ".claude/skills/repair-hull/SKILL.md",
-    ".claude/agents/quartermaster.md",
-    ".claude/agents/bosun.md",
-    ".claude/agents/captain.md",
-    ".claude/agents/cartographer.md",
+    ".tiller/bin/register-agent.py",
+    ".tiller/bin/complete-agent.py",
     ".github/copilot-instructions.md",
     ".github/skills/setup/SKILL.md",
     ".github/skills/sail/SKILL.md",
@@ -42,6 +26,8 @@
     ".github/hooks/hooks.json",
     ".github/hooks/post-write.sh",
     ".github/hooks/secret-scan.sh",
-    ".github/hooks/session-resume.sh"
+    ".github/hooks/session-resume.sh",
+    ".github/hooks/session-log.sh",
+    ".github/hooks/inbox-check.sh"
   ]
 }

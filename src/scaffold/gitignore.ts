@@ -1,6 +1,6 @@
 import type { ProjectConfig } from './types.js';
 
-export const TILLER_GITIGNORE_ENTRIES = ['.tiller/local.json', '.tiller/compass.md'];
+export const TILLER_GITIGNORE_ENTRIES = ['.tiller/local.json', '.tiller/compass.md', '.tiller/sessions/'];
 
 export function generateGitignore(_config: ProjectConfig): string {
   return `# Dependencies
@@ -34,5 +34,6 @@ npm-debug.log*
 # Tiller — local-only files (per-dev, not shared)
 .tiller/local.json
 .tiller/compass.md
+.tiller/sessions/
 `;
 }

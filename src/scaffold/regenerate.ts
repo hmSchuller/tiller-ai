@@ -5,6 +5,9 @@ import { generatePostWriteHook } from './hooks/post-write.js';
 import { generateSecretScanHook } from './hooks/secret-scan.js';
 import { generateSessionResumeHook } from './hooks/session-resume.js';
 import { generatePlanContextHook } from './hooks/plan-context.js';
+import { generateSessionLogHook } from './hooks/session-log.js';
+import { generateInboxCheckHook } from './hooks/inbox-check.js';
+
 import { generateSetupSkill } from './skills/setup.js';
 import { generateSailSkill } from './skills/sail.js';
 import { generateAnchorSkill } from './skills/anchor.js';
@@ -34,6 +37,7 @@ import { generateCopilotHooksJson } from './copilot/hooks-json.js';
 import { generateCopilotSailSkill } from './copilot/skills/sail.js';
 import { generateTillerManifest, getManagedFiles, TILLER_VERSION } from './tiller-manifest.js';
 import { TILLER_GITIGNORE_ENTRIES } from './gitignore.js';
+import { generateRegisterAgentScript, generateCompleteAgentScript } from './bin/register-agent.js';
 import type { ProjectConfig } from './types.js';
 
 /**
@@ -44,6 +48,8 @@ export async function regenerateFiles(config: ProjectConfig, cwd: string, opts?:
   const tools = config.tools ?? ['claude'];
 
   await writeFile(resolve(cwd, '.tiller/TILLER.md'), generateTillerMd(config));
+  await writeFile(resolve(cwd, '.tiller/bin/register-agent.py'), generateRegisterAgentScript());
+  await writeFile(resolve(cwd, '.tiller/bin/complete-agent.py'), generateCompleteAgentScript());
 
   // Claude Code files
   if (tools.includes('claude')) {
@@ -127,6 +133,8 @@ export async function regenerateFiles(config: ProjectConfig, cwd: string, opts?:
     await writeFile(resolve(cwd, '.github/hooks/post-write.sh'), generatePostWriteHook(config));
     await writeFile(resolve(cwd, '.github/hooks/secret-scan.sh'), generateSecretScanHook(config));
     await writeFile(resolve(cwd, '.github/hooks/session-resume.sh'), generateSessionResumeHook(config));
+    await writeFile(resolve(cwd, '.github/hooks/session-log.sh'), generateSessionLogHook(config));
+    await writeFile(resolve(cwd, '.github/hooks/inbox-check.sh'), generateInboxCheckHook(config));
   }
 
   if (!opts?.skipManifest) {

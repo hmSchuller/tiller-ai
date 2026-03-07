@@ -9,24 +9,24 @@ import { generateCopilotSailSkill } from '../../src/scaffold/copilot/skills/sail
 import { simpleConfig, copilotOnlyConfig } from '../helpers/fixtures.js';
 
 describe('generateCopilotInstructions', () => {
-  it('includes protocol enforcement', () => {
-    expect(generateCopilotInstructions(simpleConfig)).toContain('Protocol enforcement');
+  it('includes code quality section', () => {
+    expect(generateCopilotInstructions(simpleConfig)).toContain('Code quality');
   });
 
-  it('includes development loop', () => {
-    expect(generateCopilotInstructions(simpleConfig)).toContain('Development loop');
+  it('includes testing section', () => {
+    expect(generateCopilotInstructions(simpleConfig)).toContain('Testing');
   });
 
   it('includes both modes', () => {
     const result = generateCopilotInstructions(simpleConfig);
-    expect(result).toContain('### simple');
-    expect(result).toContain('### detailed');
+    expect(result).toContain('**simple**');
+    expect(result).toContain('**detailed**');
   });
 
   it('includes both workflows', () => {
     const result = generateCopilotInstructions(simpleConfig);
-    expect(result).toContain('### solo');
-    expect(result).toContain('### team');
+    expect(result).toContain('**solo**');
+    expect(result).toContain('**team**');
   });
 });
 
@@ -109,22 +109,39 @@ describe('generateCopilotHooksJson', () => {
     expect(parsed.version).toBe(1);
   });
 
-  it('has sessionStart hooks', () => {
+  it('has sessionStart hooks including session-log', () => {
     const parsed = JSON.parse(generateCopilotHooksJson(copilotOnlyConfig));
-    expect(parsed.hooks.sessionStart).toHaveLength(1);
+    expect(parsed.hooks.sessionStart).toHaveLength(2);
     expect(parsed.hooks.sessionStart[0].bash).toContain('session-resume.sh');
+    expect(parsed.hooks.sessionStart[1].bash).toContain('session-log.sh');
   });
 
-  it('has preToolUse hooks', () => {
+  it('has preToolUse hooks including session-log', () => {
     const parsed = JSON.parse(generateCopilotHooksJson(copilotOnlyConfig));
-    expect(parsed.hooks.preToolUse).toHaveLength(1);
+    expect(parsed.hooks.preToolUse).toHaveLength(3);
     expect(parsed.hooks.preToolUse[0].bash).toContain('secret-scan.sh');
+    expect(parsed.hooks.preToolUse[1].bash).toContain('inbox-check.sh');
+    expect(parsed.hooks.preToolUse[2].bash).toContain('session-log.sh');
   });
 
-  it('has postToolUse hooks', () => {
+  it('has postToolUse hooks including session-log', () => {
     const parsed = JSON.parse(generateCopilotHooksJson(copilotOnlyConfig));
-    expect(parsed.hooks.postToolUse).toHaveLength(1);
+    expect(parsed.hooks.postToolUse).toHaveLength(2);
     expect(parsed.hooks.postToolUse[0].bash).toContain('post-write.sh');
+    expect(parsed.hooks.postToolUse[1].bash).toContain('session-log.sh');
+  });
+
+  it('registers session-log on all 6 event types', () => {
+    const parsed = JSON.parse(generateCopilotHooksJson(copilotOnlyConfig));
+    for (const eventType of ['sessionStart', 'sessionEnd', 'userPromptSubmitted', 'preToolUse', 'postToolUse', 'errorOccurred']) {
+      const hooks = parsed.hooks[eventType] as Array<{ bash: string }>;
+      expect(hooks.some(h => h.bash.includes('session-log.sh')), `${eventType} should have session-log`).toBe(true);
+    }
+  });
+
+  it('does not have subagentStop (not supported by Copilot)', () => {
+    const parsed = JSON.parse(generateCopilotHooksJson(copilotOnlyConfig));
+    expect(parsed.hooks.subagentStop).toBeUndefined();
   });
 
   it('does not include plan-context hook', () => {

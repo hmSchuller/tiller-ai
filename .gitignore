@@ -47,3 +47,6 @@ npm-debug.log*
 .claude/skills/setup
 .claude/skills/tech-debt
 .claude/settings.json
+
+# Tiller
+.tiller/sessions/

@@ -3,6 +3,13 @@
 > Shared project history. Updated by /sail, /anchor, and /dock. Committed and shared.
 
 ## Done
+- [2026-03-06] docked feature/agent-inbox-session-dashboard
+- [2026-03-06] feat: dashboard Sessions tab with live agent view, inbox messaging, and 3s polling
+- [2026-03-06] feat: session hooks — postToolUse logging, preToolUse inbox-check (smart deny-with-message), subagentStop completion
+- [2026-03-06] feat: sail skill /fleet integration — replace TeamCreate/TaskCreate with native /fleet parallel execution
+- [2026-03-06] feat: dashboard session API — GET /api/sessions, GET /api/sessions/:slug, POST inbox
+- [2026-03-06] feat: session types & file utilities — .tiller/sessions/<branch-slug>/ with inbox/log I/O
+- [2026-03-06] feat: dashboard tab navigation — Config and Sessions tabs
 - [2026-03-06] docked feature/local-dashboard-for-easy-configuration-of-config
 - [2026-03-06] harden dashboard state and accessibility
 - [2026-03-06] redesign dashboard with React components, naval theming, and bundled styles

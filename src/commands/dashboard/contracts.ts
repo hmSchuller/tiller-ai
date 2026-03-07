@@ -106,3 +106,41 @@ export type DashboardServerOptions = {
   host?: string;
   port?: number;
 };
+
+export interface SessionSummary {
+  id: string;
+  branch: string;
+  startedAt: string;
+  status: 'active' | 'completed';
+  agentCount: number;
+  activeAgentCount: number;
+}
+
+export interface SessionDetailResponse {
+  id: string;
+  branch: string;
+  startedAt: string;
+  status: 'active' | 'completed';
+  agents: AgentDetailResponse[];
+}
+
+export interface AgentDetailResponse {
+  name: string;
+  type: 'fleet' | 'specialist' | 'ephemeral';
+  status: 'active' | 'completed' | 'failed';
+  startedAt: string;
+  completedAt?: string;
+  log: string;
+  inbox: InboxMessageResponse[];
+}
+
+export interface InboxMessageResponse {
+  timestamp: string;
+  from: 'orchestrator' | 'user';
+  content: string;
+  delivered: boolean;
+}
+
+export interface SendMessageRequest {
+  content: string;
+}
