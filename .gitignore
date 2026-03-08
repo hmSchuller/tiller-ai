@@ -29,7 +29,7 @@ npm-debug.log*
 # Tiller — local-only files
 .tiller/local.json
 .tiller/compass.md
-.github
+.github/agents/
 .claude/agents/bosun.md
 .claude/agents/captain.md
 .claude/agents/cartographer.md
