@@ -73,6 +73,25 @@ export function registerAgent(projectRoot: string, slug: string, agent: AgentRec
   if (!existsSync(logPath)) writeFileSync(logPath, '', 'utf-8');
 }
 
+export function markAgentCompleted(
+  projectRoot: string,
+  slug: string,
+  agentName: string,
+): AgentRecord {
+  const session = readSession(projectRoot, slug);
+  if (!session) throw new Error(`Session not found: ${slug}`);
+
+  const agent = session.agents.find((entry) => entry.name === agentName);
+  if (!agent) throw new Error(`Agent not found: ${agentName}`);
+  if (agent.status !== 'active') throw new Error(`Agent is not active: ${agentName}`);
+
+  agent.status = 'completed';
+  agent.completedAt = new Date().toISOString();
+  writeSession(projectRoot, slug, session);
+
+  return { ...agent };
+}
+
 export function appendLog(
   projectRoot: string,
   slug: string,

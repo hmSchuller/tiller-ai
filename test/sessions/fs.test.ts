@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { mkdtempSync, rmSync, readFileSync, existsSync } from 'node:fs';
+import { mkdtempSync, rmSync, readFileSync, existsSync, readdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import {
@@ -10,6 +10,7 @@ import {
   writeSession,
   listSessions,
   registerAgent,
+  markAgentCompleted,
   appendLog,
   readLog,
   appendInboxMessage,
@@ -172,6 +173,110 @@ describe('sessions/fs', () => {
 
     it('returns empty string for missing log', () => {
       expect(readLog(tmpDir, 'nonexistent', 'agent')).toBe('');
+    });
+  });
+
+  describe('markAgentCompleted', () => {
+    it('marks an active agent as completed in session.json with a fresh completedAt timestamp', () => {
+      createSession(tmpDir, 'feature/complete-test');
+      registerAgent(tmpDir, 'feature-complete-test', {
+        name: 'worker-1',
+        type: 'fleet',
+        status: 'active',
+        startedAt: '2026-03-06T18:00:00.000Z',
+      });
+      registerAgent(tmpDir, 'feature-complete-test', {
+        name: 'worker-2',
+        type: 'fleet',
+        status: 'active',
+        startedAt: '2026-03-06T18:05:00.000Z',
+      });
+
+      const before = Date.now();
+      const updatedAgent = markAgentCompleted(tmpDir, 'feature-complete-test', 'worker-1');
+      const after = Date.now();
+
+      expect(updatedAgent.status).toBe('completed');
+      expect(updatedAgent.completedAt).toBeDefined();
+      expect(new Date(updatedAgent.completedAt!).toISOString()).toBe(updatedAgent.completedAt);
+      expect(Date.parse(updatedAgent.completedAt!)).toBeGreaterThanOrEqual(before);
+      expect(Date.parse(updatedAgent.completedAt!)).toBeLessThanOrEqual(after);
+
+      const persisted = JSON.parse(
+        readFileSync(join(sessionDir(tmpDir, 'feature-complete-test'), 'session.json'), 'utf-8'),
+      );
+      expect(persisted.agents[0]).toMatchObject({
+        name: 'worker-1',
+        status: 'completed',
+        completedAt: updatedAgent.completedAt,
+      });
+      expect(persisted.agents[1]).toMatchObject({
+        name: 'worker-2',
+        status: 'active',
+      });
+      expect(persisted.agents[1]).not.toHaveProperty('completedAt');
+    });
+
+    it.each(['completed', 'failed'] as const)(
+      'rejects manual completion when the agent status is %s',
+      (status) => {
+        createSession(tmpDir, `feature/${status}-agent`);
+        writeSession(tmpDir, `feature-${status}-agent`, {
+          id: `feature-${status}-agent`,
+          branch: `feature/${status}-agent`,
+          startedAt: '2026-03-06T18:00:00.000Z',
+          status: 'active',
+          agents: [
+            {
+              name: 'worker-1',
+              type: 'fleet',
+              status,
+              startedAt: '2026-03-06T18:01:00.000Z',
+              completedAt: status === 'completed' ? '2026-03-06T18:30:00.000Z' : undefined,
+            },
+          ],
+        });
+
+        expect(() =>
+          markAgentCompleted(tmpDir, `feature-${status}-agent`, 'worker-1'),
+        ).toThrow(`Agent is not active: worker-1`);
+      },
+    );
+
+    it('updates only the targeted session.json without touching logs, inbox, current-agent, or other sessions', () => {
+      createSession(tmpDir, 'feature/collateral-test');
+      registerAgent(tmpDir, 'feature-collateral-test', {
+        name: 'worker-1',
+        type: 'fleet',
+        status: 'active',
+        startedAt: '2026-03-06T18:00:00.000Z',
+      });
+      appendLog(tmpDir, 'feature-collateral-test', 'worker-1', 'Existing log entry');
+      appendInboxMessage(tmpDir, 'feature-collateral-test', 'worker-1', {
+        timestamp: '2026-03-06T18:30:00.000Z',
+        from: 'user',
+        content: 'Existing inbox message',
+      });
+
+      const targetDir = sessionDir(tmpDir, 'feature-collateral-test');
+      writeFileSync(join(targetDir, 'current-agent'), 'worker-1\n', 'utf-8');
+
+      createSession(tmpDir, 'feature/untouched-session');
+      const untouchedSessionPath = join(sessionDir(tmpDir, 'feature-untouched-session'), 'session.json');
+
+      const filesBefore = readdirSync(targetDir).sort();
+      const logBefore = readFileSync(join(targetDir, 'worker-1.log.md'), 'utf-8');
+      const inboxBefore = readFileSync(join(targetDir, 'worker-1.inbox.md'), 'utf-8');
+      const currentAgentBefore = readFileSync(join(targetDir, 'current-agent'), 'utf-8');
+      const untouchedSessionBefore = readFileSync(untouchedSessionPath, 'utf-8');
+
+      markAgentCompleted(tmpDir, 'feature-collateral-test', 'worker-1');
+
+      expect(readdirSync(targetDir).sort()).toEqual(filesBefore);
+      expect(readFileSync(join(targetDir, 'worker-1.log.md'), 'utf-8')).toBe(logBefore);
+      expect(readFileSync(join(targetDir, 'worker-1.inbox.md'), 'utf-8')).toBe(inboxBefore);
+      expect(readFileSync(join(targetDir, 'current-agent'), 'utf-8')).toBe(currentAgentBefore);
+      expect(readFileSync(untouchedSessionPath, 'utf-8')).toBe(untouchedSessionBefore);
     });
   });
 
