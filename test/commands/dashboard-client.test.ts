@@ -444,6 +444,7 @@ function makeViewProps(
     onBackToSessions: noop,
     onSendMessage: noop,
     onDeleteMessage: noop,
+    onCompleteAgent: noop,
     ...overrides,
   };
 }
@@ -697,7 +698,7 @@ describe('SessionDetail component', () => {
 
   it('renders agents with status badges', () => {
     const html = renderToStaticMarkup(
-      createElement(SessionDetail, { session: mockSession, onBack: () => {}, onSendMessage: () => {}, onDeleteMessage: () => {} }),
+      createElement(SessionDetail, { session: mockSession, onBack: () => {}, onSendMessage: () => {}, onDeleteMessage: () => {}, onCompleteAgent: () => {} }),
     );
     expect(html).toContain('scout');
     expect(html).toContain('bosun');
@@ -710,7 +711,7 @@ describe('SessionDetail component', () => {
 
   it('renders back button and branch name', () => {
     const html = renderToStaticMarkup(
-      createElement(SessionDetail, { session: mockSession, onBack: () => {}, onSendMessage: () => {}, onDeleteMessage: () => {} }),
+      createElement(SessionDetail, { session: mockSession, onBack: () => {}, onSendMessage: () => {}, onDeleteMessage: () => {}, onCompleteAgent: () => {} }),
     );
     expect(html).toContain('← Back');
     expect(html).toContain('back-button');
@@ -745,7 +746,7 @@ describe('SessionDetail component', () => {
       ],
     };
     const html = renderToStaticMarkup(
-      createElement(SessionDetail, { session, onBack: () => {}, onSendMessage: () => {}, onDeleteMessage: () => {} }),
+      createElement(SessionDetail, { session, onBack: () => {}, onSendMessage: () => {}, onDeleteMessage: () => {}, onCompleteAgent: () => {} }),
     );
     const activeIdx = html.indexOf('active-agent');
     const completedIdx = html.indexOf('completed-agent');
@@ -778,7 +779,7 @@ describe('SessionDetail component', () => {
       ],
     };
     const html = renderToStaticMarkup(
-      createElement(SessionDetail, { session, onBack: () => {}, onSendMessage: () => {}, onDeleteMessage: () => {} }),
+      createElement(SessionDetail, { session, onBack: () => {}, onSendMessage: () => {}, onDeleteMessage: () => {}, onCompleteAgent: () => {} }),
     );
     const leadIdx = html.indexOf('sail-lead');
     const workerIdx = html.indexOf('worker-1');
@@ -787,14 +788,14 @@ describe('SessionDetail component', () => {
 
   it('shows a completed summary for collapsed completed agents', () => {
     const html = renderToStaticMarkup(
-      createElement(SessionDetail, { session: mockSession, onBack: () => {}, onSendMessage: () => {}, onDeleteMessage: () => {} }),
+      createElement(SessionDetail, { session: mockSession, onBack: () => {}, onSendMessage: () => {}, onDeleteMessage: () => {}, onCompleteAgent: () => {} }),
     );
     expect(html).toContain('agent-completed-summary');
   });
 
   it('renders the session status badge', () => {
     const html = renderToStaticMarkup(
-      createElement(SessionDetail, { session: mockSession, onBack: () => {}, onSendMessage: () => {}, onDeleteMessage: () => {} }),
+      createElement(SessionDetail, { session: mockSession, onBack: () => {}, onSendMessage: () => {}, onDeleteMessage: () => {}, onCompleteAgent: () => {} }),
     );
     // The session header should show the active status
     expect(html).toContain('session-detail-meta');
@@ -802,7 +803,7 @@ describe('SessionDetail component', () => {
 
   it('renders inbox section before log section in expanded agents', () => {
     const html = renderToStaticMarkup(
-      createElement(SessionDetail, { session: mockSession, onBack: () => {}, onSendMessage: () => {}, onDeleteMessage: () => {} }),
+      createElement(SessionDetail, { session: mockSession, onBack: () => {}, onSendMessage: () => {}, onDeleteMessage: () => {}, onCompleteAgent: () => {} }),
     );
     // Active agent (scout) is auto-expanded (M1), so inbox and log toggle should be present
     // Inbox should come before log toggle in the HTML
@@ -816,7 +817,7 @@ describe('SessionDetail component', () => {
 
   it('hides log content by default behind a toggle', () => {
     const html = renderToStaticMarkup(
-      createElement(SessionDetail, { session: mockSession, onBack: () => {}, onSendMessage: () => {}, onDeleteMessage: () => {} }),
+      createElement(SessionDetail, { session: mockSession, onBack: () => {}, onSendMessage: () => {}, onDeleteMessage: () => {}, onCompleteAgent: () => {} }),
     );
     // The log toggle button should be present
     expect(html).toContain('log-toggle');
@@ -843,7 +844,7 @@ describe('SessionDetail component', () => {
       }],
     };
     const html = renderToStaticMarkup(
-      createElement(SessionDetail, { session, onBack: () => {}, onSendMessage: () => {}, onDeleteMessage: () => {} }),
+      createElement(SessionDetail, { session, onBack: () => {}, onSendMessage: () => {}, onDeleteMessage: () => {}, onCompleteAgent: () => {} }),
     );
     expect(html).toContain('show more');
     expect(html).not.toContain(longMessage);
@@ -858,7 +859,7 @@ describe('SessionDetail component', () => {
       agents: [],
     };
     const html = renderToStaticMarkup(
-      createElement(SessionDetail, { session: emptySession, onBack: () => {}, onSendMessage: () => {}, onDeleteMessage: () => {} }),
+      createElement(SessionDetail, { session: emptySession, onBack: () => {}, onSendMessage: () => {}, onDeleteMessage: () => {}, onCompleteAgent: () => {} }),
     );
     expect(html).toContain('No agents in this session');
     expect(html).toContain('empty-state');
@@ -866,7 +867,7 @@ describe('SessionDetail component', () => {
 
   it('applies status-based CSS classes to agent cards', () => {
     const html = renderToStaticMarkup(
-      createElement(SessionDetail, { session: mockSession, onBack: () => {}, onSendMessage: () => {}, onDeleteMessage: () => {} }),
+      createElement(SessionDetail, { session: mockSession, onBack: () => {}, onSendMessage: () => {}, onDeleteMessage: () => {}, onCompleteAgent: () => {} }),
     );
     expect(html).toContain('agent-card-active');
     expect(html).toContain('agent-card-completed');
@@ -874,7 +875,7 @@ describe('SessionDetail component', () => {
 
   it('shows a delete button for undelivered messages', () => {
     const html = renderToStaticMarkup(
-      createElement(SessionDetail, { session: mockSession, onBack: () => {}, onSendMessage: () => {}, onDeleteMessage: () => {} }),
+      createElement(SessionDetail, { session: mockSession, onBack: () => {}, onSendMessage: () => {}, onDeleteMessage: () => {}, onCompleteAgent: () => {} }),
     );
     // The mockSession has an undelivered message from 'user' ("Focus on JWT")
     expect(html).toContain('delete-message-btn');
@@ -898,7 +899,7 @@ describe('SessionDetail component', () => {
       }],
     };
     const html = renderToStaticMarkup(
-      createElement(SessionDetail, { session, onBack: () => {}, onSendMessage: () => {}, onDeleteMessage: () => {} }),
+      createElement(SessionDetail, { session, onBack: () => {}, onSendMessage: () => {}, onDeleteMessage: () => {}, onCompleteAgent: () => {} }),
     );
     expect(html).not.toContain('delete-message-btn');
   });
@@ -961,5 +962,129 @@ describe('session state functions', () => {
     expect(initial.sessions).toEqual([]);
     expect(initial.selectedSession).toBeNull();
     expect(initial.sessionsLoading).toBe(false);
+  });
+});
+
+// ── Mark complete control ────────────────────────────────────────────────────
+
+describe('Mark complete control', () => {
+  const activeAgent: SessionDetailResponse['agents'][number] = {
+    name: 'sail-lead',
+    type: 'fleet',
+    status: 'active',
+    startedAt: '2024-01-15T10:00:00Z',
+    log: '',
+    inbox: [],
+  };
+
+  const completedAgent: SessionDetailResponse['agents'][number] = {
+    name: 'bosun',
+    type: 'fleet',
+    status: 'completed',
+    startedAt: '2024-01-15T10:00:00Z',
+    completedAt: '2024-01-15T10:05:00Z',
+    log: '',
+    inbox: [],
+  };
+
+  const makeSession = (agents: SessionDetailResponse['agents']): SessionDetailResponse => ({
+    id: 'test-session',
+    branch: 'feature/test',
+    startedAt: '2024-01-15T10:00:00Z',
+    status: 'active',
+    agents,
+  });
+
+  const noop = () => {};
+
+  it('shows mark-complete-btn for active agents', () => {
+    const html = renderToStaticMarkup(
+      createElement(SessionDetail, {
+        session: makeSession([activeAgent]),
+        onBack: noop,
+        onSendMessage: noop,
+        onDeleteMessage: noop,
+        onCompleteAgent: noop,
+      }),
+    );
+    expect(html).toContain('mark-complete-btn');
+    expect(html).toContain('Mark complete');
+  });
+
+  it('does not show mark-complete-btn for completed agents', () => {
+    const html = renderToStaticMarkup(
+      createElement(SessionDetail, {
+        session: makeSession([completedAgent]),
+        onBack: noop,
+        onSendMessage: noop,
+        onDeleteMessage: noop,
+        onCompleteAgent: noop,
+      }),
+    );
+    expect(html).not.toContain('mark-complete-btn');
+    expect(html).not.toContain('Mark complete');
+  });
+
+  it('does not show message-form for completed agents', () => {
+    const html = renderToStaticMarkup(
+      createElement(SessionDetail, {
+        session: makeSession([completedAgent]),
+        onBack: noop,
+        onSendMessage: noop,
+        onDeleteMessage: noop,
+        onCompleteAgent: noop,
+      }),
+    );
+    expect(html).not.toContain('message-form');
+    expect(html).not.toContain('Send a message');
+  });
+
+  it('shows message-form for active agents', () => {
+    const html = renderToStaticMarkup(
+      createElement(SessionDetail, {
+        session: makeSession([activeAgent]),
+        onBack: noop,
+        onSendMessage: noop,
+        onDeleteMessage: noop,
+        onCompleteAgent: noop,
+      }),
+    );
+    expect(html).toContain('message-form');
+    expect(html).toContain('Send a message');
+  });
+
+  it('DashboardView accepts onCompleteAgent prop and passes it to SessionDetail', () => {
+    const baseProps: DashboardViewProps = {
+      status: null,
+      formDisabled: false,
+      form: {
+        scope: 'local',
+        mode: 'simple',
+        workflow: 'solo',
+        tools: ['copilot'],
+      },
+      projectRows: [],
+      localRows: [],
+      effectiveRows: [],
+      activeTab: 'sessions',
+      sessions: [],
+      selectedSession: makeSession([activeAgent]),
+      sessionsLoading: false,
+      onSubmit: noop,
+      onScopeChange: noop,
+      onModeChange: noop,
+      onWorkflowChange: noop,
+      onToolChange: noop,
+      onTabChange: noop,
+      onSelectSession: noop,
+      onBackToSessions: noop,
+      onSendMessage: noop,
+      onDeleteMessage: noop,
+      onCompleteAgent: noop,
+    };
+    const html = renderToStaticMarkup(createElement(DashboardView, baseProps));
+    expect(html).toContain('mark-complete-btn');
+    expect(html).toContain('Mark complete');
+    expect(html).toContain('sail-lead');
   });
 });
