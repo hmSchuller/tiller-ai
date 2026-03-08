@@ -3,6 +3,7 @@
 > Shared project history. Updated by /sail, /anchor, and /dock. Committed and shared.
 
 ## Done
+- [2026-03-08] docked feature/dock-loop-and-sail-prompt
 - [2026-03-07] docked prototype/inter-agent-comm
 - [2026-03-07] feat: polish session detail UI — sorted agents, messaging-first layout, log toggle, delivery indicators
 - [2026-03-07] feat: delete unread inbox messages from dashboard
