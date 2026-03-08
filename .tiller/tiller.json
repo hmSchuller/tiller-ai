@@ -29,6 +29,7 @@
     ".github/hooks/secret-scan.sh",
     ".github/hooks/session-resume.sh",
     ".github/hooks/session-log.sh",
-    ".github/hooks/inbox-check.sh"
+    ".github/hooks/inbox-check.sh",
+    ".vscode/mcp.json"
   ]
 }
