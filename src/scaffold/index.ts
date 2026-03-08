@@ -43,6 +43,7 @@ import { generateCopilotBosunAgent } from './copilot/agents/bosun.js';
 import { generateCopilotCaptainAgent } from './copilot/agents/captain.js';
 import { generateCopilotCartographerAgent } from './copilot/agents/cartographer.js';
 import { generateCopilotHooksJson } from './copilot/hooks-json.js';
+import { generateVscodeMcpJson } from './copilot/mcp-json.js';
 import { generateCopilotDockSkill } from './copilot/skills/dock.js';
 import { generateCopilotSailSkill } from './copilot/skills/sail.js';
 import { generateRegisterAgentScript, generateCompleteAgentScript } from './bin/register-agent.js';
@@ -168,6 +169,9 @@ export async function scaffold(config: ProjectConfig, targetDir: string): Promis
     await writeFile(p('.github/hooks/session-resume.sh'), generateSessionResumeHook(config));
     await writeFile(p('.github/hooks/session-log.sh'), generateSessionLogHook(config));
     await writeFile(p('.github/hooks/inbox-check.sh'), generateInboxCheckHook(config));
+
+    // VS Code MCP config
+    await writeFile(p('.vscode/mcp.json'), generateVscodeMcpJson());
   }
 
   // Tiller bin scripts (approved once by the user, referenced by skills)

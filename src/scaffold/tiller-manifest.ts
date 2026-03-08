@@ -75,6 +75,7 @@ const COPILOT_MANAGED_FILES = [
   '.github/hooks/session-resume.sh',
   '.github/hooks/session-log.sh',
   '.github/hooks/inbox-check.sh',
+  '.vscode/mcp.json',
 ];
 
 /** Skills are placed in .claude/skills/ when Claude is selected (OpenCode reads them too).
