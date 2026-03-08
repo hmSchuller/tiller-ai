@@ -1,6 +1,7 @@
 import { createInterface, type Interface } from 'node:readline';
 import type { Readable, Writable } from 'node:stream';
 import type { JsonRpcMessage } from './types.js';
+import { PARSE_ERROR } from './types.js';
 
 export interface McpTransport {
   onMessage: (handler: (message: JsonRpcMessage) => void) => void;
@@ -39,7 +40,7 @@ export function createStdioTransport(
         send({
           jsonrpc: '2.0',
           id: null,
-          error: { code: -32700, message: 'Parse error' },
+          error: { code: PARSE_ERROR, message: 'Parse error' },
         });
       }
     });
