@@ -8,7 +8,7 @@
 
 **Path:** `src/index.ts`, `src/commands/`
 
-The CLI entrypoint wires four user-facing commands: `init`, `upgrade`, `config`, and `dashboard`. These command files stay thin and mostly hand off to shared config, scaffold, and dashboard logic, so `src/index.ts`, `src/commands/config.ts`, and `src/commands/dashboard.ts` are the best starting points when changing command behavior.
+The CLI entrypoint wires five user-facing commands: `init`, `upgrade`, `config`, `dashboard`, and `mcp-server`. These command files stay thin and mostly hand off to shared config, scaffold, dashboard, and MCP logic, so `src/index.ts`, `src/commands/config.ts`, `src/commands/dashboard.ts`, and `src/commands/mcp-server.ts` are the best starting points when changing command behavior.
 
 ### Dashboard Server & Client
 
@@ -32,13 +32,19 @@ This file-backed store defines how sail sessions, agent rosters, logs, and inbox
 
 **Path:** `src/scaffold/index.ts`, `src/scaffold/skills/`, `src/scaffold/hooks/`, `src/scaffold/bin/`, `src/scaffold/agents/`, `src/scaffold/copilot/`, `src/scaffold/opencode/`
 
-These generators produce the Tiller-managed files for Claude Code, GitHub Copilot, and OpenCode projects, including hooks, agents, skill prompts, and the shared `register-agent.py`/`complete-agent.py` helper scripts under `src/scaffold/bin/`. Copilot now has dedicated sail and dock generators under `src/scaffold/copilot/skills/`, while `src/scaffold/index.ts` and `src/scaffold/regenerate.ts` handle the initial scaffold and later rewrites into `.github/skills/`. Start with `src/scaffold/index.ts`, then read the specific generator you need to change—especially `src/scaffold/copilot/skills/` for Copilot-only flow behavior.
+These generators produce the Tiller-managed files for Claude Code, GitHub Copilot, and OpenCode projects, including hooks, agents, skill prompts, and the shared `register-agent.py`/`complete-agent.py` helper scripts under `src/scaffold/bin/`. Copilot now has dedicated sail and dock generators under `src/scaffold/copilot/skills/` and a `.vscode/mcp.json` generator at `src/scaffold/copilot/mcp-json.ts` that auto-wires the `tiller-ai mcp-server` process into VS Code. Skill prompts (both Copilot and Claude) prefer MCP tools with Python-script fallback. Start with `src/scaffold/index.ts`, then the specific generator you need—`src/scaffold/copilot/mcp-json.ts` for MCP auto-config, `src/scaffold/copilot/skills/` for Copilot-only flow behavior.
+
+### MCP Server
+
+**Path:** `src/mcp/`, `src/commands/mcp-server.ts`
+
+Implements a JSON-RPC 2.0 / Model Context Protocol server (`tiller-ai mcp-server`) that exposes Tiller's session and inbox operations as typed MCP tools and resources so AI agents can communicate without shelling out to Python scripts. `server.ts` owns the protocol handshake and request dispatch; `tools.ts` defines and handles all tool calls (register-agent, complete-agent, send-inbox-message, read-inbox, read/write-compass, list-sessions); `transport.ts` wraps stdio line-by-line framing; `types.ts` carries the full JSON-RPC + MCP type surface. Start with `src/mcp/server.ts`, then `src/mcp/tools.ts`.
 
 ### Test Suite
 
 **Path:** `test/`
 
-Vitest covers the CLI, scaffold generators, sessions store, and the dashboard’s server/client split. `test/scaffold/copilot.test.ts` and `test/scaffold/integration.test.ts` pin Copilot-specific generated skill output plus scaffold/regeneration wiring, while the dashboard and sessions tests cover the runtime surfaces those generated files feed.
+Vitest covers the CLI, scaffold generators, sessions store, the dashboard’s server/client split, and the MCP server. `test/mcp/server.test.ts`, `test/mcp/tools.test.ts`, and `test/mcp/resources.test.ts` exercise the full MCP protocol surface (tool dispatch, resource reads, JSON-RPC edge cases); `test/commands/mcp-server.test.ts` covers the CLI command entrypoint. `test/scaffold/copilot.test.ts` and `test/scaffold/integration.test.ts` pin Copilot-specific output and regeneration wiring.
 
 ### Promotional Website
 
