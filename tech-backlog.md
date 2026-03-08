@@ -6,9 +6,11 @@
 ## Backlog
 
 - [major] src/scaffold/index.ts + src/commands/upgrade.ts: gitignore missing-entries logic (filter + split('\n') + append block) is duplicated verbatim in both files with no shared helper
+- [critical] src/commands/config-shared.ts: `readConfig()` trusts parsed `.tiller/tiller.json` and `.tiller/local.json` via `as TillerManifest` / `as Record<string, unknown>` without runtime shape validation
 
 ## Done
 
+- [done 2026-03-08] src/sessions/fs.ts: `readSession()` no longer trusts parsed `session.json` via `as Session`; it now validates the runtime shape before returning session data
 - [done 2026-03-06] src/scaffold/hooks/plan-context.ts: plan-context hook now loads the detailed Step 3 plan template from the generated Claude sail skill at runtime, with an inline fallback, so the hook no longer depends on a fully duplicated sail template staying in sync by hand
 - [done 2026-03-04] src/scaffold/skills/setup.ts: Step 4 heading referred to `.tiller.json` (old filename) in both SIMPLE and DETAILED branches — corrected to `.tiller/tiller.json` to match the actual path
 - [done 2026-03-04] test/scaffold/skills.test.ts: duplicate test case — two identical `it` blocks in `generateDockSkill` both asserted `toContain('changelog.md')` with different names but the same body; removed the less descriptive duplicate
