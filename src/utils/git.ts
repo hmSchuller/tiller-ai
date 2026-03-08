@@ -18,6 +18,13 @@ export function gitInit(cwd: string): void {
   } catch {
     // Already on a branch — that's fine
   }
+  // Ensure a local identity exists so commits work in CI environments
+  try {
+    execSync('git config user.email', { cwd, stdio: 'pipe' });
+  } catch {
+    exec('git config user.email "tiller@scaffold"', cwd);
+    exec('git config user.name "Tiller"', cwd);
+  }
 }
 
 export function gitAdd(cwd: string, pattern = '-A'): void {
