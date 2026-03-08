@@ -9,6 +9,33 @@ import {
 import { join } from 'node:path';
 import type { Session, AgentRecord, InboxMessage } from './types.js';
 
+function isAgentRecord(value: unknown): value is AgentRecord {
+  if (value === null || typeof value !== 'object') return false;
+
+  const candidate = value as Record<string, unknown>;
+  return (
+    typeof candidate.name === 'string' &&
+    (candidate.type === 'fleet' || candidate.type === 'specialist' || candidate.type === 'ephemeral') &&
+    (candidate.status === 'active' || candidate.status === 'completed' || candidate.status === 'failed') &&
+    typeof candidate.startedAt === 'string' &&
+    (candidate.completedAt === undefined || typeof candidate.completedAt === 'string')
+  );
+}
+
+function isSession(value: unknown): value is Session {
+  if (value === null || typeof value !== 'object') return false;
+
+  const candidate = value as Record<string, unknown>;
+  return (
+    typeof candidate.id === 'string' &&
+    typeof candidate.branch === 'string' &&
+    typeof candidate.startedAt === 'string' &&
+    (candidate.status === 'active' || candidate.status === 'completed') &&
+    Array.isArray(candidate.agents) &&
+    candidate.agents.every(isAgentRecord)
+  );
+}
+
 export function branchToSlug(branch: string): string {
   return branch.replace(/\//g, '-').replace(/^-+|-+$/g, '');
 }
@@ -37,7 +64,11 @@ export function createSession(projectRoot: string, branch: string): Session {
 export function readSession(projectRoot: string, slug: string): Session | null {
   const filePath = join(sessionDir(projectRoot, slug), 'session.json');
   if (!existsSync(filePath)) return null;
-  return JSON.parse(readFileSync(filePath, 'utf-8')) as Session;
+  const parsed: unknown = JSON.parse(readFileSync(filePath, 'utf-8'));
+  if (!isSession(parsed)) {
+    throw new Error(`Invalid session data: ${slug}`);
+  }
+  return parsed;
 }
 
 export function writeSession(projectRoot: string, slug: string, session: Session): void {
