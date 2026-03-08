@@ -42,6 +42,7 @@ import { generateCopilotBosunAgent } from './copilot/agents/bosun.js';
 import { generateCopilotCaptainAgent } from './copilot/agents/captain.js';
 import { generateCopilotCartographerAgent } from './copilot/agents/cartographer.js';
 import { generateCopilotHooksJson } from './copilot/hooks-json.js';
+import { generateCopilotDockSkill } from './copilot/skills/dock.js';
 import { generateCopilotSailSkill } from './copilot/skills/sail.js';
 import { generateRegisterAgentScript, generateCompleteAgentScript } from './bin/register-agent.js';
 
@@ -145,7 +146,7 @@ export async function scaffold(config: ProjectConfig, targetDir: string): Promis
     await writeFile(p('.github/skills/sail/SKILL.md'), generateCopilotSailSkill(config));
     await writeFile(p('.github/skills/anchor/SKILL.md'), generateAnchorSkill(config));
     await writeFile(p('.github/skills/recap/SKILL.md'), generateRecapSkill(config));
-    await writeFile(p('.github/skills/dock/SKILL.md'), generateDockSkill(config));
+    await writeFile(p('.github/skills/dock/SKILL.md'), generateCopilotDockSkill(config));
     await writeFile(p('.github/skills/tech-debt/SKILL.md'), generateTechDebtSkill(config));
     await writeFile(p('.github/skills/scout/SKILL.md'), generateScoutSkill(config));
     await writeFile(p('.github/skills/repair-hull/SKILL.md'), generateRepairHullSkill(config));

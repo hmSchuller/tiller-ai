@@ -5,6 +5,7 @@ import { generateCopilotBosunAgent } from '../../src/scaffold/copilot/agents/bos
 import { generateCopilotCaptainAgent } from '../../src/scaffold/copilot/agents/captain.js';
 import { generateCopilotCartographerAgent } from '../../src/scaffold/copilot/agents/cartographer.js';
 import { generateCopilotHooksJson } from '../../src/scaffold/copilot/hooks-json.js';
+import { generateCopilotDockSkill } from '../../src/scaffold/copilot/skills/dock.js';
 import { generateCopilotSailSkill } from '../../src/scaffold/copilot/skills/sail.js';
 import { simpleConfig, copilotOnlyConfig } from '../helpers/fixtures.js';
 
@@ -207,5 +208,38 @@ describe('generateCopilotSailSkill', () => {
     const result = generateCopilotSailSkill(simpleConfig);
     expect(result).toContain('does NOT implement any code itself');
     expect(result).toContain('pure orchestrator');
+  });
+});
+
+describe('generateCopilotDockSkill', () => {
+  it('has dock name in frontmatter', () => {
+    const result = generateCopilotDockSkill(simpleConfig);
+    expect(result).toContain('name: dock');
+  });
+
+  it('uses AskUserQuestion only for the success loop interaction', () => {
+    const result = generateCopilotDockSkill(simpleConfig);
+    expect(result).toContain('All Step 8 user interaction uses `AskUserQuestion` only — no chat prompts.');
+    expect(result).toContain('AskUserQuestion');
+    expect(result).not.toContain('Say: "Done."');
+  });
+
+  it('offers Start new sail and Finish after a successful dock', () => {
+    const result = generateCopilotDockSkill(simpleConfig);
+    expect(result).toContain('After the dock completes successfully');
+    expect(result).toContain('"Start new sail"');
+    expect(result).toContain('"Finish"');
+    expect(result).toContain('Done. What next?');
+  });
+
+  it('asks what to work on next before continuing the sail flow', () => {
+    const result = generateCopilotDockSkill(simpleConfig);
+    expect(result).toContain('What should we work on next?');
+    expect(result).toContain('continue into the Copilot sail flow from **Step 2**');
+  });
+
+  it('does not auto-run sail from dock', () => {
+    const result = generateCopilotDockSkill(simpleConfig);
+    expect(result).toContain('Do NOT auto-run `/sail`');
   });
 });

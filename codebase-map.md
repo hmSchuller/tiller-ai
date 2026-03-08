@@ -32,13 +32,13 @@ This file-backed store defines how sail sessions, agent rosters, logs, and inbox
 
 **Path:** `src/scaffold/index.ts`, `src/scaffold/skills/`, `src/scaffold/hooks/`, `src/scaffold/bin/`, `src/scaffold/agents/`, `src/scaffold/copilot/`, `src/scaffold/opencode/`
 
-These generators produce the actual Tiller-owned files for Claude Code, GitHub Copilot, and OpenCode projects, including session-log, inbox-check, and agent-complete hooks, sail skill instructions, and the shared `register-agent.py`/`complete-agent.py` helper scripts under `src/scaffold/bin/`. Most files here are pure string builders, so the important first reads are `src/scaffold/index.ts` for orchestration and the specific generator file for the output you want to change, especially `hooks/`, `bin/`, `skills/sail.ts`, or tool-specific subfolders.
+These generators produce the Tiller-managed files for Claude Code, GitHub Copilot, and OpenCode projects, including hooks, agents, skill prompts, and the shared `register-agent.py`/`complete-agent.py` helper scripts under `src/scaffold/bin/`. Copilot now has dedicated sail and dock generators under `src/scaffold/copilot/skills/`, while `src/scaffold/index.ts` and `src/scaffold/regenerate.ts` handle the initial scaffold and later rewrites into `.github/skills/`. Start with `src/scaffold/index.ts`, then read the specific generator you need to change—especially `src/scaffold/copilot/skills/` for Copilot-only flow behavior.
 
 ### Test Suite
 
 **Path:** `test/`
 
-Vitest covers the CLI, scaffold generators, sessions store, and the dashboard’s server/client split. `test/commands/dashboard.test.ts` and `test/commands/dashboard-client.test.ts` cover the Sessions tab plus config flows, while `test/sessions/fs.test.ts` and the scaffold tests pin the file-backed session format and generated hook/skill output.
+Vitest covers the CLI, scaffold generators, sessions store, and the dashboard’s server/client split. `test/scaffold/copilot.test.ts` and `test/scaffold/integration.test.ts` pin Copilot-specific generated skill output plus scaffold/regeneration wiring, while the dashboard and sessions tests cover the runtime surfaces those generated files feed.
 
 ### Promotional Website
 

@@ -316,6 +316,16 @@ describe('scaffold integration — copilot only', () => {
     }
   });
 
+  it('scaffolds the Copilot dock loop template', async () => {
+    const content = await readFile(join(dir, '.github/skills/dock/SKILL.md'), 'utf-8');
+    expect(content).toContain('After the dock completes successfully');
+    expect(content).toContain('"Start new sail"');
+    expect(content).toContain('"Finish"');
+    expect(content).toContain('What should we work on next?');
+    expect(content).toContain('Do NOT auto-run `/sail`');
+    expect(content).not.toContain('Run `/clear` to reset context before starting your next feature, then `/sail` to continue.');
+  });
+
   it('creates all 4 agents as .agent.md files', async () => {
     for (const agent of ['quartermaster', 'bosun', 'captain', 'cartographer']) {
       expect(await cpExists(`.github/agents/${agent}.agent.md`)).toBe(true);
