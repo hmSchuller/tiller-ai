@@ -38,6 +38,7 @@ const CLAUDE_MANAGED_FILES = [
   '.claude/skills/tech-debt/SKILL.md',
   '.claude/skills/scout/SKILL.md',
   '.claude/skills/repair-hull/SKILL.md',
+  '.claude/skills/cookbook/SKILL.md',
   '.claude/agents/quartermaster.md',
   '.claude/agents/bosun.md',
   '.claude/agents/captain.md',
@@ -63,6 +64,7 @@ const COPILOT_MANAGED_FILES = [
   '.github/skills/tech-debt/SKILL.md',
   '.github/skills/scout/SKILL.md',
   '.github/skills/repair-hull/SKILL.md',
+  '.github/skills/cookbook/SKILL.md',
   '.github/agents/quartermaster.agent.md',
   '.github/agents/bosun.agent.md',
   '.github/agents/captain.agent.md',
@@ -86,6 +88,7 @@ const OPENCODE_ONLY_SKILL_FILES = [
   '.opencode/skills/tech-debt/SKILL.md',
   '.opencode/skills/scout/SKILL.md',
   '.opencode/skills/repair-hull/SKILL.md',
+  '.opencode/skills/cookbook/SKILL.md',
 ];
 
 export function getManagedFiles(tools: ToolTarget[]): string[] {

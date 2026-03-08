@@ -16,6 +16,7 @@ import { generateDockSkill } from './skills/dock.js';
 import { generateTechDebtSkill } from './skills/tech-debt.js';
 import { generateScoutSkill } from './skills/scout.js';
 import { generateRepairHullSkill } from './skills/repair-hull.js';
+import { generateCookbookSkill } from './skills/cookbook.js';
 import { generateTillerMd } from './claude-md.js';
 import { generateSettingsJson } from './settings-json.js';
 import { generateQuartermasterAgent } from './agents/quartermaster.js';
@@ -87,6 +88,7 @@ export async function regenerateFiles(config: ProjectConfig, cwd: string, opts?:
     await writeFile(resolve(cwd, '.claude/skills/tech-debt/SKILL.md'), generateTechDebtSkill(config));
     await writeFile(resolve(cwd, '.claude/skills/scout/SKILL.md'), generateScoutSkill(config));
     await writeFile(resolve(cwd, '.claude/skills/repair-hull/SKILL.md'), generateRepairHullSkill(config));
+    await writeFile(resolve(cwd, '.claude/skills/cookbook/SKILL.md'), generateCookbookSkill(config));
     await writeFile(resolve(cwd, '.claude/agents/quartermaster.md'), generateQuartermasterAgent(config));
     await writeFile(resolve(cwd, '.claude/agents/bosun.md'), generateBosunAgent(config));
     await writeFile(resolve(cwd, '.claude/agents/captain.md'), generateCaptainAgent(config));
@@ -111,6 +113,7 @@ export async function regenerateFiles(config: ProjectConfig, cwd: string, opts?:
       await writeFile(resolve(cwd, '.opencode/skills/tech-debt/SKILL.md'), generateTechDebtSkill(config));
       await writeFile(resolve(cwd, '.opencode/skills/scout/SKILL.md'), generateScoutSkill(config));
       await writeFile(resolve(cwd, '.opencode/skills/repair-hull/SKILL.md'), generateRepairHullSkill(config));
+      await writeFile(resolve(cwd, '.opencode/skills/cookbook/SKILL.md'), generateCookbookSkill(config));
     }
   }
 
@@ -125,6 +128,7 @@ export async function regenerateFiles(config: ProjectConfig, cwd: string, opts?:
     await writeFile(resolve(cwd, '.github/skills/tech-debt/SKILL.md'), generateTechDebtSkill(config));
     await writeFile(resolve(cwd, '.github/skills/scout/SKILL.md'), generateScoutSkill(config));
     await writeFile(resolve(cwd, '.github/skills/repair-hull/SKILL.md'), generateRepairHullSkill(config));
+    await writeFile(resolve(cwd, '.github/skills/cookbook/SKILL.md'), generateCookbookSkill(config));
     await writeFile(resolve(cwd, '.github/agents/quartermaster.agent.md'), generateCopilotQuartermasterAgent(config));
     await writeFile(resolve(cwd, '.github/agents/bosun.agent.md'), generateCopilotBosunAgent(config));
     await writeFile(resolve(cwd, '.github/agents/captain.agent.md'), generateCopilotCaptainAgent(config));

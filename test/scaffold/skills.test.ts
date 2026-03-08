@@ -6,6 +6,7 @@ import { generateDockSkill } from '../../src/scaffold/skills/dock.js';
 import { generateTechDebtSkill } from '../../src/scaffold/skills/tech-debt.js';
 import { generateScoutSkill } from '../../src/scaffold/skills/scout.js';
 import { generateRepairHullSkill } from '../../src/scaffold/skills/repair-hull.js';
+import { generateCookbookSkill } from '../../src/scaffold/skills/cookbook.js';
 import { simpleConfig, detailedConfig, teamSimpleConfig } from '../helpers/fixtures.js';
 
 describe('generateSailSkill', () => {
@@ -932,5 +933,103 @@ describe('generateRepairHullSkill', () => {
     const result = generateRepairHullSkill(simpleConfig);
     expect(result).toContain('.tiller/local.json');
     expect(result).toContain('.tiller/tiller.json');
+  });
+});
+
+describe('generateCookbookSkill', () => {
+  it('has correct frontmatter name', () => {
+    expect(generateCookbookSkill(simpleConfig)).toContain('name: cookbook');
+  });
+
+  it('has a description covering best-practice documentation', () => {
+    const result = generateCookbookSkill(simpleConfig);
+    expect(result).toContain('best practices');
+  });
+
+  it('includes orient step that reads tiller.json', () => {
+    expect(generateCookbookSkill(simpleConfig)).toContain('.tiller/tiller.json');
+  });
+
+  it('includes orient step that announces current mode', () => {
+    expect(generateCookbookSkill(simpleConfig)).toContain('Mode: <mode>');
+  });
+
+  it('detects technologies by scanning manifest files', () => {
+    const result = generateCookbookSkill(simpleConfig);
+    expect(result).toContain('package.json');
+    expect(result).toContain('Cargo.toml');
+    expect(result).toContain('go.mod');
+  });
+
+  it('uses Explore agent to scan the project', () => {
+    const result = generateCookbookSkill(simpleConfig);
+    expect(result).toContain('Explore agent');
+    expect(result).toContain('subagent_type: "Explore"');
+  });
+
+  it('checks for existing guidelines in common documentation locations', () => {
+    const result = generateCookbookSkill(simpleConfig);
+    expect(result).toContain('CONTRIBUTING.md');
+    expect(result).toContain('README.md');
+  });
+
+  it('asks user to confirm when no guidelines are found', () => {
+    const result = generateCookbookSkill(simpleConfig);
+    expect(result).toContain('confirm');
+    expect(result).toContain('confirmed');
+  });
+
+  it('asks user where to place the cookbook folder', () => {
+    const result = generateCookbookSkill(simpleConfig);
+    expect(result).toContain('cookbook-root');
+    expect(result).toContain('docs/cookbook');
+  });
+
+  it('spawns general-purpose sub-agent to research each technology', () => {
+    const result = generateCookbookSkill(simpleConfig);
+    expect(result).toContain('subagent_type: "general-purpose"');
+    expect(result).toContain('production-grade');
+  });
+
+  it('instructs creation of per-technology subfolders', () => {
+    const result = generateCookbookSkill(simpleConfig);
+    expect(result).toContain('<technology-1>');
+    expect(result).toContain('<technology-2>');
+  });
+
+  it('creates multiple topic files per technology rather than one big file', () => {
+    const result = generateCookbookSkill(simpleConfig);
+    expect(result).toContain('coding-style.md');
+    expect(result).toContain('testing.md');
+    expect(result).toContain('security.md');
+    expect(result).toContain('pitfalls.md');
+  });
+
+  it('creates a top-level README.md with an index', () => {
+    const result = generateCookbookSkill(simpleConfig);
+    expect(result).toContain('README.md');
+    expect(result).toContain('Project Cookbook');
+  });
+
+  it('instructs cross-referencing between technology files', () => {
+    expect(generateCookbookSkill(simpleConfig)).toContain('Cross-reference');
+  });
+
+  it('outputs a summary of what was created', () => {
+    const result = generateCookbookSkill(simpleConfig);
+    expect(result).toContain('Cookbook created at');
+    expect(result).toContain('Technologies documented');
+  });
+
+  it('handles both simple and detailed modes at runtime', () => {
+    const result = generateCookbookSkill(simpleConfig);
+    expect(result).toContain('simple');
+    expect(result).toContain('detailed');
+  });
+
+  it('does not vary output based on config mode (runtime-evaluated)', () => {
+    const simple = generateCookbookSkill(simpleConfig);
+    const detailed = generateCookbookSkill(detailedConfig);
+    expect(simple).toEqual(detailed);
   });
 });
