@@ -15,8 +15,13 @@ Use this skill to contribute anything: new features, bug fixes, or incremental t
 
 ## Sub-agent registration rule (applies to ALL steps)
 
-**Every time** you spawn a sub-agent (via the Task tool), you MUST register it in the session BEFORE spawning:
+**Every time** you spawn a sub-agent (via the Task tool), you MUST register it in the session BEFORE spawning.
 
+**Preferred — use the MCP tool** (if \`tiller/register-agent\` is available):
+Use the \`tiller/register-agent\` MCP tool with parameters: \`{ "sessionSlug": "<slug>", "name": "<agent-name>", "type": "<agent-type>", "startedAt": "<ISO timestamp>" }\`.
+Then write the current-agent file: \`echo "<agent-name>" > .tiller/sessions/<slug>/current-agent\`
+
+**Fallback — use the Python script** (if MCP tool is not available):
 \`\`\`bash
 ts=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 python3 .tiller/bin/register-agent.py ".tiller/sessions/<slug>/session.json" "$ts" "<agent-name>" "<agent-type>"
@@ -27,6 +32,9 @@ Use descriptive names and types: e.g. \`"interviewer" "requirements"\`, \`"plann
 
 After a sub-agent completes, mark it completed and restore the lead agent:
 
+**Preferred — MCP tool:** Use \`tiller/complete-agent\` with \`{ "sessionSlug": "<slug>", "agentName": "<agent-name>" }\`, then \`echo "sail-lead" > .tiller/sessions/<slug>/current-agent\`.
+
+**Fallback — Python script:**
 \`\`\`bash
 python3 .tiller/bin/complete-agent.py ".tiller/sessions/<slug>/session.json" "<agent-name>"
 echo "sail-lead" > .tiller/sessions/<slug>/current-agent

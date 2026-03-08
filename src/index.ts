@@ -3,6 +3,7 @@ import { initCommand } from './commands/init.js';
 import { upgradeCommand } from './commands/upgrade.js';
 import { configCommand } from './commands/config.js';
 import { dashboardCommand } from './commands/dashboard.js';
+import { mcpServerCommand } from './commands/mcp-server.js';
 import { TILLER_VERSION } from './scaffold/tiller-manifest.js';
 
 const program = new Command();
@@ -37,6 +38,13 @@ program
   .description('Launch a local browser dashboard for configuration')
   .action(async () => {
     await dashboardCommand();
+  });
+
+program
+  .command('mcp-server')
+  .description('Start the MCP server for AI agent communication (stdio transport)')
+  .action(async () => {
+    await mcpServerCommand();
   });
 
 program.parse();

@@ -35,6 +35,7 @@ import { generateCopilotBosunAgent } from './copilot/agents/bosun.js';
 import { generateCopilotCaptainAgent } from './copilot/agents/captain.js';
 import { generateCopilotCartographerAgent } from './copilot/agents/cartographer.js';
 import { generateCopilotHooksJson } from './copilot/hooks-json.js';
+import { generateVscodeMcpJson } from './copilot/mcp-json.js';
 import { generateCopilotDockSkill } from './copilot/skills/dock.js';
 import { generateCopilotSailSkill } from './copilot/skills/sail.js';
 import { generateTillerManifest, getManagedFiles, TILLER_VERSION } from './tiller-manifest.js';
@@ -140,6 +141,9 @@ export async function regenerateFiles(config: ProjectConfig, cwd: string, opts?:
     await writeFile(resolve(cwd, '.github/hooks/session-resume.sh'), generateSessionResumeHook(config));
     await writeFile(resolve(cwd, '.github/hooks/session-log.sh'), generateSessionLogHook(config));
     await writeFile(resolve(cwd, '.github/hooks/inbox-check.sh'), generateInboxCheckHook(config));
+
+    // VS Code MCP config
+    await writeFile(resolve(cwd, '.vscode/mcp.json'), generateVscodeMcpJson());
   }
 
   if (!opts?.skipManifest) {

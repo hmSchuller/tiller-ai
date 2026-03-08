@@ -109,7 +109,6 @@ npx tiller-ai upgrade --yes
 - **/setup** — first-run: understand the project and configure CLAUDE.md
 - **/sail** [idea] — milestone-driven development: plan, build, test, auto-commit. Independent milestones are parallelized using agent teams. Every 3 landed features, automatically runs a tech debt cleanup before planning.
 - **/scout** [topic] — pre-work investigation: explore the codebase, ask clarifying questions, produce a structured ticket (GitHub Issue or terminal output).
-- **/cookbook** — scan the project stack, research best practices for every technology found, and write them as structured markdown files under `docs/cookbook/` (or a user-specified path)
 - **/anchor** — commit current progress on the feature branch
 - **/dock** — merge or PR depending on workflow
 - **/recap** — read-only status of all work
@@ -122,28 +121,6 @@ Tiller provides four specialist agents in `.claude/agents/`. They are native Cla
 - **bosun** — tech debt maintenance. Scans the codebase, logs issues to `tech-backlog.md` by severity, fixes one small item per run. Alerts on critical items.
 - **captain** — arbitration. Only activated when Quartermaster and Sailing Agent reach impasse. Issues one of three rulings: AGREE WITH QUARTERMASTER, AGREE WITH SAILING AGENT, or COMPROMISE. (opus)
 - **cartographer** — codebase map maintainer. Spawned at /dock time to update `codebase-map.md` with features and module paths. Reports structural concerns for the calling skill to escalate.
-
-## Cookbook
-
-`/cookbook` generates a best-practices reference under `docs/cookbook/` (default) or any path the user specifies. When the folder exists, **read the relevant technology section before implementing a feature in that technology**.
-
-Structure:
-```
-docs/cookbook/
-  README.md                  ← index of all technologies
-  <technology>/
-    README.md                ← 1–2 sentence intro + links
-    project-structure.md
-    coding-style.md
-    error-handling.md
-    testing.md
-    performance.md
-    security.md
-    tooling.md
-    pitfalls.md
-```
-
-Each topic file covers one concern. Only files with meaningful content are created. Files are kept under ~300 lines; longer content is split into numbered parts (e.g. `testing-1.md`).
 
 ## Rules
 
