@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { mkdtempSync, rmSync, readFileSync, existsSync } from 'node:fs';
+import { mkdtempSync, rmSync, readFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import {
@@ -87,6 +87,25 @@ describe('sessions/fs', () => {
       const session = readSession(tmpDir, 'feature-read-test');
       expect(session).not.toBeNull();
       expect(session!.branch).toBe('feature/read-test');
+    });
+
+    it('throws for invalid session data', () => {
+      const dir = join(tmpDir, '.tiller', 'sessions', 'feature-invalid');
+      const filePath = join(dir, 'session.json');
+      mkdirSync(dir, { recursive: true });
+      writeFileSync(
+        filePath,
+        JSON.stringify({
+          id: 'feature-invalid',
+          branch: 'feature/invalid',
+          startedAt: '2026-03-08T00:00:00Z',
+          status: 'active',
+          agents: [{ name: 'qm' }],
+        }),
+        'utf-8',
+      );
+
+      expect(() => readSession(tmpDir, 'feature-invalid')).toThrow('Invalid session data: feature-invalid');
     });
   });
 
