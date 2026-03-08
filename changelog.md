@@ -3,6 +3,9 @@
 > Shared project history. Updated by /sail, /anchor, and /dock. Committed and shared.
 
 ## Done
+- [2026-03-08] feat: add Sessions UI control for manually completing agents
+- [2026-03-08] feat: add dashboard endpoint for manually completing agents
+- [2026-03-08] feat: add manual agent completion helper for session state
 - [2026-03-08] docked feature/dock-loop-and-sail-prompt
 - [2026-03-07] docked prototype/inter-agent-comm
 - [2026-03-07] feat: polish session detail UI — sorted agents, messaging-first layout, log toggle, delivery indicators

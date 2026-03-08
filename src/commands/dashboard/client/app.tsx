@@ -62,6 +62,7 @@ export type DashboardViewProps = {
   onBackToSessions: () => void;
   onSendMessage: (agentName: string, content: string) => void;
   onDeleteMessage: (agentName: string, messageIndex: number) => void;
+  onCompleteAgent: (agentName: string) => void;
 };
 
 const DASHBOARD_TABS = [
@@ -90,6 +91,7 @@ export function DashboardView({
   onBackToSessions,
   onSendMessage,
   onDeleteMessage,
+  onCompleteAgent,
 }: DashboardViewProps) {
   return (
     <main className="shell">
@@ -116,7 +118,7 @@ export function DashboardView({
       ) : sessionsLoading && sessions.length === 0 && !selectedSession ? (
         <div className="empty-state">Loading sessions…</div>
       ) : selectedSession ? (
-        <SessionDetail session={selectedSession} onBack={onBackToSessions} onSendMessage={onSendMessage} onDeleteMessage={onDeleteMessage} />
+        <SessionDetail session={selectedSession} onBack={onBackToSessions} onSendMessage={onSendMessage} onDeleteMessage={onDeleteMessage} onCompleteAgent={onCompleteAgent} />
       ) : (
         <SessionList sessions={sessions} onSelectSession={onSelectSession} />
       )}
@@ -328,6 +330,25 @@ export function DashboardApp() {
     }
   };
 
+  const onCompleteAgent = async (agentName: string): Promise<void> => {
+    const sessionId = appState.selectedSession?.id;
+    if (!sessionId) return;
+
+    try {
+      const response = await fetch(
+        `/api/sessions/${encodeURIComponent(sessionId)}/agents/${encodeURIComponent(agentName)}/complete`,
+        { method: 'POST' },
+      );
+      if (!response.ok) {
+        return;
+      }
+      // Refresh both the selected session detail and the session list so ordering/counts update
+      await Promise.all([fetchSessionDetail(sessionId), fetchSessions()]);
+    } catch {
+      // Silently ignore completion errors
+    }
+  };
+
   const projectRows = appState.dashState ? getSnapshotRows(appState.dashState.project) : [];
   const localRows = appState.dashState ? getLocalRows(appState.dashState.local) : [];
   const effectiveRows = appState.dashState ? getSnapshotRows(appState.dashState.effective) : [];
@@ -354,6 +375,7 @@ export function DashboardApp() {
       onBackToSessions={onBackToSessions}
       onSendMessage={onSendMessage}
       onDeleteMessage={onDeleteMessage}
+      onCompleteAgent={onCompleteAgent}
     />
   );
 }

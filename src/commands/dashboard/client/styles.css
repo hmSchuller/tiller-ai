@@ -902,7 +902,31 @@ input:disabled,
   transform: translateY(0);
 }
 
-/* ── Delete message button ─────────────────────────────────────── */
+/* ── Mark complete action ──────────────────────────────────────── */
+
+.agent-complete-action {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.mark-complete-btn {
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-inset);
+  color: var(--color-text-muted);
+  padding: var(--space-2) var(--space-3);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+
+.mark-complete-btn:hover {
+  background: rgba(51, 65, 85, 0.80);
+  border-color: var(--color-accent);
+  color: var(--color-text);
+}
 
 .delete-message-btn {
   flex-shrink: 0;
