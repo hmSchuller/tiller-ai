@@ -37,6 +37,14 @@ function requireString(args: Record<string, unknown>, key: string): string {
   return value;
 }
 
+function requireSlug(args: Record<string, unknown>, key: string): string {
+  const value = requireString(args, key);
+  if (value.includes('..')) {
+    throw new Error(`Invalid parameter: ${key}`);
+  }
+  return value;
+}
+
 function requireNumber(args: Record<string, unknown>, key: string): number {
   const value = args[key];
   if (typeof value !== 'number') {
@@ -158,7 +166,7 @@ export function createToolHandlers(projectRoot: string): Record<string, McpToolH
   return {
     'register-agent': async (args) => {
       try {
-        const sessionSlug = requireString(args, 'sessionSlug');
+        const sessionSlug = requireSlug(args, 'sessionSlug');
         const name = requireString(args, 'name');
         const type = requireString(args, 'type');
         const startedAt = requireString(args, 'startedAt');
@@ -182,8 +190,8 @@ export function createToolHandlers(projectRoot: string): Record<string, McpToolH
 
     'complete-agent': async (args) => {
       try {
-        const sessionSlug = requireString(args, 'sessionSlug');
-        const agentName = requireString(args, 'agentName');
+        const sessionSlug = requireSlug(args, 'sessionSlug');
+        const agentName = requireSlug(args, 'agentName');
 
         const session = readSession(projectRoot, sessionSlug);
         if (!session) return error(`Session not found: ${sessionSlug}`);
@@ -203,8 +211,8 @@ export function createToolHandlers(projectRoot: string): Record<string, McpToolH
 
     'send-inbox-message': async (args) => {
       try {
-        const sessionSlug = requireString(args, 'sessionSlug');
-        const agentName = requireString(args, 'agentName');
+        const sessionSlug = requireSlug(args, 'sessionSlug');
+        const agentName = requireSlug(args, 'agentName');
         const content = requireString(args, 'content');
         const from = typeof args.from === 'string' ? args.from : 'orchestrator';
 
@@ -226,8 +234,8 @@ export function createToolHandlers(projectRoot: string): Record<string, McpToolH
 
     'check-inbox': async (args) => {
       try {
-        const sessionSlug = requireString(args, 'sessionSlug');
-        const agentName = requireString(args, 'agentName');
+        const sessionSlug = requireSlug(args, 'sessionSlug');
+        const agentName = requireSlug(args, 'agentName');
         const undeliveredOnly = args.undeliveredOnly === true;
 
         const messages = undeliveredOnly
@@ -242,8 +250,8 @@ export function createToolHandlers(projectRoot: string): Record<string, McpToolH
 
     'delete-inbox-message': async (args) => {
       try {
-        const sessionSlug = requireString(args, 'sessionSlug');
-        const agentName = requireString(args, 'agentName');
+        const sessionSlug = requireSlug(args, 'sessionSlug');
+        const agentName = requireSlug(args, 'agentName');
         const messageIndex = requireNumber(args, 'messageIndex');
 
         deleteInboxMessage(projectRoot, sessionSlug, agentName, messageIndex);
@@ -256,7 +264,7 @@ export function createToolHandlers(projectRoot: string): Record<string, McpToolH
 
     'read-session': async (args) => {
       try {
-        const sessionSlug = requireString(args, 'sessionSlug');
+        const sessionSlug = requireSlug(args, 'sessionSlug');
         const session = readSession(projectRoot, sessionSlug);
         if (!session) return error(`Session not found: ${sessionSlug}`);
         return success(session);

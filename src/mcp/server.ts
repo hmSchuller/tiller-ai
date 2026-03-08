@@ -20,10 +20,11 @@ import {
 } from './types.js';
 import { createStdioTransport, type McpTransport } from './transport.js';
 import { createResourceManager, type ResourceManager } from './resources.js';
+import { TILLER_VERSION } from '../scaffold/tiller-manifest.js';
 
 const PROTOCOL_VERSION = '2025-03-26';
 const SERVER_NAME = 'tiller-mcp';
-const SERVER_VERSION = '0.6.0';
+const SERVER_VERSION = TILLER_VERSION;
 
 export class McpServer {
   private readonly tools: McpToolDefinition[];

@@ -19,6 +19,7 @@ interface ParsedUri {
 function parseInboxUri(uri: string): ParsedUri | null {
   const match = uri.match(/^inbox:\/\/([^/]+)\/([^/]+)$/);
   if (!match) return null;
+  if (match[1].includes('..') || match[2].includes('..')) return null;
   return { slug: match[1], agent: match[2] };
 }
 

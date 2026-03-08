@@ -92,6 +92,17 @@ describe('mcp/tools', () => {
       expect(result.isError).toBe(true);
       expect(result.content[0].text).toContain('Missing required parameter');
     });
+
+    it('returns error for path traversal in sessionSlug', async () => {
+      const result = await handlers['register-agent']({
+        sessionSlug: '../../etc',
+        name: 'agent',
+        type: 'fleet',
+        startedAt: new Date().toISOString(),
+      });
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain('Invalid parameter');
+    });
   });
 
   describe('complete-agent', () => {

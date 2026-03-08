@@ -135,6 +135,20 @@ describe('ResourceManager', () => {
 
       expect(() => manager.readResource('bad://uri')).toThrow('Invalid resource URI');
     });
+
+    it('throws for path traversal in slug', () => {
+      tmpRoot = makeTmpDir();
+      manager = createResourceManager(tmpRoot, notifySpy);
+
+      expect(() => manager.readResource('inbox://../agent')).toThrow('Invalid resource URI');
+    });
+
+    it('throws for path traversal in agent', () => {
+      tmpRoot = makeTmpDir();
+      manager = createResourceManager(tmpRoot, notifySpy);
+
+      expect(() => manager.readResource('inbox://sess/..%2Fagent')).toThrow('Invalid resource URI');
+    });
   });
 
   describe('subscribe / unsubscribe', () => {
