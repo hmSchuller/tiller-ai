@@ -29,7 +29,10 @@ npm-debug.log*
 # Tiller — local-only files
 .tiller/local.json
 .tiller/compass.md
-.github/agents/
+.github/agents/bosun.agent.md
+.github/agents/captain.agent.md
+.github/agents/cartographer.agent.md
+.github/agents/quartermaster.agent.md
 .claude/agents/bosun.md
 .claude/agents/captain.md
 .claude/agents/cartographer.md
@@ -38,14 +41,14 @@ npm-debug.log*
 .claude/hooks/post-write.sh
 .claude/hooks/secret-scan.sh
 .claude/hooks/session-resume.sh
-.claude/skills/anchor
-.claude/skills/dock
-.claude/skills/recap
-.claude/skills/repair-hull
-.claude/skills/sail
-.claude/skills/scout
-.claude/skills/setup
-.claude/skills/tech-debt
+.claude/skills/anchor/SKILL.md
+.claude/skills/dock/SKILL.md
+.claude/skills/recap/SKILL.md
+.claude/skills/repair-hull/SKILL.md
+.claude/skills/sail/SKILL.md
+.claude/skills/scout/SKILL.md
+.claude/skills/setup/SKILL.md
+.claude/skills/tech-debt/SKILL.md
 .claude/settings.json
 
 # Tiller
