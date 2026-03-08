@@ -38,13 +38,13 @@ These generators produce the Tiller-managed files for Claude Code, GitHub Copilo
 
 **Path:** `src/mcp/`, `src/commands/mcp-server.ts`
 
-Implements a JSON-RPC 2.0 / Model Context Protocol server (`tiller-ai mcp-server`) that exposes Tiller's session and inbox operations as typed MCP tools and resources so AI agents can communicate without shelling out to Python scripts. `server.ts` owns the protocol handshake and request dispatch; `tools.ts` defines and handles all tool calls (register-agent, complete-agent, send-inbox-message, read-inbox, read/write-compass, list-sessions); `transport.ts` wraps stdio line-by-line framing; `types.ts` carries the full JSON-RPC + MCP type surface. Start with `src/mcp/server.ts`, then `src/mcp/tools.ts`.
+Implements a JSON-RPC 2.0 / Model Context Protocol server (`tiller-ai mcp-server`) that exposes Tiller's session and inbox operations as typed MCP tools and resources so AI agents can communicate without shelling out to Python scripts. `server.ts` owns the protocol handshake and request dispatch; `tools.ts` defines and handles all 10 tool calls (register-agent, complete-agent, send-inbox-message, read-inbox, read/write-compass, list-sessions, and **create-session** — idempotent, path-traversal-safe, derives a slug from a branch name via `branchToSlug`); `transport.ts` wraps stdio line-by-line framing; `types.ts` carries the full JSON-RPC + MCP type surface. Start with `src/mcp/server.ts`, then `src/mcp/tools.ts`.
 
 ### Test Suite
 
 **Path:** `test/`
 
-Vitest covers the CLI, scaffold generators, sessions store, the dashboard’s server/client split, and the MCP server. `test/mcp/server.test.ts`, `test/mcp/tools.test.ts`, and `test/mcp/resources.test.ts` exercise the full MCP protocol surface (tool dispatch, resource reads, JSON-RPC edge cases); `test/commands/mcp-server.test.ts` covers the CLI command entrypoint. `test/scaffold/copilot.test.ts` and `test/scaffold/integration.test.ts` pin Copilot-specific output and regeneration wiring.
+Vitest covers the CLI, scaffold generators, sessions store, the dashboard’s server/client split, and the MCP server. `test/mcp/server.test.ts`, `test/mcp/tools.test.ts`, and `test/mcp/resources.test.ts` exercise the full MCP protocol surface (tool dispatch, resource reads, JSON-RPC edge cases); `tools.test.ts` now asserts 10 tool definitions and includes a `create-session` suite covering happy path, idempotency, missing param, and path-traversal rejection. `test/commands/mcp-server.test.ts` covers the CLI command entrypoint. `test/scaffold/copilot.test.ts` and `test/scaffold/integration.test.ts` pin Copilot-specific output and regeneration wiring.
 
 ### Promotional Website
 
