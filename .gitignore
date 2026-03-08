@@ -29,7 +29,25 @@ npm-debug.log*
 # Tiller — local-only files
 .tiller/local.json
 .tiller/compass.md
-.github/agents/
+.github/copilot-instructions.md
+.github/skills/anchor
+.github/skills/dock
+.github/skills/recap
+.github/skills/repair-hull
+.github/skills/sail
+.github/skills/scout
+.github/skills/setup
+.github/skills/tech-debt
+.github/agents/bosun.agent.md
+.github/agents/captain.agent.md
+.github/agents/cartographer.agent.md
+.github/agents/quartermaster.agent.md
+.github/hooks/hooks.json
+.github/hooks/inbox-check.sh
+.github/hooks/post-write.sh
+.github/hooks/secret-scan.sh
+.github/hooks/session-log.sh
+.github/hooks/session-resume.sh
 .claude/agents/bosun.md
 .claude/agents/captain.md
 .claude/agents/cartographer.md
