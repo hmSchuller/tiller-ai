@@ -4,6 +4,8 @@ import type {
   JsonRpcRequest,
   McpInitializeParams,
   McpInitializeResult,
+  McpResourceReadParams,
+  McpResourceSubscribeParams,
   McpServerCapabilities,
   McpToolCallParams,
   McpToolCallResult,
@@ -17,6 +19,7 @@ import {
   METHOD_NOT_FOUND,
 } from './types.js';
 import { createStdioTransport, type McpTransport } from './transport.js';
+import { createResourceManager, type ResourceManager } from './resources.js';
 
 const PROTOCOL_VERSION = '2025-03-26';
 const SERVER_NAME = 'tiller-mcp';
@@ -27,11 +30,13 @@ export class McpServer {
   private readonly handlers: Map<string, McpToolHandler>;
   private readonly transport: McpTransport;
   private readonly capabilities: McpServerCapabilities;
+  private readonly resourceManager?: ResourceManager;
 
   constructor(
     tools: McpToolDefinition[],
     handlers: Record<string, McpToolHandler>,
     transport?: McpTransport,
+    projectRoot?: string,
   ) {
     this.tools = tools;
     this.handlers = new Map(Object.entries(handlers));
@@ -40,6 +45,12 @@ export class McpServer {
       tools: {},
       resources: { subscribe: true },
     };
+
+    if (projectRoot) {
+      this.resourceManager = createResourceManager(projectRoot, (uri) => {
+        this.sendNotification('notifications/resources/updated', { uri });
+      });
+    }
   }
 
   start(): void {
@@ -48,6 +59,7 @@ export class McpServer {
   }
 
   close(): void {
+    this.resourceManager?.close();
     this.transport.close();
   }
 
@@ -71,6 +83,18 @@ export class McpServer {
         break;
       case 'tools/call':
         this.handleToolCall(request);
+        break;
+      case 'resources/list':
+        this.handleResourcesList(request);
+        break;
+      case 'resources/read':
+        this.handleResourceRead(request);
+        break;
+      case 'resources/subscribe':
+        this.handleResourceSubscribe(request);
+        break;
+      case 'resources/unsubscribe':
+        this.handleResourceUnsubscribe(request);
         break;
       default:
         this.sendError(request.id, METHOD_NOT_FOUND, `Method not found: ${request.method}`);
@@ -120,12 +144,76 @@ export class McpServer {
       });
   }
 
+  private handleResourcesList(request: JsonRpcRequest): void {
+    if (!this.resourceManager) {
+      this.sendResult(request.id, { resources: [] });
+      return;
+    }
+    this.sendResult(request.id, { resources: this.resourceManager.listResources() });
+  }
+
+  private handleResourceRead(request: JsonRpcRequest): void {
+    const params = request.params as McpResourceReadParams | undefined;
+    if (!params?.uri) {
+      this.sendError(request.id, INVALID_PARAMS, 'Missing resource URI');
+      return;
+    }
+    if (!this.resourceManager) {
+      this.sendError(request.id, INVALID_PARAMS, 'Resources not available');
+      return;
+    }
+    try {
+      const contents = this.resourceManager.readResource(params.uri);
+      this.sendResult(request.id, { contents });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Resource read failed';
+      this.sendError(request.id, INVALID_PARAMS, message);
+    }
+  }
+
+  private handleResourceSubscribe(request: JsonRpcRequest): void {
+    const params = request.params as McpResourceSubscribeParams | undefined;
+    if (!params?.uri) {
+      this.sendError(request.id, INVALID_PARAMS, 'Missing resource URI');
+      return;
+    }
+    if (!this.resourceManager) {
+      this.sendError(request.id, INVALID_PARAMS, 'Resources not available');
+      return;
+    }
+    try {
+      this.resourceManager.subscribe(params.uri);
+      this.sendResult(request.id, {});
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Subscribe failed';
+      this.sendError(request.id, INVALID_PARAMS, message);
+    }
+  }
+
+  private handleResourceUnsubscribe(request: JsonRpcRequest): void {
+    const params = request.params as McpResourceSubscribeParams | undefined;
+    if (!params?.uri) {
+      this.sendError(request.id, INVALID_PARAMS, 'Missing resource URI');
+      return;
+    }
+    if (!this.resourceManager) {
+      this.sendError(request.id, INVALID_PARAMS, 'Resources not available');
+      return;
+    }
+    this.resourceManager.unsubscribe(params.uri);
+    this.sendResult(request.id, {});
+  }
+
   private sendResult(id: JsonRpcId, result: unknown): void {
     this.transport.send({ jsonrpc: '2.0', id, result });
   }
 
   private sendError(id: JsonRpcId, code: number, message: string): void {
     this.transport.send({ jsonrpc: '2.0', id, error: { code, message } });
+  }
+
+  private sendNotification(method: string, params: Record<string, unknown>): void {
+    this.transport.send({ jsonrpc: '2.0', method, params } as JsonRpcMessage);
   }
 }
 
@@ -141,6 +229,7 @@ export function createServer(
   tools: McpToolDefinition[],
   handlers: Record<string, McpToolHandler>,
   transport?: McpTransport,
+  projectRoot?: string,
 ): McpServer {
-  return new McpServer(tools, handlers, transport);
+  return new McpServer(tools, handlers, transport, projectRoot);
 }

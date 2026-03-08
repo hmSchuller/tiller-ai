@@ -1,9 +1,13 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { mkdirSync, writeFileSync, rmSync } from 'node:fs';
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 import type {
   JsonRpcMessage,
   JsonRpcSuccessResponse,
   JsonRpcErrorResponse,
   McpInitializeResult,
+  McpResource,
   McpToolDefinition,
   McpToolHandler,
 } from '../../src/mcp/types.js';
@@ -322,6 +326,151 @@ describe('McpServer', () => {
       expect(transport.responses).toHaveLength(3);
       const callResult = (transport.responses[2] as JsonRpcSuccessResponse).result as { content: Array<{ type: string; text: string }> };
       expect(callResult.content[0].text).toBe('ping');
+    });
+  });
+
+  describe('resources/list', () => {
+    let tmpRoot: string;
+
+    afterEach(() => {
+      rmSync(tmpRoot, { recursive: true, force: true });
+    });
+
+    it('returns resources when projectRoot is provided', () => {
+      tmpRoot = join(tmpdir(), `tiller-srv-res-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+      const sessDir = join(tmpRoot, '.tiller', 'sessions', 'test-sess');
+      mkdirSync(sessDir, { recursive: true });
+      writeFileSync(join(sessDir, 'agent-1.inbox.md'), '', 'utf-8');
+
+      const server = createServer([], {}, transport, tmpRoot);
+      server.start();
+
+      transport.inject({ jsonrpc: '2.0', id: 1, method: 'resources/list' });
+
+      expect(transport.responses).toHaveLength(1);
+      const response = transport.responses[0] as JsonRpcSuccessResponse;
+      const result = response.result as { resources: McpResource[] };
+      expect(result.resources).toHaveLength(1);
+      expect(result.resources[0].uri).toBe('inbox://test-sess/agent-1');
+
+      server.close();
+    });
+
+    it('returns empty resources when no projectRoot', () => {
+      tmpRoot = join(tmpdir(), `tiller-srv-noop-${Date.now()}`);
+      mkdirSync(tmpRoot, { recursive: true });
+
+      const server = createServer([], {}, transport);
+      server.start();
+
+      transport.inject({ jsonrpc: '2.0', id: 1, method: 'resources/list' });
+
+      const response = transport.responses[0] as JsonRpcSuccessResponse;
+      const result = response.result as { resources: McpResource[] };
+      expect(result.resources).toEqual([]);
+    });
+  });
+
+  describe('resources/read', () => {
+    let tmpRoot: string;
+
+    afterEach(() => {
+      rmSync(tmpRoot, { recursive: true, force: true });
+    });
+
+    it('returns inbox content for a valid resource', () => {
+      tmpRoot = join(tmpdir(), `tiller-srv-read-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+      const sessDir = join(tmpRoot, '.tiller', 'sessions', 'read-sess');
+      mkdirSync(sessDir, { recursive: true });
+      writeFileSync(join(sessDir, 'session.json'), JSON.stringify({
+        id: 'read-sess', branch: 'read-sess', startedAt: new Date().toISOString(),
+        status: 'active', agents: [],
+      }), 'utf-8');
+      writeFileSync(join(sessDir, 'bot.inbox.md'), [
+        '<!-- TILLER-MSG -->',
+        'timestamp: 2025-01-01T00:00:00Z',
+        'from: orchestrator',
+        'delivered: false',
+        '<!-- /TILLER-MSG-HEAD -->',
+        'Test message',
+        '<!-- /TILLER-MSG -->',
+        '',
+      ].join('\n'), 'utf-8');
+
+      const server = createServer([], {}, transport, tmpRoot);
+      server.start();
+
+      transport.inject({
+        jsonrpc: '2.0', id: 1, method: 'resources/read',
+        params: { uri: 'inbox://read-sess/bot' },
+      });
+
+      const response = transport.responses[0] as JsonRpcSuccessResponse;
+      const result = response.result as { contents: Array<{ uri: string; text: string }> };
+      expect(result.contents).toHaveLength(1);
+      const messages = JSON.parse(result.contents[0].text);
+      expect(messages[0].content).toBe('Test message');
+
+      server.close();
+    });
+
+    it('returns error when URI is missing', () => {
+      tmpRoot = join(tmpdir(), `tiller-srv-noparams-${Date.now()}`);
+      mkdirSync(tmpRoot, { recursive: true });
+
+      const server = createServer([], {}, transport, tmpRoot);
+      server.start();
+
+      transport.inject({ jsonrpc: '2.0', id: 1, method: 'resources/read', params: {} });
+
+      const response = transport.responses[0] as JsonRpcErrorResponse;
+      expect(response.error.code).toBe(INVALID_PARAMS);
+
+      server.close();
+    });
+  });
+
+  describe('resources/subscribe', () => {
+    let tmpRoot: string;
+
+    afterEach(() => {
+      rmSync(tmpRoot, { recursive: true, force: true });
+    });
+
+    it('acknowledges a valid subscription', () => {
+      tmpRoot = join(tmpdir(), `tiller-srv-sub-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+      const sessDir = join(tmpRoot, '.tiller', 'sessions', 'sub-sess');
+      mkdirSync(sessDir, { recursive: true });
+      writeFileSync(join(sessDir, 'agent.inbox.md'), '', 'utf-8');
+
+      const server = createServer([], {}, transport, tmpRoot);
+      server.start();
+
+      transport.inject({
+        jsonrpc: '2.0', id: 1, method: 'resources/subscribe',
+        params: { uri: 'inbox://sub-sess/agent' },
+      });
+
+      const response = transport.responses[0] as JsonRpcSuccessResponse;
+      expect(response.id).toBe(1);
+      expect(response.result).toEqual({});
+
+      server.close();
+    });
+
+    it('returns error when URI is missing', () => {
+      tmpRoot = join(tmpdir(), `tiller-srv-sub-err-${Date.now()}`);
+      mkdirSync(tmpRoot, { recursive: true });
+
+      const server = createServer([], {}, transport, tmpRoot);
+      server.start();
+
+      transport.inject({ jsonrpc: '2.0', id: 1, method: 'resources/subscribe', params: {} });
+
+      const response = transport.responses[0] as JsonRpcErrorResponse;
+      expect(response.error.code).toBe(INVALID_PARAMS);
+
+      server.close();
     });
   });
 });

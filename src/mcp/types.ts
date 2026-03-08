@@ -120,3 +120,34 @@ export interface McpToolCallResult {
 export type McpToolHandler = (
   args: Record<string, unknown>,
 ) => Promise<McpToolCallResult>;
+
+// MCP resource types
+
+export interface McpResource {
+  uri: string;
+  name: string;
+  description?: string;
+  mimeType?: string;
+}
+
+export interface McpResourceContent {
+  uri: string;
+  mimeType?: string;
+  text?: string;
+}
+
+export interface McpResourcesListResult {
+  resources: McpResource[];
+}
+
+export interface McpResourceReadParams {
+  uri: string;
+}
+
+export interface McpResourceReadResult {
+  contents: McpResourceContent[];
+}
+
+export interface McpResourceSubscribeParams {
+  uri: string;
+}
