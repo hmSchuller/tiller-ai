@@ -17,6 +17,7 @@ import {
   readInbox,
   readLog,
   readSession,
+  markAgentCompleted,
   appendInboxMessage,
   deleteInboxMessage,
 } from '../../sessions/fs.js';
@@ -174,6 +175,10 @@ function getRequestIssue(message: string, reason = 'invalid-request'): Dashboard
   return { scope: 'request', reason, message };
 }
 
+function hasInvalidPathSegment(value: string): boolean {
+  return value.includes('..');
+}
+
 async function readRequestBody(req: IncomingMessage): Promise<unknown> {
   let body = '';
 
@@ -263,6 +268,22 @@ async function handleSaveRequest(cwd: string, payload: unknown): Promise<{ statu
   }
 
   return { statusCode: 200, body: toStateResponse(await readConfig(cwd)) };
+}
+
+function handleAgentCompleteRequest(cwd: string, slug: string, agentName: string): { statusCode: number; body: unknown } {
+  try {
+    markAgentCompleted(cwd, slug, agentName);
+    return { statusCode: 200, body: { ok: true } };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to complete agent.';
+    if (message === `Session not found: ${slug}`) {
+      return { statusCode: 404, body: { error: 'Session not found' } };
+    }
+    if (message === `Agent not found: ${agentName}`) {
+      return { statusCode: 404, body: { error: 'Agent not found' } };
+    }
+    return { statusCode: 400, body: { ok: false, error: getRequestIssue(message) } };
+  }
 }
 
 async function readDistAsset(assetPath: string): Promise<Buffer> {
@@ -363,7 +384,7 @@ export function createDashboardRequestHandler(cwd: string) {
       const sessionDetailMatch = req.method === 'GET' && requestUrl.pathname.match(/^\/api\/sessions\/([^/]+)$/);
       if (sessionDetailMatch) {
         const slug = decodeURIComponent(sessionDetailMatch[1]);
-        if (slug.includes('..')) {
+        if (hasInvalidPathSegment(slug)) {
           sendJson(res, 400, { ok: false, error: getRequestIssue('Invalid path segment.') });
           return;
         }
@@ -397,7 +418,7 @@ export function createDashboardRequestHandler(cwd: string) {
         const slug = decodeURIComponent(inboxPostMatch[1]);
         const agentName = decodeURIComponent(inboxPostMatch[2]);
 
-        if (slug.includes('..') || agentName.includes('..')) {
+        if (hasInvalidPathSegment(slug) || hasInvalidPathSegment(agentName)) {
           sendJson(res, 400, { ok: false, error: getRequestIssue('Invalid path segment.') });
           return;
         }
@@ -432,18 +453,34 @@ export function createDashboardRequestHandler(cwd: string) {
         return;
       }
 
+      const agentCompleteMatch =
+        req.method === 'POST' && requestUrl.pathname.match(/^\/api\/sessions\/([^/]+)\/agents\/([^/]+)\/complete$/);
+      if (agentCompleteMatch) {
+        const slug = decodeURIComponent(agentCompleteMatch[1]);
+        const agentName = decodeURIComponent(agentCompleteMatch[2]);
+
+        if (hasInvalidPathSegment(slug) || hasInvalidPathSegment(agentName)) {
+          sendJson(res, 400, { ok: false, error: getRequestIssue('Invalid path segment.') });
+          return;
+        }
+
+        const response = handleAgentCompleteRequest(cwd, slug, agentName);
+        sendJson(res, response.statusCode, response.body);
+        return;
+      }
+
       const inboxDeleteMatch = req.method === 'DELETE' && requestUrl.pathname.match(/^\/api\/sessions\/([^/]+)\/inbox\/([^/]+)\/(\d+)$/);
       if (inboxDeleteMatch) {
         const slug = decodeURIComponent(inboxDeleteMatch[1]);
         const agentName = decodeURIComponent(inboxDeleteMatch[2]);
         const messageIndex = parseInt(inboxDeleteMatch[3], 10);
 
-        if (slug.includes('..')) {
+        if (hasInvalidPathSegment(slug)) {
           sendJson(res, 400, { ok: false, error: getRequestIssue('Invalid path segment.') });
           return;
         }
 
-        if (agentName.includes('..') || agentName.includes('/')) {
+        if (hasInvalidPathSegment(agentName) || agentName.includes('/')) {
           sendJson(res, 400, { ok: false, error: getRequestIssue('Invalid agent name.') });
           return;
         }

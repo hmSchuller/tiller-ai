@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { generateTillerManifest, TILLER_VERSION } from '../../src/scaffold/tiller-manifest.js';
 import type { ToolTarget } from '../../src/scaffold/types.js';
 import { dashboardCommand, startDashboardServer } from '../../src/commands/dashboard.js';
-import { createSession, registerAgent } from '../../src/sessions/fs.js';
+import { createSession, readSession, registerAgent } from '../../src/sessions/fs.js';
 
 async function setupProject(
   tmpDir: string,
@@ -462,6 +462,151 @@ describe('dashboard server', () => {
 
     expect(response.status).toBe(404);
     expect(payload).toEqual({ error: 'Session not found' });
+  });
+
+  it('POST /api/sessions/:slug/agents/:agent/complete marks an active agent as completed', async () => {
+    await setupProject(tmpDir);
+    const session = createSession(tmpDir, 'feature/manual-complete');
+    registerAgent(tmpDir, session.id, {
+      name: 'worker-2',
+      type: 'fleet',
+      status: 'active',
+      startedAt: '2026-03-06T18:05:00.000Z',
+    });
+
+    const server = await startDashboardServer(tmpDir);
+    servers.push(server);
+
+    const response = await fetch(`${server.url}/api/sessions/${session.id}/agents/worker-2/complete`, {
+      method: 'POST',
+    });
+    const payload = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(payload).toEqual({ ok: true });
+
+    const persisted = readSession(tmpDir, session.id);
+    expect(persisted?.agents[0]).toMatchObject({
+      name: 'worker-2',
+      status: 'completed',
+    });
+    expect(persisted?.agents[0].completedAt).toEqual(expect.any(String));
+
+    const detailResponse = await fetch(`${server.url}/api/sessions/${session.id}`);
+    const detail = await detailResponse.json();
+    expect(detail.agents).toContainEqual(
+      expect.objectContaining({
+        name: 'worker-2',
+        status: 'completed',
+        completedAt: expect.any(String),
+      }),
+    );
+  });
+
+  it('POST /api/sessions/:slug/agents/:agent/complete returns 404 for a missing session', async () => {
+    await setupProject(tmpDir);
+
+    const server = await startDashboardServer(tmpDir);
+    servers.push(server);
+
+    const response = await fetch(`${server.url}/api/sessions/nonexistent/agents/worker-2/complete`, {
+      method: 'POST',
+    });
+    const payload = await response.json();
+
+    expect(response.status).toBe(404);
+    expect(payload).toEqual({ error: 'Session not found' });
+  });
+
+  it('POST /api/sessions/:slug/agents/:agent/complete returns 404 for an unknown agent', async () => {
+    await setupProject(tmpDir);
+    createSession(tmpDir, 'feature/manual-complete');
+
+    const server = await startDashboardServer(tmpDir);
+    servers.push(server);
+
+    const response = await fetch(`${server.url}/api/sessions/feature-manual-complete/agents/worker-2/complete`, {
+      method: 'POST',
+    });
+    const payload = await response.json();
+
+    expect(response.status).toBe(404);
+    expect(payload).toEqual({ error: 'Agent not found' });
+  });
+
+  it('POST /api/sessions/:slug/agents/:agent/complete rejects non-active agents with a request error', async () => {
+    await setupProject(tmpDir);
+    const session = createSession(tmpDir, 'feature/already-complete');
+    registerAgent(tmpDir, session.id, {
+      name: 'worker-2',
+      type: 'fleet',
+      status: 'completed',
+      startedAt: '2026-03-06T18:05:00.000Z',
+      completedAt: '2026-03-06T18:45:00.000Z',
+    });
+
+    const server = await startDashboardServer(tmpDir);
+    servers.push(server);
+
+    const response = await fetch(`${server.url}/api/sessions/${session.id}/agents/worker-2/complete`, {
+      method: 'POST',
+    });
+    const payload = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(payload).toMatchObject({
+      ok: false,
+      error: {
+        scope: 'request',
+        reason: 'invalid-request',
+        message: 'Agent is not active: worker-2',
+      },
+    });
+  });
+
+  it('POST /api/sessions/:slug/agents/:agent/complete rejects path traversal in the session slug', async () => {
+    await setupProject(tmpDir);
+
+    const server = await startDashboardServer(tmpDir);
+    servers.push(server);
+
+    const response = await fetch(
+      `${server.url}/api/sessions/${encodeURIComponent('../../evil')}/agents/worker-2/complete`,
+      { method: 'POST' },
+    );
+    const payload = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(payload).toMatchObject({
+      ok: false,
+      error: {
+        scope: 'request',
+        message: 'Invalid path segment.',
+      },
+    });
+  });
+
+  it('POST /api/sessions/:slug/agents/:agent/complete rejects path traversal in the agent name', async () => {
+    await setupProject(tmpDir);
+    createSession(tmpDir, 'feature/manual-complete');
+
+    const server = await startDashboardServer(tmpDir);
+    servers.push(server);
+
+    const response = await fetch(
+      `${server.url}/api/sessions/feature-manual-complete/agents/${encodeURIComponent('../../evil')}/complete`,
+      { method: 'POST' },
+    );
+    const payload = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(payload).toMatchObject({
+      ok: false,
+      error: {
+        scope: 'request',
+        message: 'Invalid path segment.',
+      },
+    });
   });
 
   it('POST /api/sessions/:slug/inbox/:agent sends a message', async () => {
