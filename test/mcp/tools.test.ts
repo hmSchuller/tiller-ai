@@ -20,9 +20,9 @@ describe('mcp/tools', () => {
   });
 
   describe('createToolDefinitions', () => {
-    it('returns all 9 tool definitions', () => {
+    it('returns all 10 tool definitions', () => {
       const tools = createToolDefinitions();
-      expect(tools).toHaveLength(9);
+      expect(tools).toHaveLength(10);
       const names = tools.map((t) => t.name);
       expect(names).toEqual([
         'register-agent',
@@ -34,6 +34,7 @@ describe('mcp/tools', () => {
         'list-sessions',
         'read-compass',
         'update-compass',
+        'create-session',
       ]);
     });
 
@@ -475,6 +476,39 @@ describe('mcp/tools', () => {
       const result = await handlers['update-compass']({});
       expect(result.isError).toBe(true);
       expect(result.content[0].text).toContain('Missing required parameter');
+    });
+  });
+
+  describe('create-session', () => {
+    it('creates a new session and returns the full session object', async () => {
+      const result = await handlers['create-session']({ branch: 'feature/new-thing' });
+      expect(result.isError).toBeUndefined();
+      const data = JSON.parse(result.content[0].text);
+      expect(data.id).toBe('feature-new-thing');
+      expect(data.branch).toBe('feature/new-thing');
+      expect(data.status).toBe('active');
+      expect(Array.isArray(data.agents)).toBe(true);
+    });
+
+    it('is idempotent — returns existing session if it already exists', async () => {
+      const session = createSession(tmpDir, 'feature/idempotent');
+      const result = await handlers['create-session']({ branch: 'feature/idempotent' });
+      expect(result.isError).toBeUndefined();
+      const data = JSON.parse(result.content[0].text);
+      expect(data.id).toBe(session.id);
+      expect(data.startedAt).toBe(session.startedAt);
+    });
+
+    it('returns error for missing branch param', async () => {
+      const result = await handlers['create-session']({});
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain('Missing required parameter');
+    });
+
+    it('returns error for path traversal in branch', async () => {
+      const result = await handlers['create-session']({ branch: '../../etc/passwd' });
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain('Invalid parameter');
     });
   });
 });

@@ -14,6 +14,8 @@ import {
   readInbox,
   getUndeliveredMessages,
   deleteInboxMessage,
+  createSession,
+  branchToSlug,
 } from '../sessions/fs.js';
 
 function success(data: unknown): McpToolCallResult {
@@ -159,6 +161,17 @@ export function createToolDefinitions(): McpToolDefinition[] {
         required: ['content'],
       },
     },
+    {
+      name: 'create-session',
+      description: 'Create a new session (idempotent — returns existing session if it already exists)',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          branch: { type: 'string', description: 'Branch name (e.g. feature/my-thing); slug is derived automatically' },
+        },
+        required: ['branch'],
+      },
+    },
   ];
 }
 
@@ -300,6 +313,22 @@ export function createToolHandlers(projectRoot: string): Record<string, McpToolH
         mkdirSync(dirname(compassPath), { recursive: true });
         writeFileSync(compassPath, content, 'utf-8');
         return success({ ok: true });
+      } catch (err) {
+        return error(err instanceof Error ? err.message : 'Unknown error');
+      }
+    },
+
+    'create-session': async (args) => {
+      try {
+        const branch = requireString(args, 'branch');
+        const slug = branchToSlug(branch);
+        if (slug.includes('..')) return error('Invalid parameter: branch');
+
+        const existing = readSession(projectRoot, slug);
+        if (existing) return success(existing);
+
+        const session = createSession(projectRoot, branch);
+        return success(session);
       } catch (err) {
         return error(err instanceof Error ? err.message : 'Unknown error');
       }
