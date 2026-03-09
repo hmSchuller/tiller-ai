@@ -137,8 +137,9 @@ export function DashboardApp() {
   const fetchSessions = useCallback(async (): Promise<void> => {
     try {
       const response = await fetch('/api/sessions', { cache: 'no-store' });
-      const sessions = (await response.json()) as SessionSummary[];
-      setAppState((current) => setSessions(current, sessions));
+      const data = (await response.json()) as unknown;
+      if (!Array.isArray(data)) return;
+      setAppState((current) => setSessions(current, data as SessionSummary[]));
     } catch {
       // Silently ignore polling errors
     }
@@ -147,6 +148,7 @@ export function DashboardApp() {
   const fetchSessionDetail = useCallback(async (slug: string): Promise<void> => {
     try {
       const response = await fetch(`/api/sessions/${encodeURIComponent(slug)}`, { cache: 'no-store' });
+      if (!response.ok) return;
       const detail = (await response.json()) as SessionDetailResponse;
       setAppState((current) => selectSession(current, detail));
     } catch {

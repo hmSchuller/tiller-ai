@@ -105,7 +105,7 @@ describe('McpServer', () => {
       const result = response.result as McpInitializeResult;
       expect(result.protocolVersion).toBe('2025-03-26');
       expect(result.serverInfo.name).toBe('tiller-mcp');
-      expect(result.serverInfo.version).toBe('0.6.0');
+      expect(result.serverInfo.version).toBe('0.7.0');
       expect(result.capabilities.tools).toEqual({});
       expect(result.capabilities.resources).toEqual({ subscribe: true });
     });

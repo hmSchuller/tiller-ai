@@ -2,6 +2,7 @@
 
 > Shared project history. Updated by /sail, /anchor, and /dock. Committed and shared.
 
+- [2026-03-09] bumped version to 0.7.0
 ## Done
 - [2026-03-09] docked feature/mcp-session-creation
 - [2026-03-09] feat: use tiller-create-session MCP for session creation in sail skills — replace manual bash session.json creation with MCP-first (tiller-create-session + tiller-register-agent with lead type), fix isAgentRecord guard and schema enum to accept lead type
