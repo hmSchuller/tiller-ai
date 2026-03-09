@@ -3,6 +3,7 @@
 > Shared project history. Updated by /sail, /anchor, and /dock. Committed and shared.
 
 ## Done
+- [2026-03-09] docs: reframe Tiller as companion framework for AI coding assistants — equal-billing README for Copilot CLI + Claude Code, tool support maturity table, MCP server section with all 10 tools, dual scaffold file trees, /cookbook in skills, delete website/ and deploy workflow
 - [2026-03-08] docked feature/create-session-mcp-tool
 - [2026-03-08] docked feature/mcp-server-for-agent-communication
 - [2026-03-08] feat: custom MCP server for agent communication — stdio JSON-RPC transport, 9 tools (agent lifecycle, inbox, sessions, compass), resource subscriptions with file-watch notifications, CLI mcp-server command, .vscode/mcp.json auto-config, MCP-first skill prompts with Python fallback
