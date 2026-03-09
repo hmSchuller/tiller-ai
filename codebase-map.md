@@ -46,8 +46,3 @@ Implements a JSON-RPC 2.0 / Model Context Protocol server (`tiller-ai mcp-server
 
 Vitest covers the CLI, scaffold generators, sessions store, the dashboard’s server/client split, and the MCP server. `test/mcp/server.test.ts`, `test/mcp/tools.test.ts`, and `test/mcp/resources.test.ts` exercise the full MCP protocol surface (tool dispatch, resource reads, JSON-RPC edge cases); `tools.test.ts` now asserts 10 tool definitions and includes a `create-session` suite covering happy path, idempotency, missing param, and path-traversal rejection. `test/commands/mcp-server.test.ts` covers the CLI command entrypoint. `test/scaffold/copilot.test.ts` and `test/scaffold/integration.test.ts` pin Copilot-specific output and regeneration wiring.
 
-### Promotional Website
-
-**Path:** `website/`
-
-The Astro website is separate from the npm package and exists for project marketing. Work here is mostly content and landing-page composition, so start in `website/src/components/` when updating the public-facing site.
