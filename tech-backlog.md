@@ -10,6 +10,8 @@
 
 ## Done
 
+- [done 2026-03-08] src/commands/config-shared.ts: `arraysEqual` was resorting `[...b]` on every iteration of `every` (O(n² log n)); hoisted both sorts outside the loop for clarity and efficiency
+
 - [done 2026-03-08] src/sessions/fs.ts: `readSession()` no longer trusts parsed `session.json` via `as Session`; it now validates the runtime shape before returning session data
 - [done 2026-03-06] src/scaffold/hooks/plan-context.ts: plan-context hook now loads the detailed Step 3 plan template from the generated Claude sail skill at runtime, with an inline fallback, so the hook no longer depends on a fully duplicated sail template staying in sync by hand
 - [done 2026-03-04] src/scaffold/skills/setup.ts: Step 4 heading referred to `.tiller.json` (old filename) in both SIMPLE and DETAILED branches — corrected to `.tiller/tiller.json` to match the actual path
