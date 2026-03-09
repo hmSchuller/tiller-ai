@@ -3,6 +3,7 @@
 > Shared project history. Updated by /sail, /anchor, and /dock. Committed and shared.
 
 ## Done
+- [2026-03-08] docked feature/create-session-mcp-tool
 - [2026-03-08] docked feature/mcp-server-for-agent-communication
 - [2026-03-08] feat: custom MCP server for agent communication — stdio JSON-RPC transport, 9 tools (agent lifecycle, inbox, sessions, compass), resource subscriptions with file-watch notifications, CLI mcp-server command, .vscode/mcp.json auto-config, MCP-first skill prompts with Python fallback
 - [2026-03-08] docked feature/dock-loop-and-sail-prompt
