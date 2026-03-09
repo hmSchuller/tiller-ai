@@ -3,6 +3,7 @@
 > Shared project history. Updated by /sail, /anchor, and /dock. Committed and shared.
 
 ## Done
+- [2026-03-09] docked feature/readme-website-copilot-pivot
 - [2026-03-09] docs: reframe Tiller as companion framework for AI coding assistants — equal-billing README for Copilot CLI + Claude Code, tool support maturity table, MCP server section with all 10 tools, dual scaffold file trees, /cookbook in skills, delete website/ and deploy workflow
 - [2026-03-08] docked feature/create-session-mcp-tool
 - [2026-03-08] docked feature/mcp-server-for-agent-communication
