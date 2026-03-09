@@ -3,6 +3,7 @@
 > Shared project history. Updated by /sail, /anchor, and /dock. Committed and shared.
 
 ## Done
+- [2026-03-09] docked feature/mcp-session-creation
 - [2026-03-09] feat: use tiller-create-session MCP for session creation in sail skills — replace manual bash session.json creation with MCP-first (tiller-create-session + tiller-register-agent with lead type), fix isAgentRecord guard and schema enum to accept lead type
 - [2026-03-09] docked feature/readme-website-copilot-pivot
 - [2026-03-09] docs: reframe Tiller as companion framework for AI coding assistants — equal-billing README for Copilot CLI + Claude Code, tool support maturity table, MCP server section with all 10 tools, dual scaffold file trees, /cookbook in skills, delete website/ and deploy workflow
