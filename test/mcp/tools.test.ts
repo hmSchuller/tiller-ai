@@ -63,6 +63,21 @@ describe('mcp/tools', () => {
       expect(data.agent).toBe('quartermaster');
     });
 
+    it('accepts lead type for sail-lead registration', async () => {
+      createSession(tmpDir, 'feature/lead-test');
+      const result = await handlers['register-agent']({
+        sessionSlug: 'feature-lead-test',
+        name: 'sail-lead',
+        type: 'lead',
+        startedAt: '2026-01-01T00:00:00Z',
+      });
+
+      expect(result.isError).toBeUndefined();
+      const data = JSON.parse(result.content[0].text);
+      expect(data.ok).toBe(true);
+      expect(data.agent).toBe('sail-lead');
+    });
+
     it('returns error for missing session', async () => {
       const result = await handlers['register-agent']({
         sessionSlug: 'nonexistent',

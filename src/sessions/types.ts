@@ -8,7 +8,7 @@ export interface Session {
 
 export interface AgentRecord {
   name: string;
-  type: 'fleet' | 'specialist' | 'ephemeral';
+  type: 'fleet' | 'specialist' | 'ephemeral' | 'lead';
   status: 'active' | 'completed' | 'failed';
   startedAt: string;
   completedAt?: string;
