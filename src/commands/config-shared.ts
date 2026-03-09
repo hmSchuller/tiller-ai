@@ -65,7 +65,10 @@ function getLocalManagedFiles(manifest: TillerManifest, local: Record<string, un
 
 /** Order-insensitive array equality for string arrays. */
 export function arraysEqual(a: string[], b: string[]): boolean {
-  return a.length === b.length && [...a].sort().every((v, i) => v === [...b].sort()[i]);
+  if (a.length !== b.length) return false;
+  const sortedA = [...a].sort();
+  const sortedB = [...b].sort();
+  return sortedA.every((v, i) => v === sortedB[i]);
 }
 
 /**
