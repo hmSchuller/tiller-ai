@@ -158,6 +158,23 @@ describe('sessions/fs', () => {
       expect(existsSync(join(dir, 'quartermaster.log.md'))).toBe(true);
     });
 
+    it('accepts lead type for sail-lead agent', () => {
+      createSession(tmpDir, 'feature/lead-test');
+      const agent: AgentRecord = {
+        name: 'sail-lead',
+        type: 'lead',
+        status: 'active',
+        startedAt: new Date().toISOString(),
+      };
+
+      registerAgent(tmpDir, 'feature-lead-test', agent);
+
+      const session = readSession(tmpDir, 'feature-lead-test');
+      expect(session!.agents).toHaveLength(1);
+      expect(session!.agents[0].name).toBe('sail-lead');
+      expect(session!.agents[0].type).toBe('lead');
+    });
+
     it('throws for missing session', () => {
       const agent: AgentRecord = {
         name: 'test',

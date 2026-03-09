@@ -59,13 +59,21 @@ Save the returned task IDs for later \`TaskUpdate\` calls. Proceed immediately �
 After branch routing (Step 2) determines the branch name, create or reuse a session folder for this sail:
 
 1. Derive the session slug from the branch name by replacing \`/\` with \`-\` (e.g. \`feature/my-thing\` → \`feature-my-thing\`)
-2. Check if \`.tiller/sessions/<slug>/session.json\` already exists:
-   - **If it exists** (resuming a previous sail): read the existing session and continue. Do not overwrite it.
-   - **If it does not exist**: create the session folder and metadata (include sail-lead in agents):
-     \`\`\`bash
+2. Create or reuse the session:
+
+   **Preferred — MCP tools:**
+   - Use \`tiller/create-session\` with \`{ "branch": "<branch>" }\` — idempotent, returns the existing session if already present
+   - If the returned session has no agents (new session): use \`tiller/register-agent\` with \`{ "sessionSlug": "<slug>", "name": "sail-lead", "type": "lead", "startedAt": "<ISO timestamp>" }\`
+   - If resuming (agents already present): skip registration — sail-lead is already in the session
+
+   **Fallback — bash (if MCP unavailable):**
+   \`\`\`bash
+   if [ ! -f ".tiller/sessions/<slug>/session.json" ]; then
      mkdir -p .tiller/sessions/<slug> && echo '{"id":"<slug>","branch":"<branch>","startedAt":"<ISO-timestamp>","status":"active","agents":[{"name":"sail-lead","type":"lead","status":"active","startedAt":"<ISO-timestamp>"}]}' > .tiller/sessions/<slug>/session.json
-     echo "sail-lead" > .tiller/sessions/<slug>/current-agent
-     \`\`\`
+   fi
+   \`\`\`
+
+3. Write the current-agent file: \`echo "sail-lead" > .tiller/sessions/<slug>/current-agent\`
 4. Print: "Dashboard: http://localhost:19850 (run \`tiller-ai dashboard\` in another terminal to view session)"
 
 ## Step 1: Orient

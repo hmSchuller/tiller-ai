@@ -408,8 +408,26 @@ describe('generateSailSkill', () => {
 
   it('reuses existing session folder when resuming', () => {
     const result = generateSailSkill(simpleConfig);
-    expect(result).toContain('resuming a previous sail');
-    expect(result).toContain('Do not overwrite');
+    expect(result).toContain('If resuming (agents already present)');
+    expect(result).toContain('sail-lead is already in the session');
+  });
+
+  it('uses MCP create-session as preferred method', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('tiller/create-session');
+    expect(result).toContain('idempotent');
+  });
+
+  it('registers sail-lead with lead type via MCP after session creation', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('tiller/register-agent');
+    expect(result).toContain('"type": "lead"');
+  });
+
+  it('includes bash fallback for session creation', () => {
+    const result = generateSailSkill(simpleConfig);
+    expect(result).toContain('Fallback — bash (if MCP unavailable)');
+    expect(result).toContain('mkdir -p .tiller/sessions/');
   });
 });
 

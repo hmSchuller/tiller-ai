@@ -15,7 +15,7 @@ function isAgentRecord(value: unknown): value is AgentRecord {
   const candidate = value as Record<string, unknown>;
   return (
     typeof candidate.name === 'string' &&
-    (candidate.type === 'fleet' || candidate.type === 'specialist' || candidate.type === 'ephemeral') &&
+    (candidate.type === 'fleet' || candidate.type === 'specialist' || candidate.type === 'ephemeral' || candidate.type === 'lead') &&
     (candidate.status === 'active' || candidate.status === 'completed' || candidate.status === 'failed') &&
     typeof candidate.startedAt === 'string' &&
     (candidate.completedAt === undefined || typeof candidate.completedAt === 'string')

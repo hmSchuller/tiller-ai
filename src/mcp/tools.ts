@@ -65,7 +65,7 @@ export function createToolDefinitions(): McpToolDefinition[] {
         properties: {
           sessionSlug: { type: 'string', description: 'Session slug identifier' },
           name: { type: 'string', description: 'Agent name' },
-          type: { type: 'string', enum: ['fleet', 'specialist', 'ephemeral'], description: 'Agent type' },
+          type: { type: 'string', enum: ['fleet', 'specialist', 'ephemeral', 'lead'], description: 'Agent type' },
           startedAt: { type: 'string', description: 'ISO 8601 start timestamp' },
         },
         required: ['sessionSlug', 'name', 'type', 'startedAt'],
@@ -184,7 +184,7 @@ export function createToolHandlers(projectRoot: string): Record<string, McpToolH
         const type = requireString(args, 'type');
         const startedAt = requireString(args, 'startedAt');
 
-        if (type !== 'fleet' && type !== 'specialist' && type !== 'ephemeral') {
+        if (type !== 'fleet' && type !== 'specialist' && type !== 'ephemeral' && type !== 'lead') {
           return error(`Invalid agent type: ${type}`);
         }
 

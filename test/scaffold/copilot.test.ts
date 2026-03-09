@@ -209,6 +209,31 @@ describe('generateCopilotSailSkill', () => {
     expect(result).toContain('does NOT implement any code itself');
     expect(result).toContain('pure orchestrator');
   });
+
+  it('uses tiller/create-session MCP as preferred session creation method', () => {
+    const result = generateCopilotSailSkill(simpleConfig);
+    expect(result).toContain('tiller/create-session');
+    expect(result).toContain('idempotent');
+  });
+
+  it('registers sail-lead with lead type via tiller/register-agent', () => {
+    const result = generateCopilotSailSkill(simpleConfig);
+    expect(result).toContain('tiller/register-agent');
+    expect(result).toContain('"type": "lead"');
+    expect(result).toContain('sail-lead');
+  });
+
+  it('includes bash fallback for session creation', () => {
+    const result = generateCopilotSailSkill(simpleConfig);
+    expect(result).toContain('Fallback — bash (if MCP unavailable)');
+    expect(result).toContain('mkdir -p .tiller/sessions/');
+  });
+
+  it('handles resuming session without re-registering sail-lead', () => {
+    const result = generateCopilotSailSkill(simpleConfig);
+    expect(result).toContain('If resuming (agents already present)');
+    expect(result).toContain('sail-lead is already in the session');
+  });
 });
 
 describe('generateCopilotDockSkill', () => {
